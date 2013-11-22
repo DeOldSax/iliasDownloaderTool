@@ -84,7 +84,8 @@ public class IliasPdfFinder {
 				List<Element> directory = openFolder(kurs);
 				for (Element dir : directory) {
 					final boolean dirIstPdfFile = dir.attr("href").contains("cmd=sendfile");
-					final boolean linkToFolder = dir.attr("href").contains("goto_produktiv_fold_");
+					final boolean linkToFolder = dir.attr("href").contains("goto_produktiv_fold_")
+							|| dir.attr("href").contains("goto_produktiv_grp_") || dir.attr("href").contains("goto_produktiv_frm_");
 					if (dirIstPdfFile) {
 						dir.setBaseUri("https://ilias.studium.kit.edu/");
 						final double size = new IliasConnector().requestHead(dir.attr("abs:href"));
