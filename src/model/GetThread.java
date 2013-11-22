@@ -1,7 +1,3 @@
-/**
- * wichtiger Hinweis: dieser Thread bearbeitet genau eine PDF!!
- */
-
 package model;
 
 import iliasWorker.Ilias;

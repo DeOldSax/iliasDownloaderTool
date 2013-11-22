@@ -1,6 +1,6 @@
 package iliasWorker;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import model.Adresse;
@@ -11,14 +11,13 @@ import org.jsoup.nodes.Element;
 
 public class IliasCourseFinder {
 	/**
-	 * saves all coursenames and urls from startpage in LinkedList
-	 * kurse<Adresse>
+	 * saves all coursenames and urls from startpage in List kurse<Adresse>
 	 * 
 	 * @param html
 	 *            startPage
 	 */
 	public List<Adresse> getKurse(String html) {
-		List<Adresse> kurse = new LinkedList<Adresse>();
+		List<Adresse> kurse = new ArrayList<Adresse>();
 		String s = null;
 		Document doc = Jsoup.parse(html);
 		List<Element> temp = doc.select("h4");

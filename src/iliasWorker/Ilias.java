@@ -1,11 +1,3 @@
-/**
- * Tools for Ilias!
- * 
- * @author David Englert
- * @version 27.07.2013
- *  
- */
-
 package iliasWorker;
 
 import java.io.IOException;

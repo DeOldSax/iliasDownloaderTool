@@ -7,23 +7,15 @@ import java.util.List;
 import java.util.Vector;
 
 import model.Adresse;
-import view.DownloaderToolWindow;
 
 public class PdfDownloader implements ActionListener {
 
-	private DownloaderToolWindow window;
 	private final Vector<String> adresseList;
 	public final List<Adresse> allPdf;
 
 	public PdfDownloader() {
 		adresseList = new Vector<String>();
 		allPdf = new ArrayList<Adresse>();
-	}
-
-	public PdfDownloader(Vector<String> adresseList, List<Adresse> allPdf, DownloaderToolWindow window) {
-		this.adresseList = adresseList;
-		this.allPdf = allPdf;
-		this.window = window;
 	}
 
 	public void download(Adresse adresse) {
