@@ -2,6 +2,7 @@ package iliasWorker;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import model.Adresse;
 
@@ -16,47 +17,22 @@ public class IliasPdfFinder {
 	private final List<Adresse> allPdfs;
 	private final List<Adresse> allDirs;
 	private final LoginLoader loginLoader;
+	public AtomicInteger threadCount;
 
 	public IliasPdfFinder(LoginLoader loginLoader) {
 		this.loginLoader = loginLoader;
 		allPdfs = new LinkedList<Adresse>();
 		allDirs = new LinkedList<Adresse>();
+		threadCount = new AtomicInteger(0);
 	}
 
-	public List<Adresse> findAllPdfs(List<Adresse> kurse) {
-		for (Adresse kurs : kurse) {
-			showInGui(kurs);
-			List<Element> directory = openFolder(kurs);
-			for (Element dir : directory) {
-				final boolean dirIstPdfFile = dir.attr("href").contains("cmd=sendfile");
-				if (dirIstPdfFile) {
-					dir.setBaseUri("https://ilias.studium.kit.edu/");
-					final double size = new IliasConnector().requestHead(dir.attr("abs:href"));
-					Adresse newPdfFile = createAdresse(kurs, dir, false, true, size);
-					allPdfs.add(newPdfFile);
+	public void findAllPdfs(List<Adresse> kurse) {
+		startScanner(kurse);
+	}
 
-					List<Element> elemse = dir.parent().parent().siblingElements().select("div").select("span");
-					for (Element el : elemse) {
-						final boolean istUngelesen = el.attr("class").contains("il_ItemAlertProperty");
-						if (istUngelesen) {
-							newPdfFile.setGelesen(false);
-						}
-					}
-				}
-
-				final boolean linkToFolder = dir.attr("href").contains("goto_produktiv_fold_");
-				if (linkToFolder) {
-					LinkedList<Adresse> tempo = new LinkedList<Adresse>();
-					Adresse newFolder = createAdresse(kurs, dir, true, false, 0.0);
-					tempo.add(newFolder);
-					allDirs.add(newFolder);
-					// System.out.println("nächster Ordner: " +
-					// newFolder.getName());
-					findAllPdfs(tempo);
-				}
-			}
-		}
-		return allPdfs;
+	private void startScanner(List<Adresse> kurse) {
+		threadCount.incrementAndGet();
+		new Thread(new GetterThread(this, kurse)).start();
 	}
 
 	private void showInGui(Adresse kurs) {
@@ -93,4 +69,46 @@ public class IliasPdfFinder {
 		return allDirs;
 	}
 
+	private class GetterThread implements Runnable {
+		private final IliasPdfFinder iliasPdfFinder;
+		private final List<Adresse> kurse;
+
+		GetterThread(IliasPdfFinder iliasPdfFinder, List<Adresse> kurse) {
+			this.iliasPdfFinder = iliasPdfFinder;
+			this.kurse = kurse;
+		}
+
+		@Override
+		public void run() {
+			for (Adresse kurs : kurse) {
+				List<Element> directory = openFolder(kurs);
+				for (Element dir : directory) {
+					final boolean dirIstPdfFile = dir.attr("href").contains("cmd=sendfile");
+					final boolean linkToFolder = dir.attr("href").contains("goto_produktiv_fold_");
+					if (dirIstPdfFile) {
+						dir.setBaseUri("https://ilias.studium.kit.edu/");
+						final double size = new IliasConnector().requestHead(dir.attr("abs:href"));
+						Adresse newPdfFile = createAdresse(kurs, dir, false, true, size);
+						allPdfs.add(newPdfFile);
+
+						List<Element> elemse = dir.parent().parent().siblingElements().select("div").select("span");
+						for (Element el : elemse) {
+							final boolean istUngelesen = el.attr("class").contains("il_ItemAlertProperty");
+							if (istUngelesen) {
+								newPdfFile.setGelesen(false);
+							}
+						}
+					}
+					if (linkToFolder) {
+						LinkedList<Adresse> tempo = new LinkedList<Adresse>();
+						Adresse newFolder = createAdresse(kurs, dir, true, false, 0.0);
+						tempo.add(newFolder);
+						allDirs.add(newFolder);
+						iliasPdfFinder.startScanner(tempo);
+					}
+				}
+			}
+			iliasPdfFinder.threadCount.decrementAndGet();
+		}
+	}
 }

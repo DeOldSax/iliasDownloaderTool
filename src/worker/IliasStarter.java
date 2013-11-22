@@ -65,7 +65,16 @@ public class IliasStarter implements Runnable {
 		final IliasCourseFinder iliasCourseFinder = new IliasCourseFinder();
 		kurse = iliasCourseFinder.getKurse(htmlContent);
 		loginLoader.changeStatusMessage(kurse.size() + " Kurse auf Schreibtisch gefunden...");
-		allPdfs = iliasPdfFinder.findAllPdfs(kurse);
+		iliasPdfFinder.findAllPdfs(kurse);
+		allPdfs = iliasPdfFinder.getAllPdfs();
+		while (iliasPdfFinder.threadCount.get() > 0) {
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+
 		allDirs = iliasPdfFinder.getAllDirs();
 		final LocalFolderService localFolderPath = new LocalFolderService(this);
 		loginLoader.stopRunning();
