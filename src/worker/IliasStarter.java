@@ -61,9 +61,9 @@ public class IliasStarter implements Runnable {
 	}
 
 	private void watchForFolders() {
-		final IliasPdfFinder iliasPdfFinder = new IliasPdfFinder(loginLoader);
+		final IliasPdfFinder iliasPdfFinder = new IliasPdfFinder();
 		final IliasCourseFinder iliasCourseFinder = new IliasCourseFinder();
-		kurse = iliasCourseFinder.getKurse(htmlContent);
+		kurse = iliasCourseFinder.getSubjects(htmlContent);
 		loginLoader.changeStatusMessage(kurse.size() + " Kurse auf Schreibtisch gefunden...");
 		iliasPdfFinder.findAllPdfs(kurse);
 		allPdfs = iliasPdfFinder.getAllPdfs();

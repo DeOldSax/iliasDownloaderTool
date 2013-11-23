@@ -11,7 +11,7 @@ import javax.swing.SwingConstants;
 
 public class Button extends JLabel {
 
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 6678947082955370336L;
 	private static final Color DEFAULT_COLOR = Color.WHITE;
 
 	public Button(String text) {

@@ -37,4 +37,29 @@ public class StorageProvider {
 			e.printStackTrace();
 		}
 	}
+
+	public void storeCommitVersion(String numberOfCommits) {
+		myPrefs.put("commitNumber", numberOfCommits);
+	}
+
+	public String getCommitVersion() {
+		return myPrefs.get("commitNumber", "-1");
+	}
+
+	public void storeUsername(String username) {
+		myPrefs.put("username", username);
+	}
+
+	public void storePassword(String password) {
+		myPrefs.put("password", password);
+	}
+
+	public String getUsername() {
+		return myPrefs.get("username", "");
+	}
+
+	public String getPassword() {
+		return myPrefs.get("password", "");
+	}
+
 }

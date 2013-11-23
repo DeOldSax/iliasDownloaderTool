@@ -1,6 +1,6 @@
 package iliasWorker;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -10,19 +10,15 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-import view.LoginLoader;
-
 public class IliasPdfFinder {
 
 	private final List<Adresse> allPdfs;
 	private final List<Adresse> allDirs;
-	private final LoginLoader loginLoader;
 	public AtomicInteger threadCount;
 
-	public IliasPdfFinder(LoginLoader loginLoader) {
-		this.loginLoader = loginLoader;
-		allPdfs = new LinkedList<Adresse>();
-		allDirs = new LinkedList<Adresse>();
+	public IliasPdfFinder() {
+		allPdfs = new ArrayList<Adresse>();
+		allDirs = new ArrayList<Adresse>();
 		threadCount = new AtomicInteger(0);
 	}
 
@@ -32,17 +28,7 @@ public class IliasPdfFinder {
 
 	private void startScanner(List<Adresse> kurse) {
 		threadCount.incrementAndGet();
-		new Thread(new GetterThread(this, kurse)).start();
-	}
-
-	private void showInGui(Adresse kurs) {
-		StringBuilder message = new StringBuilder();
-		final Adresse parentFolder = kurs.getParentFolder();
-		message.append("durchsuche Ordner ").append(kurs.getName());
-		if (parentFolder != null) {
-			message.append(" in ").append(parentFolder.getName());
-		}
-		loginLoader.changeStatusMessage(message.toString());
+		new Thread(new IliasDirectoryScanner(this, kurse)).start();
 	}
 
 	private Adresse createAdresse(Adresse kurs, Element dir, boolean folder, boolean pdf, double size) {
@@ -53,14 +39,6 @@ public class IliasPdfFinder {
 		return newFileOrDir;
 	}
 
-	private List<Element> openFolder(Adresse kurs) {
-		List<Element> directory;
-		final String newHtmlContent = new IliasConnector().requestGet(kurs.getUrl());
-		Document doc = Jsoup.parse(newHtmlContent);
-		directory = doc.select("h4").select("a");
-		return directory;
-	}
-
 	public List<Adresse> getAllPdfs() {
 		return allPdfs;
 	}
@@ -69,11 +47,11 @@ public class IliasPdfFinder {
 		return allDirs;
 	}
 
-	private class GetterThread implements Runnable {
+	private class IliasDirectoryScanner implements Runnable {
 		private final IliasPdfFinder iliasPdfFinder;
 		private final List<Adresse> kurse;
 
-		GetterThread(IliasPdfFinder iliasPdfFinder, List<Adresse> kurse) {
+		private IliasDirectoryScanner(IliasPdfFinder iliasPdfFinder, List<Adresse> kurse) {
 			this.iliasPdfFinder = iliasPdfFinder;
 			this.kurse = kurse;
 		}
@@ -101,7 +79,7 @@ public class IliasPdfFinder {
 						}
 					}
 					if (linkToFolder) {
-						LinkedList<Adresse> tempo = new LinkedList<Adresse>();
+						List<Adresse> tempo = new ArrayList<Adresse>();
 						Adresse newFolder = createAdresse(kurs, dir, true, false, 0.0);
 						tempo.add(newFolder);
 						allDirs.add(newFolder);
@@ -110,6 +88,14 @@ public class IliasPdfFinder {
 				}
 			}
 			iliasPdfFinder.threadCount.decrementAndGet();
+		}
+
+		private List<Element> openFolder(Adresse kurs) {
+			List<Element> directory;
+			final String newHtmlContent = new IliasConnector().requestGet(kurs.getUrl());
+			Document doc = Jsoup.parse(newHtmlContent);
+			directory = doc.select("h4").select("a");
+			return directory;
 		}
 	}
 }

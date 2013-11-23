@@ -15,6 +15,7 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
+import model.StorageProvider;
 import worker.IliasStarter;
 
 public class LoginWindow {
@@ -25,8 +26,10 @@ public class LoginWindow {
 	private final JPasswordField passwordField;
 	private final JLabel nameLabel, passwordLabel, icon;
 	private final JFrame loginDialog;
+	private final StorageProvider storageProvider;
 
 	public LoginWindow() {
+		storageProvider = new StorageProvider();
 		loginDialog = new JFrame();
 		loginDialog.setSize(610, 160);
 		loginDialog.setTitle("Anmeldung");
@@ -45,8 +48,8 @@ public class LoginWindow {
 		left = new JPanel(new GridLayout(2, 1, 1, 5));
 		right = new JPanel(new GridLayout(2, 1, 1, 5));
 
-		usernameField = new JTextField();
-		passwordField = new JPasswordField();
+		usernameField = new JTextField(storageProvider.getUsername());
+		passwordField = new JPasswordField(storageProvider.getPassword());
 		passwordField.addActionListener(new LoginProvider());
 		nameLabel = new JLabel("Benutzererkennung: ");
 		passwordLabel = new JLabel("Passwort: ");
@@ -72,6 +75,7 @@ public class LoginWindow {
 		c.add(icon, BorderLayout.NORTH);
 		c.add(south, BorderLayout.CENTER);
 
+		passwordField.requestFocus();
 		loginDialog.setVisible(true);
 	}
 
@@ -96,6 +100,8 @@ public class LoginWindow {
 					password = password + pass[i];
 				}
 				loginDialog.setVisible(false);
+				storageProvider.storeUsername(username);
+				storageProvider.storePassword(password);
 				new Thread(new IliasStarter(username, password)).start();
 			}
 		}

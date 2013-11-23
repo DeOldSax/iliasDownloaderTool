@@ -11,13 +11,13 @@ import org.jsoup.nodes.Element;
 
 public class IliasCourseFinder {
 	/**
-	 * saves all coursenames and urls from startpage in List kurse<Adresse>
+	 * saves all subjects and urls from startpage in List subject<Adresse>
 	 * 
 	 * @param html
 	 *            startPage
 	 */
-	public List<Adresse> getKurse(String html) {
-		List<Adresse> kurse = new ArrayList<Adresse>();
+	public List<Adresse> getSubjects(String html) {
+		List<Adresse> subjects = new ArrayList<Adresse>();
 		String s = null;
 		Document doc = Jsoup.parse(html);
 		List<Element> temp = doc.select("h4");
@@ -37,9 +37,9 @@ public class IliasCourseFinder {
 					int index = x.text().indexOf("]");
 					name = name.substring(index + 2);
 				}
-				kurse.add(new Adresse(name, url, null, false, false, 0.0));
+				subjects.add(new Adresse(name, url, null, false, false, 0.0));
 			}
 		}
-		return kurse;
+		return subjects;
 	}
 }
