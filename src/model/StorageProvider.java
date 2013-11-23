@@ -66,7 +66,7 @@ public class StorageProvider {
 		return myPrefs.getBoolean("firstStart", true);
 	}
 
-	public void storeFirstStart() {
-		myPrefs.putBoolean("firstStart", false);
+	public void storeFirstStart(boolean value) {
+		myPrefs.putBoolean("firstStart", value);
 	}
 }
