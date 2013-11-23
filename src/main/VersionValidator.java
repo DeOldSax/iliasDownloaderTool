@@ -34,10 +34,10 @@ public class VersionValidator {
 		if (!newVersionAvailable()) {
 			return false;
 		}
-		storageProvider.storeFirstStart(true);
 		int answer = JOptionPane.showConfirmDialog(null, "   download new version?", "new version available!", JOptionPane.YES_NO_OPTION,
 				JOptionPane.INFORMATION_MESSAGE);
 		if (answer == YES) {
+			storageProvider.storeFirstStart(true);
 			storageProvider.storeCommitVersion(numberOfCommits);
 			if (Desktop.isDesktopSupported()) {
 				try {
@@ -78,7 +78,7 @@ public class VersionValidator {
 				numberOfCommits = element.text();
 				final int lastCommitVersion = Integer.parseInt(storageProvider.getCommitVersion());
 				final int newCommitVersion = Integer.parseInt(numberOfCommits);
-				if (lastCommitVersion != newCommitVersion) {
+				if (lastCommitVersion != newCommitVersion && storageProvider.firstStart()) {
 					return true;
 				}
 			}
