@@ -62,4 +62,11 @@ public class StorageProvider {
 		return myPrefs.get("password", "");
 	}
 
+	public boolean firstStart() {
+		return myPrefs.getBoolean("firstStart", true);
+	}
+
+	public void storeFirstStart() {
+		myPrefs.putBoolean("firstStart", false);
+	}
 }

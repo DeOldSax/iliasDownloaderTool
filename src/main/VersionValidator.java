@@ -21,11 +21,16 @@ import org.jsoup.select.Elements;
 
 public class VersionValidator {
 	private final int YES = 0;
-	private final int NO = 1;
 	private StorageProvider storageProvider;
 	private String numberOfCommits = "-1";
 
 	public boolean validate() {
+		storageProvider = new StorageProvider();
+
+		if (storageProvider.firstStart()) {
+			storageProvider.storeFirstStart();
+			return false;
+		}
 		if (!newVersionAvailable()) {
 			return false;
 		}
@@ -41,13 +46,11 @@ public class VersionValidator {
 					e.printStackTrace();
 				}
 			} else {
+				// TODO better option to copy link
 				JOptionPane.showMessageDialog(null, "https://github.com/DeOldSax/iliasDownloaderTool/raw/master/IliasDownloaderTool.jar",
 						"follow link", JOptionPane.INFORMATION_MESSAGE);
 			}
 			return true;
-		}
-		if (answer == NO) {
-			return false;
 		}
 		return false;
 	}
@@ -72,10 +75,9 @@ public class VersionValidator {
 		for (Element element : select) {
 			if (element.text().matches("\\d+") && element.toString().contains("octicon-history")) {
 				numberOfCommits = element.text();
-				storageProvider = new StorageProvider();
 				final int lastCommitVersion = Integer.parseInt(storageProvider.getCommitVersion());
 				final int newCommitVersion = Integer.parseInt(numberOfCommits);
-				if (lastCommitVersion != newCommitVersion) {
+				if (lastCommitVersion - 5 != newCommitVersion) {
 					return true;
 				}
 			}
