@@ -11,13 +11,13 @@ public class JTreeContentFiller {
 		for (Adresse adresse : kurse) {
 			DefaultMutableTreeNode topsChilds = new DefaultMutableTreeNode(adresse.getName());
 			top.add(topsChilds);
-			for (Adresse subDir : adresse.getChildFolder()) {
+			for (Adresse subDir : adresse.getChildFolders()) {
 				final DefaultMutableTreeNode subDirNode = new DefaultMutableTreeNode(subDir.getName());
 				if (subDir.isPdf()) {
 					topsChilds.add(subDirNode);
 				}
 				if (subDir.isFolder()) {
-					addKurseToTree(subDirNode, subDir.getChildFolder());
+					addKurseToTree(subDirNode, subDir.getChildFolders());
 					topsChilds.add(subDirNode);
 				}
 			}
@@ -33,7 +33,7 @@ public class JTreeContentFiller {
 			if (!adresse.isGelesen() && adresse.isPdf() || adresse.isFolder()) {
 				top.add(topsChilds);
 			}
-			for (Adresse subDir : adresse.getChildFolder()) {
+			for (Adresse subDir : adresse.getChildFolders()) {
 				final DefaultMutableTreeNode subDirNode = new DefaultMutableTreeNode(subDir.getName());
 				if (subDir.isFolder() && noFurtherSubContent(subDir)) {
 					return;
@@ -42,7 +42,7 @@ public class JTreeContentFiller {
 					topsChilds.add(subDirNode);
 				}
 				if (subDir.isFolder()) {
-					addKurseToTree(subDirNode, subDir.getChildFolder());
+					addKurseToTree(subDirNode, subDir.getChildFolders());
 					topsChilds.add(subDirNode);
 				}
 			}
@@ -50,7 +50,7 @@ public class JTreeContentFiller {
 	}
 
 	private boolean noFurtherSubContent(Adresse adresse) {
-		if (adresse.getChildFolder().isEmpty()) {
+		if (adresse.getChildFolders().isEmpty()) {
 			return true;
 		}
 		return false;

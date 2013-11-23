@@ -9,13 +9,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import model.Adresse;
+import model.LocalDataReader;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.protocol.BasicHttpContext;
-
-import view.LocalFolderService;
 
 public class FileDownloader implements Runnable {
 	private HttpGet request;
@@ -28,7 +27,7 @@ public class FileDownloader implements Runnable {
 
 	public FileDownloader(Adresse adresse, String type) {
 		this.adresse = adresse;
-		this.targetPath = LocalFolderService.getLocalDownloadPathString();
+		this.targetPath = new LocalDataReader().findLocalDownloadPath(adresse);
 		this.type = type;
 	}
 

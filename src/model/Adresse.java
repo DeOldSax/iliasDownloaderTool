@@ -20,7 +20,7 @@ public class Adresse {
 		this.folder = folder;
 		this.size = size;
 		if (parentFolder != null) {
-			parentFolder.getChildFolder().add(this);
+			parentFolder.getChildFolders().add(this);
 		}
 		this.parentFolder = parentFolder;
 		this.childFolders = new LinkedList<Adresse>();
@@ -76,11 +76,11 @@ public class Adresse {
 		this.parentFolder = parentFolder;
 	}
 
-	public List<Adresse> getChildFolder() {
+	public List<Adresse> getChildFolders() {
 		return childFolders;
 	}
 
-	public void setChildFolder(List<Adresse> childFolders) {
+	public void setChildFolders(List<Adresse> childFolders) {
 		this.childFolders = childFolders;
 	}
 
