@@ -3,7 +3,6 @@ package view;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Font;
-import java.awt.Window.Type;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -44,10 +43,9 @@ public class LocalFolderService implements ActionListener {
 	 * @wbp.parser.entryPoint
 	 */
 	public void showDialog() {
+		LookAndFeelChanger.changeToNative();
 		dialog = new JFrame();
 		c = dialog.getContentPane();
-		dialog.setUndecorated(true);
-		dialog.setType(Type.UTILITY);
 		dialog.getContentPane().setBackground(new Color(102, 205, 170));
 		dialog.getContentPane().setForeground(new Color(46, 139, 87));
 		dialog.setForeground(new Color(46, 139, 87));
@@ -69,6 +67,7 @@ public class LocalFolderService implements ActionListener {
 		downloadPath.addActionListener(new Starter());
 		dialog.getContentPane().add(downloadPath);
 		downloadPath.setColumns(10);
+		downloadPath.requestFocus();
 
 		JButton btnStarten = new JButton("OK");
 		btnStarten.addActionListener(new Starter());
@@ -91,13 +90,15 @@ public class LocalFolderService implements ActionListener {
 		JButton btnffnen = new JButton("\u00F6ffnen...");
 		btnffnen.setBackground(new Color(32, 178, 170));
 		btnffnen.setBounds(317, 13, 89, 23);
+		btnffnen.addActionListener(new DownloadFolderChooser(dialog, localIliasPath));
 		dialog.getContentPane().add(btnffnen);
 
 		JButton btnffnen_1 = new JButton("\u00F6ffnen...");
 		btnffnen_1.setBackground(new Color(32, 178, 170));
 		btnffnen_1.setBounds(318, 94, 89, 23);
+		btnffnen_1.addActionListener(new DownloadFolderChooser(dialog, downloadPath));
 		dialog.getContentPane().add(btnffnen_1);
-		dialog.setSize(418, 210);
+		dialog.setSize(418, 250);
 		dialog.setVisible(true);
 		dialog.setLocationRelativeTo(null);
 		dialog.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

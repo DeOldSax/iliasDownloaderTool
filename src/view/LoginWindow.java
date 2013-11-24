@@ -51,6 +51,7 @@ public class LoginWindow {
 		usernameField = new JTextField(storageProvider.getUsername());
 		passwordField = new JPasswordField(storageProvider.getPassword());
 		passwordField.addActionListener(new LoginProvider());
+		usernameField.addActionListener(new LoginProvider());
 		nameLabel = new JLabel("Benutzererkennung: ");
 		passwordLabel = new JLabel("Passwort: ");
 

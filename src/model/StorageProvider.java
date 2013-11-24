@@ -33,6 +33,8 @@ public class StorageProvider {
 	public void removeNode() {
 		try {
 			myPrefs.removeNode();
+			myPrefs.remove(ILIAS_FOLDER);
+			myPrefs.remove(DOWNLOAD_PATH);
 		} catch (BackingStoreException e) {
 			e.printStackTrace();
 		}

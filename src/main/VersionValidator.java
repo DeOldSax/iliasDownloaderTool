@@ -19,12 +19,15 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import view.LookAndFeelChanger;
+
 public class VersionValidator {
 	private final int YES = 0;
 	private StorageProvider storageProvider;
 	private String numberOfCommits = "-1";
 
 	public boolean validate() {
+		LookAndFeelChanger.changeToNative();
 		storageProvider = new StorageProvider();
 
 		if (storageProvider.firstStart()) {

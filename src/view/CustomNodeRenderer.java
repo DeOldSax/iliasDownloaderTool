@@ -106,11 +106,11 @@ public class CustomNodeRenderer extends DefaultTreeCellRenderer {
 				return adresse.isFolder();
 			}
 		}
-		for (Adresse adresse : allKurse) {
-			if (adresse.getName().equals(name)) {
-				return true;
-			}
-		}
+		// for (Adresse adresse : allKurse) {
+		// if (adresse.getName().equals(name)) {
+		// return true;
+		// }
+		// }
 		return false;
 	}
 }

@@ -50,6 +50,7 @@ public class DownloaderToolWindow {
 	 * @wbp.parser.entryPoint
 	 */
 	public DownloaderToolWindow(IliasStarter iliasStarter) {
+		LookAndFeelChanger.changeToJava();
 		treeFiller = new JTreeContentFiller();
 		window = new JFrame();
 		c = window.getContentPane();
@@ -137,7 +138,6 @@ public class DownloaderToolWindow {
 		contactDevButton.addMouseListener(new EmailOpener());
 		backgroundCenter.add(contactDevButton, BorderLayout.SOUTH);
 		// backgroundSouth.add(closeIcon);
-
 		window.setVisible(true);
 	}
 
