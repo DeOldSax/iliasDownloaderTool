@@ -81,7 +81,7 @@ public class VersionValidator {
 				numberOfCommits = element.text();
 				final int lastCommitVersion = Integer.parseInt(storageProvider.getCommitVersion());
 				final int newCommitVersion = Integer.parseInt(numberOfCommits);
-				if (lastCommitVersion != newCommitVersion && storageProvider.firstStart()) {
+				if (lastCommitVersion != newCommitVersion && !storageProvider.firstStart()) {
 					return true;
 				}
 			}
