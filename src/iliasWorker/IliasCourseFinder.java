@@ -37,7 +37,7 @@ public class IliasCourseFinder {
 					int index = x.text().indexOf("]");
 					name = name.substring(index + 2);
 				}
-				subjects.add(new Adresse(name, url, null, false, false, 0.0));
+				subjects.add(new Adresse(name, url, null, false, false, 0));
 			}
 		}
 		return subjects;

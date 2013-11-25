@@ -15,7 +15,7 @@ public class EmailOpener extends MouseAdapter {
 	public void mouseClicked(MouseEvent e) {
 		if (Desktop.isDesktopSupported()) {
 			try {
-				Desktop.getDesktop().mail(new URI("mailto:DeOldSax@gmx.de"));
+				Desktop.getDesktop().mail(new URI("mailto:DeOldSax@gmx.de?subject=BugReport/Verbesserungsvorschlag"));
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			} catch (URISyntaxException e1) {

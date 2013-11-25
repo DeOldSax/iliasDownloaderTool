@@ -31,7 +31,7 @@ public class IliasPdfFinder {
 		new Thread(new IliasDirectoryScanner(this, kurse)).start();
 	}
 
-	private Adresse createAdresse(Adresse kurs, Element dir, boolean folder, boolean pdf, double size) {
+	private Adresse createAdresse(Adresse kurs, Element dir, boolean folder, boolean pdf, int size) {
 		dir.setBaseUri("https://ilias.studium.kit.edu/");
 		final String fileName = dir.text();
 		final String downloadLink = dir.attr("abs:href");
@@ -66,7 +66,7 @@ public class IliasPdfFinder {
 							|| dir.attr("href").contains("goto_produktiv_grp_") || dir.attr("href").contains("goto_produktiv_frm_");
 					if (dirIstPdfFile) {
 						dir.setBaseUri("https://ilias.studium.kit.edu/");
-						final double size = new IliasConnector().requestHead(dir.attr("abs:href"));
+						final int size = new IliasConnector().requestHead(dir.attr("abs:href"));
 						Adresse newPdfFile = createAdresse(kurs, dir, false, true, size);
 						allPdfs.add(newPdfFile);
 
@@ -80,7 +80,7 @@ public class IliasPdfFinder {
 					}
 					if (linkToFolder) {
 						List<Adresse> tempo = new ArrayList<Adresse>();
-						Adresse newFolder = createAdresse(kurs, dir, true, false, 0.0);
+						Adresse newFolder = createAdresse(kurs, dir, true, false, 0);
 						tempo.add(newFolder);
 						allDirs.add(newFolder);
 						iliasPdfFinder.startScanner(tempo);

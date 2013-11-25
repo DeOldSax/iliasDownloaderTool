@@ -34,9 +34,9 @@ public class GetThread extends Thread {
 	BasicCookieStore cookiestore;
 	LaxRedirectStrategy strategy;
 	private final Adresse adresse;
-	private final List<Double> localData;
+	private final List<Integer> localData;
 
-	public GetThread(Adresse adresse, List<Double> localData) {
+	public GetThread(Adresse adresse, List<Integer> localData) {
 		this.adresse = adresse;
 		this.localData = localData;
 		this.context = new BasicHttpContext();
@@ -76,8 +76,8 @@ public class GetThread extends Thread {
 
 			for (int i = 0; i < pdfSize.length; i++) {
 				System.out.println("Schleife startet");
-				System.out.println("Dateigröße: " + Double.valueOf(pdfSize[i].getValue()) + " -- " + adresse.getName());
-				if (!localData.contains(Double.valueOf(pdfSize[i].getValue()))) {
+				System.out.println("Dateigröße: " + Integer.valueOf(pdfSize[i].getValue()) + " -- " + adresse.getName());
+				if (!localData.contains(Integer.valueOf(pdfSize[i].getValue()))) {
 					// wenn keine Lokale Dateigröße mit den Online Dateien
 					// übereinstimmt
 					// Dateigröße stimmt überein, Hash prüfen!

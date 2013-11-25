@@ -14,6 +14,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.JTree;
+import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -42,8 +43,8 @@ public class DownloaderToolWindow {
 	private final JTree treeAllePdf;
 	private final JScrollPane treeAllePdfScrollPane, resultListScrollPane;
 	private final JTextField search;
-	private final Vector<String> resultVector;
-	private final JList<String> searchResults;
+	private final Vector<Adresse> resultVector;
+	private final JList<Adresse> searchResults;
 	private final JTreeContentFiller treeFiller;
 
 	/**
@@ -72,7 +73,7 @@ public class DownloaderToolWindow {
 
 		Button actionButton = new Button("   ungelesene Dateien anzeigen   ");
 		backgroundNorth.add(actionButton);
-		overview = new DefaultMutableTreeNode("Übersicht");
+		overview = new DefaultMutableTreeNode(new Adresse("Übersicht", null, null, false, false, 0));
 		treeAllePdf = new JTree(overview);
 		actionButton.addMouseListener(new ButtonHandler("ungelesen", treeAllePdf, overview, iliasStarter, this));
 		Button actionButton2 = new Button("   lokal nicht vorhandene Dateien anzeigen   ");
@@ -116,12 +117,12 @@ public class DownloaderToolWindow {
 		treeAllePdf.addMouseListener(new FocusBorderOfTree());
 		treeAllePdf.setCellRenderer(new CustomNodeRenderer(iliasStarter));
 
-		searchResults = new JList<String>();
+		searchResults = new JList<Adresse>();
 		resultListScrollPane = new JScrollPane(searchResults);
 		searchResults.setSelectionBackground(Color.BLUE);
 		searchResults.setBorder(new LineBorder(Color.LIGHT_GRAY, 1, true));
 		searchResults.setFont(new Font("Calibri", Font.PLAIN, 14));
-		resultVector = new Vector<String>();
+		resultVector = new Vector<Adresse>();
 		searchResults.addMouseListener(new ResultSelector(overview, treeAllePdf, searchResults));
 		searchResults.addMouseListener(new ResultListPopupMenu(iliasStarter));
 		searchResults.addKeyListener(new ResultSelector(overview, treeAllePdf, searchResults));
@@ -134,7 +135,8 @@ public class DownloaderToolWindow {
 		CloseIcon closeIcon = new CloseIcon(Color.WHITE);
 		closeIcon.setToolTipText("Beenden");
 
-		Button contactDevButton = new Button("contact developer");
+		Button contactDevButton = new Button("Entwickler kontaktieren");
+		contactDevButton.setHorizontalTextPosition(SwingConstants.CENTER);
 		contactDevButton.addMouseListener(new EmailOpener());
 		backgroundCenter.add(contactDevButton, BorderLayout.SOUTH);
 		// backgroundSouth.add(closeIcon);
@@ -146,13 +148,8 @@ public class DownloaderToolWindow {
 		searchResults.setListData(resultVector);
 	}
 
-	public void addToResultList(String name, Adresse adresse) {
-		StringBuilder sb = new StringBuilder();
-		sb.append(name);
-		if (adresse != null) {
-			sb.append(" [").append(adresse.getName()).append("]");
-		}
-		resultVector.add(sb.toString());
+	public void addToResultList(Adresse adresse) {
+		resultVector.add(adresse);
 		searchResults.setListData(resultVector);
 	}
 }

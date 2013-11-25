@@ -9,15 +9,15 @@ import java.util.Map;
 import view.LocalFolderService;
 
 public class LocalDataReader {
-	private final List<Double> localDataList;
+	private final List<Integer> localDataList;
 	private final Map<Integer, String> localPdfWithParents;
 
 	public LocalDataReader() {
-		this.localDataList = new LinkedList<Double>();
+		this.localDataList = new LinkedList<Integer>();
 		this.localPdfWithParents = new HashMap<Integer, String>();
 	}
 
-	public List<Double> searchPdf(String path) {
+	public List<Integer> searchPdf(String path) {
 		File dir = new File(path);
 
 		File[] files = dir.listFiles();
@@ -26,7 +26,7 @@ public class LocalDataReader {
 			if (file.isDirectory()) {
 				searchPdf(file.getAbsolutePath());
 			} else if (file.isFile() && file.getPath().toLowerCase().endsWith(".pdf")) {
-				localDataList.add((double) file.length());
+				localDataList.add((int) file.length());
 				localPdfWithParents.put((int) file.length(), path);
 			}
 		}
@@ -50,6 +50,6 @@ public class LocalDataReader {
 				}
 			}
 		}
-		return LocalFolderService.getLocalDownloadPathString();
+		return LocalFolderService.getLocalIliasPathString();
 	}
 }

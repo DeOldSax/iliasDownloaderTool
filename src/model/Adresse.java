@@ -11,9 +11,9 @@ public class Adresse {
 	private List<Adresse> childFolders = null;
 	private final boolean folder;
 	private final boolean pdf;
-	private final double size;
+	private final int size;
 
-	public Adresse(String name, String url, Adresse parentFolder, boolean folder, boolean pdf, double size) {
+	public Adresse(String name, String url, Adresse parentFolder, boolean folder, boolean pdf, int size) {
 		this.name = name;
 		this.url = url;
 		this.pdf = pdf;
@@ -26,13 +26,7 @@ public class Adresse {
 		this.childFolders = new LinkedList<Adresse>();
 	}
 
-	public Adresse() {
-		this.size = 0.0;
-		this.pdf = false;
-		this.folder = false;
-	}
-
-	public double getSize() {
+	public int getSize() {
 		return size;
 	}
 
@@ -88,4 +82,5 @@ public class Adresse {
 	public String toString() {
 		return name;
 	}
+
 }

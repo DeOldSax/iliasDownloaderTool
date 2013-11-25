@@ -22,7 +22,7 @@ public class CustomNodeRenderer extends DefaultTreeCellRenderer {
 	private final Icon notInLocalFolderPdfIcon;
 	private final Icon folderIcon;
 	private final Icon folderIconUnread;
-	private final List<Double> localPdfSizes;
+	private final List<Integer> localPdfSizes;
 	private final List<Adresse> allPdfs;
 	private final List<Adresse> allFolders;
 
@@ -67,9 +67,9 @@ public class CustomNodeRenderer extends DefaultTreeCellRenderer {
 
 	private boolean adresseIsNotOnLocalFolder(Object value) {
 		DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
-		String name = (String) node.getUserObject();
+		Adresse pdf = (Adresse) node.getUserObject();
 		for (Adresse adresse : allPdfs) {
-			if (adresse.getName().equals(name)) {
+			if (adresse.equals(pdf)) {
 				return !localPdfSizes.contains(adresse.getSize());
 			}
 		}
@@ -78,9 +78,9 @@ public class CustomNodeRenderer extends DefaultTreeCellRenderer {
 
 	private boolean adresseIsUnreadPdf(Object value) {
 		DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
-		String name = (String) node.getUserObject();
+		Adresse pdf = (Adresse) node.getUserObject();
 		for (Adresse adresse : allPdfs) {
-			if (adresse.getName().equals(name)) {
+			if (adresse.equals(pdf)) {
 				return !adresse.isGelesen();
 			}
 		}
@@ -89,9 +89,9 @@ public class CustomNodeRenderer extends DefaultTreeCellRenderer {
 
 	private boolean folderContainsUnreadSubContent(Object value) {
 		DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
-		String name = (String) node.getUserObject();
+		Adresse pdf = (Adresse) node.getUserObject();
 		for (Adresse adresse : allPdfs) {
-			if (adresse.getName().equals(name)) {
+			if (adresse.equals(pdf)) {
 
 			}
 		}
@@ -100,9 +100,9 @@ public class CustomNodeRenderer extends DefaultTreeCellRenderer {
 
 	private boolean adresseIsFolder(Object value) {
 		DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
-		String name = (String) node.getUserObject();
+		Adresse dir = (Adresse) node.getUserObject();
 		for (Adresse adresse : allFolders) {
-			if (adresse.getName().equals(name)) {
+			if (adresse.equals(dir)) {
 				return adresse.isFolder();
 			}
 		}

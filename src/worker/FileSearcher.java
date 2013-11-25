@@ -38,7 +38,7 @@ public class FileSearcher extends KeyAdapter {
 	}
 
 	private void act() {
-		List<String> alreadyAddedStrings = new ArrayList<String>();
+		List<Adresse> alreadyAddedStrings = new ArrayList<Adresse>();
 		window.clearResultList();
 		if (word.getText().isEmpty() || word.getText().equals(" ")) {
 			return;
@@ -46,31 +46,30 @@ public class FileSearcher extends KeyAdapter {
 		for (Adresse pdf : allPdfs) {
 			final String[] splitedStrings = pdf.getName().split(" ");
 			for (int i = 0; i < splitedStrings.length; i++) {
-				splitedStrings[i] = splitedStrings[i] + " ";
+				splitedStrings[i] = (splitedStrings[i] + " ").toLowerCase();
 			}
 			for (int i = 0; i < splitedStrings.length; i++) {
-				if (splitedStrings[i].toLowerCase().startsWith(word.getText().toLowerCase())
-						&& !alreadyAddedStrings.contains(pdf.getName())) {
-					window.addToResultList(pdf.getName(), pdf.getParentFolder());
-					alreadyAddedStrings.add(pdf.getName());
+				if (splitedStrings[i].startsWith(word.getText().toLowerCase()) && !alreadyAddedStrings.contains(pdf.getName())) {
+					window.addToResultList(pdf);
+					alreadyAddedStrings.add(pdf);
 					continue;
 				}
 				if (word.getText().contains(" ") && pdf.getName().toLowerCase().contains(word.getText().toLowerCase())
 						&& !alreadyAddedStrings.contains(pdf.getName())) {
-					window.addToResultList(pdf.getName(), pdf.getParentFolder());
-					alreadyAddedStrings.add(pdf.getName());
+					window.addToResultList(pdf);
+					alreadyAddedStrings.add(pdf);
 					continue;
 				}
 				if (splitedStrings[i].toLowerCase().contains(word.getText().toLowerCase()) && !alreadyAddedStrings.contains(pdf.getName())) {
-					window.addToResultList(pdf.getName(), pdf.getParentFolder());
-					alreadyAddedStrings.add(pdf.getName());
+					window.addToResultList(pdf);
+					alreadyAddedStrings.add(pdf);
 					continue;
 				}
 				if (pdf.getParentFolder() != null) {
 					if (word.getText().length() > 3 && pdf.getParentFolder().getName().toLowerCase().contains(word.getText().toLowerCase())
 							&& !alreadyAddedStrings.contains(pdf.getName())) {
-						window.addToResultList(pdf.getName(), pdf.getParentFolder());
-						alreadyAddedStrings.add(pdf.getName());
+						window.addToResultList(pdf);
+						alreadyAddedStrings.add(pdf);
 					}
 					continue;
 				}
@@ -78,8 +77,8 @@ public class FileSearcher extends KeyAdapter {
 					if (word.getText().length() > 3
 							&& pdf.getParentFolder().getParentFolder().getName().toLowerCase().contains(word.getText().toLowerCase())
 							&& !alreadyAddedStrings.contains(pdf.getName())) {
-						window.addToResultList(pdf.getName(), pdf.getParentFolder());
-						alreadyAddedStrings.add(pdf.getName());
+						window.addToResultList(pdf);
+						alreadyAddedStrings.add(pdf);
 					}
 					continue;
 				}

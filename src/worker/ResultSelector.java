@@ -15,12 +15,14 @@ import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
+import model.Adresse;
+
 public class ResultSelector extends KeyAdapter implements MouseListener {
 	private final DefaultMutableTreeNode allePdf;
 	private final JTree tree;
-	private final JList<String> resultList;
+	private final JList<Adresse> resultList;
 
-	public ResultSelector(DefaultMutableTreeNode allePdf, JTree tree, JList<String> resultList) {
+	public ResultSelector(DefaultMutableTreeNode allePdf, JTree tree, JList<Adresse> resultList) {
 		this.allePdf = allePdf;
 		this.tree = tree;
 		this.resultList = resultList;
@@ -68,26 +70,23 @@ public class ResultSelector extends KeyAdapter implements MouseListener {
 
 	private void openNodeInTree(InputEvent e) {
 		resultList.setSelectionForeground(Color.WHITE);
-		final JList model = (JList<String>) e.getSource();
+		final JList<Adresse> list = (JList<Adresse>) e.getSource();
 		collapseAll(tree);
-		@SuppressWarnings("unchecked")
-		final JList<String> source = model;
-		final int selectedIndex = source.getSelectedIndex();
-		String name = source.getModel().getElementAt(selectedIndex);
-		name = name.substring(0, name.indexOf("[") - 1);
+		final int selectedIndex = list.getSelectedIndex();
+		Adresse adresse = list.getModel().getElementAt(selectedIndex);
 
-		final TreePath path = find(allePdf, name);
+		final TreePath path = find(allePdf, adresse);
 		tree.scrollPathToVisible(path);
 		tree.getSelectionModel().clearSelection();
 		tree.getSelectionModel().setSelectionPath(path);
 	}
 
-	private TreePath find(DefaultMutableTreeNode root, String name) {
-		@SuppressWarnings("unchecked")
+	private TreePath find(DefaultMutableTreeNode root, Adresse adresse) {
 		Enumeration<DefaultMutableTreeNode> e = root.depthFirstEnumeration();
 		while (e.hasMoreElements()) {
-			DefaultMutableTreeNode node = e.nextElement();
-			if (node.toString().equalsIgnoreCase(name)) {
+			final DefaultMutableTreeNode node = e.nextElement();
+			final Adresse userObject = (Adresse) node.getUserObject();
+			if (userObject.equals(adresse)) {
 				return new TreePath(node.getPath());
 			}
 		}

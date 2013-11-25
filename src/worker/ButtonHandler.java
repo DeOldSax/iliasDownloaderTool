@@ -64,15 +64,12 @@ public class ButtonHandler implements MouseListener {
 		collapseAll(tree);
 		tree.setCellRenderer(new CustomNodeRenderer(iliasStarter));
 		tree.getSelectionModel().clearSelection();
-		final List<Double> allLocalPdfSizes = new LocalDataReader().searchPdf(LocalFolderService.getLocalIliasPathString());
+		final List<Integer> allLocalPdfSizes = new LocalDataReader().searchPdf(LocalFolderService.getLocalIliasPathString());
 		for (Adresse adresse : allPdf) {
-			if (adresse.getName().contains("or2_")) {
-				new String();
-			}
 			if (!allLocalPdfSizes.contains(adresse.getSize())) {
-				final TreePath treePath = findTreePath(node, adresse.getName());
+				final TreePath treePath = findTreePath(node, adresse);
 				tree.scrollPathToVisible(treePath);
-				window.addToResultList(adresse.getName(), adresse.getParentFolder());
+				window.addToResultList(adresse);
 			}
 		}
 	}
@@ -84,21 +81,21 @@ public class ButtonHandler implements MouseListener {
 		tree.getSelectionModel().clearSelection();
 		for (Adresse pdf : allPdf) {
 			if (!pdf.isGelesen()) {
-				final TreePath path = findTreePath(node, pdf.getName());
+				final TreePath path = findTreePath(node, pdf);
 				tree.getSelectionModel().setSelectionPath(path);
 				tree.scrollPathToVisible(path);
-				window.addToResultList(pdf.getName(), pdf.getParentFolder());
+				window.addToResultList(pdf);
 			}
 		}
 	}
 
-	private TreePath findTreePath(DefaultMutableTreeNode root, String name) {
+	private TreePath findTreePath(DefaultMutableTreeNode root, Adresse pdf) {
 		@SuppressWarnings("unchecked")
 		Enumeration<DefaultMutableTreeNode> e = root.depthFirstEnumeration();
 		while (e.hasMoreElements()) {
 			DefaultMutableTreeNode node = e.nextElement();
-			String adresseName = (String) node.getUserObject();
-			if (adresseName.equals(name)) {
+			Adresse adresse = (Adresse) node.getUserObject();
+			if (adresse.equals(pdf)) {
 				return new TreePath(node.getPath());
 			}
 		}

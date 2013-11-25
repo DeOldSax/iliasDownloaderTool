@@ -9,10 +9,10 @@ import model.Adresse;
 public class JTreeContentFiller {
 	public void addKurseToTree(DefaultMutableTreeNode top, List<Adresse> kurse) {
 		for (Adresse adresse : kurse) {
-			DefaultMutableTreeNode topsChilds = new DefaultMutableTreeNode(adresse.getName());
+			DefaultMutableTreeNode topsChilds = new DefaultMutableTreeNode(adresse);
 			top.add(topsChilds);
 			for (Adresse subDir : adresse.getChildFolders()) {
-				final DefaultMutableTreeNode subDirNode = new DefaultMutableTreeNode(subDir.getName());
+				final DefaultMutableTreeNode subDirNode = new DefaultMutableTreeNode(subDir);
 				if (subDir.isPdf()) {
 					topsChilds.add(subDirNode);
 				}
@@ -29,12 +29,12 @@ public class JTreeContentFiller {
 			if (adresse.isFolder() && noFurtherSubContent(adresse)) {
 				return;
 			}
-			DefaultMutableTreeNode topsChilds = new DefaultMutableTreeNode(adresse.getName());
+			DefaultMutableTreeNode topsChilds = new DefaultMutableTreeNode(adresse);
 			if (!adresse.isGelesen() && adresse.isPdf() || adresse.isFolder()) {
 				top.add(topsChilds);
 			}
 			for (Adresse subDir : adresse.getChildFolders()) {
-				final DefaultMutableTreeNode subDirNode = new DefaultMutableTreeNode(subDir.getName());
+				final DefaultMutableTreeNode subDirNode = new DefaultMutableTreeNode(subDir);
 				if (subDir.isFolder() && noFurtherSubContent(subDir)) {
 					return;
 				}
