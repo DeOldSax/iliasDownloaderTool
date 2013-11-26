@@ -25,7 +25,8 @@ import javax.swing.tree.TreeSelectionModel;
 import laf.Button;
 import laf.FocusBorderOfTree;
 import laf.TextFieldListener;
-import model.Adresse;
+import model.Directory;
+import model.PDF;
 import worker.ButtonHandler;
 import worker.EmailOpener;
 import worker.FileSearcher;
@@ -43,8 +44,8 @@ public class DownloaderToolWindow {
 	private final JTree treeAllePdf;
 	private final JScrollPane treeAllePdfScrollPane, resultListScrollPane;
 	private final JTextField search;
-	private final Vector<Adresse> resultVector;
-	private final JList<Adresse> searchResults;
+	private final Vector<PDF> resultVector;
+	private final JList<PDF> searchResults;
 	private final JTreeContentFiller treeFiller;
 
 	/**
@@ -73,7 +74,7 @@ public class DownloaderToolWindow {
 
 		Button actionButton = new Button("   ungelesene Dateien anzeigen   ");
 		backgroundNorth.add(actionButton);
-		overview = new DefaultMutableTreeNode(new Adresse("Übersicht", null, null, false, false, 0));
+		overview = new DefaultMutableTreeNode(new Directory("Übersicht", null, null));
 		treeAllePdf = new JTree(overview);
 		actionButton.addMouseListener(new ButtonHandler("ungelesen", treeAllePdf, overview, iliasStarter, this));
 		Button actionButton2 = new Button("   lokal nicht vorhandene Dateien anzeigen   ");
@@ -117,12 +118,12 @@ public class DownloaderToolWindow {
 		treeAllePdf.addMouseListener(new FocusBorderOfTree());
 		treeAllePdf.setCellRenderer(new CustomNodeRenderer(iliasStarter));
 
-		searchResults = new JList<Adresse>();
+		searchResults = new JList<PDF>();
 		resultListScrollPane = new JScrollPane(searchResults);
 		searchResults.setSelectionBackground(Color.BLUE);
 		searchResults.setBorder(new LineBorder(Color.LIGHT_GRAY, 1, true));
 		searchResults.setFont(new Font("Calibri", Font.PLAIN, 14));
-		resultVector = new Vector<Adresse>();
+		resultVector = new Vector<PDF>();
 		searchResults.addMouseListener(new ResultSelector(overview, treeAllePdf, searchResults));
 		searchResults.addMouseListener(new ResultListPopupMenu(iliasStarter));
 		searchResults.addKeyListener(new ResultSelector(overview, treeAllePdf, searchResults));
@@ -148,7 +149,7 @@ public class DownloaderToolWindow {
 		searchResults.setListData(resultVector);
 	}
 
-	public void addToResultList(Adresse adresse) {
+	public void addToResultList(PDF adresse) {
 		resultVector.add(adresse);
 		searchResults.setListData(resultVector);
 	}

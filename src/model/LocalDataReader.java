@@ -33,18 +33,18 @@ public class LocalDataReader {
 		return localDataList;
 	}
 
-	public String searchLocalParentFolder(Adresse onlineAdresse) {
+	public String searchLocalParentFolder(PDF onlineAdresse) {
 		searchPdf(LocalFolderService.getLocalIliasPathString());
-		final int size = (int) onlineAdresse.getSize();
+		final int size = onlineAdresse.getSize();
 		final String path = localPdfWithParents.get(size);
 		return path;
 	}
 
-	public String findLocalDownloadPath(Adresse adresse) {
-		final List<Adresse> childFolders = adresse.getParentFolder().getChildFolders();
-		for (Adresse dir : childFolders) {
-			if (dir.isPdf()) {
-				final String result = searchLocalParentFolder(dir);
+	public String findLocalDownloadPath(Directory pdf) {
+		final List<Directory> childFolders = pdf.getParentDirectory().getChildFolders();
+		for (Directory directory : childFolders) {
+			if (directory instanceof PDF) {
+				final String result = searchLocalParentFolder((PDF) directory);
 				if (result != null) {
 					return result;
 				}

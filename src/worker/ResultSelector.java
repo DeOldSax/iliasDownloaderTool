@@ -15,14 +15,14 @@ import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
-import model.Adresse;
+import model.PDF;
 
 public class ResultSelector extends KeyAdapter implements MouseListener {
 	private final DefaultMutableTreeNode allePdf;
 	private final JTree tree;
-	private final JList<Adresse> resultList;
+	private final JList<PDF> resultList;
 
-	public ResultSelector(DefaultMutableTreeNode allePdf, JTree tree, JList<Adresse> resultList) {
+	public ResultSelector(DefaultMutableTreeNode allePdf, JTree tree, JList<PDF> resultList) {
 		this.allePdf = allePdf;
 		this.tree = tree;
 		this.resultList = resultList;
@@ -70,10 +70,10 @@ public class ResultSelector extends KeyAdapter implements MouseListener {
 
 	private void openNodeInTree(InputEvent e) {
 		resultList.setSelectionForeground(Color.WHITE);
-		final JList<Adresse> list = (JList<Adresse>) e.getSource();
+		final JList<PDF> list = (JList<PDF>) e.getSource();
 		collapseAll(tree);
 		final int selectedIndex = list.getSelectedIndex();
-		Adresse adresse = list.getModel().getElementAt(selectedIndex);
+		PDF adresse = list.getModel().getElementAt(selectedIndex);
 
 		final TreePath path = find(allePdf, adresse);
 		tree.scrollPathToVisible(path);
@@ -81,13 +81,15 @@ public class ResultSelector extends KeyAdapter implements MouseListener {
 		tree.getSelectionModel().setSelectionPath(path);
 	}
 
-	private TreePath find(DefaultMutableTreeNode root, Adresse adresse) {
+	private TreePath find(DefaultMutableTreeNode root, PDF adresse) {
 		Enumeration<DefaultMutableTreeNode> e = root.depthFirstEnumeration();
 		while (e.hasMoreElements()) {
 			final DefaultMutableTreeNode node = e.nextElement();
-			final Adresse userObject = (Adresse) node.getUserObject();
-			if (userObject.equals(adresse)) {
-				return new TreePath(node.getPath());
+			if (node.getUserObject() instanceof PDF) {
+				final PDF userObject = (PDF) node.getUserObject();
+				if (userObject.equals(adresse)) {
+					return new TreePath(node.getPath());
+				}
 			}
 		}
 		return null;

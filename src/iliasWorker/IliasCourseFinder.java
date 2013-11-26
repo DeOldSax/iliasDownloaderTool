@@ -3,7 +3,8 @@ package iliasWorker;
 import java.util.ArrayList;
 import java.util.List;
 
-import model.Adresse;
+import model.Directory;
+import model.Folder;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -16,8 +17,8 @@ public class IliasCourseFinder {
 	 * @param html
 	 *            startPage
 	 */
-	public List<Adresse> getSubjects(String html) {
-		List<Adresse> subjects = new ArrayList<Adresse>();
+	public List<Directory> getSubjects(String html) {
+		List<Directory> subjects = new ArrayList<Directory>();
 		String s = null;
 		Document doc = Jsoup.parse(html);
 		List<Element> temp = doc.select("h4");
@@ -37,7 +38,7 @@ public class IliasCourseFinder {
 					int index = x.text().indexOf("]");
 					name = name.substring(index + 2);
 				}
-				subjects.add(new Adresse(name, url, null, false, false, 0));
+				subjects.add(new Folder(name, url, null));
 			}
 		}
 		return subjects;

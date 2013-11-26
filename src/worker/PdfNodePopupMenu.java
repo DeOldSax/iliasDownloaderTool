@@ -1,32 +1,44 @@
 package worker;
 
 import java.awt.Color;
+import java.awt.Desktop;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
+import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
-import model.Adresse;
+import model.Forum;
+import model.PDF;
 
 public class PdfNodePopupMenu extends MouseAdapter {
 	private static final String HERUNTERLADEN = "herunterladen";
-	private final JPopupMenu menu;
+	private static final String OEFFNEN = "öffnen";
+	private JPopupMenu menu;
 	private final IliasStarter iliasStarter;
 	private TreePath[] selectionPaths;
+	private final JMenuItem downloadMenuItem;
+	private final JMenuItem openForumMenuItem;
 
 	public PdfNodePopupMenu(IliasStarter iliasStarter) {
 		this.iliasStarter = iliasStarter;
 		this.menu = new JPopupMenu();
 
-		final JMenuItem downloadMenuItem = new JMenuItem(HERUNTERLADEN);
+		downloadMenuItem = new JMenuItem(HERUNTERLADEN);
 		downloadMenuItem.setOpaque(true);
 		downloadMenuItem.setBackground(Color.WHITE);
 		downloadMenuItem.addMouseListener(new Closer());
-		menu.add(downloadMenuItem);
+		openForumMenuItem = new JMenuItem(OEFFNEN);
+		openForumMenuItem.setOpaque(true);
+		openForumMenuItem.setBackground(Color.WHITE);
+		openForumMenuItem.addMouseListener(new Closer());
 	}
 
 	@Override
@@ -41,8 +53,18 @@ public class PdfNodePopupMenu extends MouseAdapter {
 	 * @wbp.parser.entryPoint
 	 */
 	private void showPopMenu(MouseEvent e) {
-		JTree selectedNode = (JTree) e.getSource();
-		selectionPaths = selectedNode.getSelectionPaths();
+		this.menu = new JPopupMenu();
+		JTree tree = (JTree) e.getSource();
+		selectionPaths = tree.getSelectionPaths();
+		for (TreePath path : selectionPaths) {
+			final Object selectedNode = ((DefaultMutableTreeNode) path.getLastPathComponent()).getUserObject();
+			if (selectedNode instanceof Forum) {
+				menu.add(openForumMenuItem);
+			}
+			if (selectedNode instanceof PDF) {
+				menu.add(downloadMenuItem);
+			}
+		}
 
 		menu.show(e.getComponent(), e.getX(), e.getY());
 		menu.setVisible(true);
@@ -56,15 +78,25 @@ public class PdfNodePopupMenu extends MouseAdapter {
 			JMenuItem selectedAction = (JMenuItem) e.getSource();
 			if (selectedAction.getText().equals(HERUNTERLADEN)) {
 				for (TreePath path : selectionPaths) {
-					final String filename = path.getLastPathComponent().toString();
-					new PdfDownloader().download(findAdresse(filename));
+					final PDF pdf = (PDF) ((DefaultMutableTreeNode) path.getLastPathComponent()).getUserObject();
+					new PdfDownloader().download(pdf);
+				}
+			}
+			if (selectedAction.getText().equals(OEFFNEN)) {
+				for (TreePath path : selectionPaths) {
+					final Forum forum = (Forum) ((DefaultMutableTreeNode) path.getLastPathComponent()).getUserObject();
+					try {
+						Desktop.getDesktop().browse(new URI(forum.getUrl()));
+					} catch (IOException | URISyntaxException e1) {
+						e1.printStackTrace();
+					}
 				}
 			}
 		}
 	}
 
-	private Adresse findAdresse(String filename) {
-		for (Adresse adresse : iliasStarter.getAllPdfs()) {
+	private PDF findAdresse(String filename) {
+		for (PDF adresse : iliasStarter.getAllPdfs()) {
 			if (adresse.getName().equals(filename)) {
 				return adresse;
 			}

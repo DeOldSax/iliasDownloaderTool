@@ -10,13 +10,13 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
-import model.Adresse;
+import model.PDF;
 
 public class ResultListPopupMenu extends MouseAdapter {
 	private static final String HERUNTERLADEN = "herunterladen";
 	private final JPopupMenu menu;
 	private final IliasStarter iliasStarter;
-	private JList<Adresse> list;
+	private JList<PDF> list;
 
 	public ResultListPopupMenu(IliasStarter iliasStarter) {
 		this.iliasStarter = iliasStarter;
@@ -31,7 +31,7 @@ public class ResultListPopupMenu extends MouseAdapter {
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		list = (JList<Adresse>) e.getSource();
+		list = (JList<PDF>) e.getSource();
 
 		if (SwingUtilities.isRightMouseButton(e) && !(list.getSelectedValuesList().size() == 0)) {
 			showPopMenu(e);
@@ -52,15 +52,15 @@ public class ResultListPopupMenu extends MouseAdapter {
 		@Override
 		public void mouseReleased(MouseEvent e) {
 			menu.setVisible(false);
-			List<Adresse> selectedValuesList = list.getSelectedValuesList();
-			for (Adresse adresse : selectedValuesList) {
-				new PdfDownloader().download(findAdresse(adresse));
+			List<PDF> selectedValuesList = list.getSelectedValuesList();
+			for (PDF pdf : selectedValuesList) {
+				new PdfDownloader().download(findAdresse(pdf));
 			}
 		}
 	}
 
-	private Adresse findAdresse(Adresse pdf) {
-		for (Adresse adresse : iliasStarter.getAllPdfs()) {
+	private PDF findAdresse(PDF pdf) {
+		for (PDF adresse : iliasStarter.getAllPdfs()) {
 			if (adresse.equals(pdf)) {
 				return adresse;
 			}

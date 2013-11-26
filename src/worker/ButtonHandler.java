@@ -9,8 +9,8 @@ import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
-import model.Adresse;
 import model.LocalDataReader;
+import model.PDF;
 import view.CustomNodeRenderer;
 import view.DownloaderToolWindow;
 import view.LocalFolderService;
@@ -20,7 +20,7 @@ public class ButtonHandler implements MouseListener {
 	private final String status;
 	private final JTree tree;
 	private final DefaultMutableTreeNode node;
-	private final List<Adresse> allPdf;
+	private final List<PDF> allPdf;
 	private final DownloaderToolWindow window;
 	private final IliasStarter iliasStarter;
 
@@ -65,7 +65,7 @@ public class ButtonHandler implements MouseListener {
 		tree.setCellRenderer(new CustomNodeRenderer(iliasStarter));
 		tree.getSelectionModel().clearSelection();
 		final List<Integer> allLocalPdfSizes = new LocalDataReader().searchPdf(LocalFolderService.getLocalIliasPathString());
-		for (Adresse adresse : allPdf) {
+		for (PDF adresse : allPdf) {
 			if (!allLocalPdfSizes.contains(adresse.getSize())) {
 				final TreePath treePath = findTreePath(node, adresse);
 				tree.scrollPathToVisible(treePath);
@@ -79,8 +79,8 @@ public class ButtonHandler implements MouseListener {
 		collapseAll(tree);
 		tree.setCellRenderer(new CustomNodeRenderer(iliasStarter));
 		tree.getSelectionModel().clearSelection();
-		for (Adresse pdf : allPdf) {
-			if (!pdf.isGelesen()) {
+		for (PDF pdf : allPdf) {
+			if (!pdf.isRead()) {
 				final TreePath path = findTreePath(node, pdf);
 				tree.getSelectionModel().setSelectionPath(path);
 				tree.scrollPathToVisible(path);
@@ -89,14 +89,16 @@ public class ButtonHandler implements MouseListener {
 		}
 	}
 
-	private TreePath findTreePath(DefaultMutableTreeNode root, Adresse pdf) {
+	private TreePath findTreePath(DefaultMutableTreeNode root, PDF pdf) {
 		@SuppressWarnings("unchecked")
 		Enumeration<DefaultMutableTreeNode> e = root.depthFirstEnumeration();
 		while (e.hasMoreElements()) {
 			DefaultMutableTreeNode node = e.nextElement();
-			Adresse adresse = (Adresse) node.getUserObject();
-			if (adresse.equals(pdf)) {
-				return new TreePath(node.getPath());
+			if (node.getUserObject() instanceof PDF) {
+				PDF adresse = (PDF) node.getUserObject();
+				if (adresse.equals(pdf)) {
+					return new TreePath(node.getPath());
+				}
 			}
 		}
 		return null;

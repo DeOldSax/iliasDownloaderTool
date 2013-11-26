@@ -9,8 +9,11 @@ import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
-import model.Adresse;
+import model.Directory;
+import model.Folder;
+import model.Forum;
 import model.LocalDataReader;
+import model.PDF;
 import worker.IliasStarter;
 
 public class CustomNodeRenderer extends DefaultTreeCellRenderer {
@@ -22,11 +25,12 @@ public class CustomNodeRenderer extends DefaultTreeCellRenderer {
 	private final Icon notInLocalFolderPdfIcon;
 	private final Icon folderIcon;
 	private final Icon folderIconUnread;
+	private final Icon forumIcon;
 	private final List<Integer> localPdfSizes;
-	private final List<Adresse> allPdfs;
-	private final List<Adresse> allFolders;
+	private final List<PDF> allPdfs;
+	private final List<Directory> allFolders;
 
-	private final List<Adresse> allKurse;
+	private final List<Directory> allKurse;
 
 	public CustomNodeRenderer(IliasStarter iliasStarter) {
 		allPdfs = iliasStarter.getAllPdfs();
@@ -38,6 +42,7 @@ public class CustomNodeRenderer extends DefaultTreeCellRenderer {
 		notInLocalFolderPdfIcon = new ImageIcon(CustomNodeRenderer.class.getResource("pdf_icon_notLocal.png"));
 		folderIcon = new ImageIcon(CustomNodeRenderer.class.getResource("folder_icon.jpg"));
 		folderIconUnread = new ImageIcon(CustomNodeRenderer.class.getResource("folder_icon_unread.jpg"));
+		forumIcon = new ImageIcon(CustomNodeRenderer.class.getResource("forum_icon.gif"));
 	}
 
 	@Override
@@ -45,30 +50,44 @@ public class CustomNodeRenderer extends DefaultTreeCellRenderer {
 			boolean hasFocus) {
 
 		super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
-		if (leaf) {
+		DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
+
+		if (node.getUserObject() instanceof PDF) {
 			setIcon(normalPdfIcon);
 		}
-		if (adresseIsUnreadPdf(value)) {
+
+		if (adresseIsUnreadPdf(node)) {
 			setIcon(unreadPdfIcon);
 		}
-		if (adresseIsNotOnLocalFolder(value)) {
+
+		if (adresseIsNotOnLocalFolder(node)) {
 			setIcon(notInLocalFolderPdfIcon);
 		}
-		if (!leaf || adresseIsFolder(value)) {
-			// if (folderContainsUnreadSubContent(value)) {
-			// setIcon(folderIconUnread);
-			// break;
-			// }
-			setIcon(folderIcon);
 
+		if (node.getUserObject() instanceof Forum) {
+			setIcon(forumIcon);
 		}
+
+		if (node.getUserObject() instanceof Folder) {
+			setIcon(folderIcon);
+		}
+
+		// if (!leaf || adresseIsFolder(value)) {
+		// // if (folderContainsUnreadSubContent(value)) {
+		// // setIcon(folderIconUnread);
+		// // break;
+		// // }
+		//
+		// }
 		return this;
 	}
 
-	private boolean adresseIsNotOnLocalFolder(Object value) {
-		DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
-		Adresse pdf = (Adresse) node.getUserObject();
-		for (Adresse adresse : allPdfs) {
+	private boolean adresseIsNotOnLocalFolder(DefaultMutableTreeNode node) {
+		if (!(node.getUserObject() instanceof PDF)) {
+			return false;
+		}
+		PDF pdf = (PDF) node.getUserObject();
+		for (PDF adresse : allPdfs) {
 			if (adresse.equals(pdf)) {
 				return !localPdfSizes.contains(adresse.getSize());
 			}
@@ -76,22 +95,21 @@ public class CustomNodeRenderer extends DefaultTreeCellRenderer {
 		return false;
 	}
 
-	private boolean adresseIsUnreadPdf(Object value) {
-		DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
-		Adresse pdf = (Adresse) node.getUserObject();
-		for (Adresse adresse : allPdfs) {
-			if (adresse.equals(pdf)) {
-				return !adresse.isGelesen();
-			}
+	private boolean adresseIsUnreadPdf(DefaultMutableTreeNode node) {
+		if (!(node.getUserObject() instanceof PDF)) {
+			return false;
 		}
-		return false;
+		return !((PDF) node.getUserObject()).isRead();
 	}
 
 	private boolean folderContainsUnreadSubContent(Object value) {
+		if (!(value instanceof Folder)) {
+			return false;
+		}
 		DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
-		Adresse pdf = (Adresse) node.getUserObject();
-		for (Adresse adresse : allPdfs) {
-			if (adresse.equals(pdf)) {
+		Folder folder = (Folder) node.getUserObject();
+		for (PDF pdf : allPdfs) {
+			if (pdf.equals(folder)) {
 
 			}
 		}
@@ -99,18 +117,19 @@ public class CustomNodeRenderer extends DefaultTreeCellRenderer {
 	}
 
 	private boolean adresseIsFolder(Object value) {
-		DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
-		Adresse dir = (Adresse) node.getUserObject();
-		for (Adresse adresse : allFolders) {
-			if (adresse.equals(dir)) {
-				return adresse.isFolder();
-			}
-		}
-		// for (Adresse adresse : allKurse) {
-		// if (adresse.getName().equals(name)) {
-		// return true;
+		return value instanceof Folder;
+		// DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
+		// Adresse dir = (Adresse) node.getUserObject();
+		// for (Adresse adresse : allFolders) {
+		// if (adresse.equals(dir)) {
+		// return adresse.isFolder();
 		// }
 		// }
-		return false;
+		// // for (Adresse adresse : allKurse) {
+		// // if (adresse.getName().equals(name)) {
+		// // return true;
+		// // }
+		// // }
+		// return false;
 	}
 }

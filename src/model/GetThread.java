@@ -33,10 +33,10 @@ public class GetThread extends Thread {
 	HttpResponse response;
 	BasicCookieStore cookiestore;
 	LaxRedirectStrategy strategy;
-	private final Adresse adresse;
+	private final Directory adresse;
 	private final List<Integer> localData;
 
-	public GetThread(Adresse adresse, List<Integer> localData) {
+	public GetThread(Directory adresse, List<Integer> localData) {
 		this.adresse = adresse;
 		this.localData = localData;
 		this.context = new BasicHttpContext();

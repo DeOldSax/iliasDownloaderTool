@@ -10,8 +10,8 @@ import java.io.IOException;
 
 import javax.swing.JFileChooser;
 
-import model.Adresse;
 import model.LocalDataReader;
+import model.PDF;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -25,16 +25,16 @@ public class FileDownloader implements Runnable {
 	private HttpResponse response;
 	private BasicHttpContext context;
 	private HttpEntity entity;
-	private final Adresse adresse;
+	private final PDF pdf;
 	private String targetPath;
 	private final String type;
 	private final JFileChooser fileChooser;
 	private String name;
 
-	public FileDownloader(Adresse adresse, String type) {
+	public FileDownloader(PDF pdf, String type) {
 		LookAndFeelChanger.changeToNative();
-		this.adresse = adresse;
-		this.targetPath = new LocalDataReader().findLocalDownloadPath(adresse);
+		this.pdf = pdf;
+		this.targetPath = new LocalDataReader().findLocalDownloadPath(pdf);
 		this.type = type;
 		fileChooser = new JFileChooser();
 	}
@@ -42,13 +42,13 @@ public class FileDownloader implements Runnable {
 	@Override
 	public void run() {
 		try {
-			name = adresse.getName().replace(":", " - ").replace("/", "+");
+			name = pdf.getName().replace(":", " - ").replace("/", "+");
 
 			final boolean saved = openFileChooser();
 			LookAndFeelChanger.changeToJava();
 
 			if (saved) {
-				request = new HttpGet(adresse.getUrl());
+				request = new HttpGet(pdf.getUrl());
 
 				response = Ilias.getClient().execute(request, context);
 				entity = response.getEntity();

@@ -7,7 +7,8 @@ import iliasWorker.IliasPdfFinder;
 import java.awt.EventQueue;
 import java.util.List;
 
-import model.Adresse;
+import model.Directory;
+import model.PDF;
 import view.LocalFolderService;
 import view.LoginLoader;
 import view.LoginWindow;
@@ -16,12 +17,12 @@ public class IliasStarter implements Runnable {
 
 	private Ilias ilias;
 	private String htmlContent;
-	private List<Adresse> kurse;
-	private List<Adresse> allPdfs;
+	private List<Directory> kurse;
+	private List<PDF> allPdfs;
 	private final String username;
 	private final String password;
 	private LoginLoader loginLoader;
-	private List<Adresse> allDirs;
+	private List<Directory> allDirs;
 
 	public IliasStarter(String username, String password) {
 		this.username = username;
@@ -81,15 +82,15 @@ public class IliasStarter implements Runnable {
 		localFolderPath.showDialog();
 	}
 
-	public List<Adresse> getKurse() {
+	public List<Directory> getKurse() {
 		return kurse;
 	}
 
-	public List<Adresse> getAllPdfs() {
+	public List<PDF> getAllPdfs() {
 		return allPdfs;
 	}
 
-	public List<Adresse> getAllFolder() {
+	public List<Directory> getAllFolder() {
 		return allDirs;
 	}
 }

@@ -4,19 +4,22 @@ import java.util.List;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import model.Adresse;
+import model.Directory;
+import model.Folder;
+import model.Forum;
+import model.PDF;
 
 public class JTreeContentFiller {
-	public void addKurseToTree(DefaultMutableTreeNode top, List<Adresse> kurse) {
-		for (Adresse adresse : kurse) {
-			DefaultMutableTreeNode topsChilds = new DefaultMutableTreeNode(adresse);
+	public void addKurseToTree(DefaultMutableTreeNode top, List<Directory> kurse) {
+		for (Directory directory : kurse) {
+			DefaultMutableTreeNode topsChilds = new DefaultMutableTreeNode(directory);
 			top.add(topsChilds);
-			for (Adresse subDir : adresse.getChildFolders()) {
+			for (Directory subDir : directory.getChildFolders()) {
 				final DefaultMutableTreeNode subDirNode = new DefaultMutableTreeNode(subDir);
-				if (subDir.isPdf()) {
+				if (subDir instanceof PDF || subDir instanceof Forum) {
 					topsChilds.add(subDirNode);
 				}
-				if (subDir.isFolder()) {
+				if (subDir instanceof Folder) {
 					addKurseToTree(subDirNode, subDir.getChildFolders());
 					topsChilds.add(subDirNode);
 				}
@@ -24,24 +27,24 @@ public class JTreeContentFiller {
 		}
 	}
 
-	public void addKurseUngelesenToTree(DefaultMutableTreeNode top, List<Adresse> kurse) {
-		for (Adresse adresse : kurse) {
-			if (adresse.isFolder() && noFurtherSubContent(adresse)) {
+	public void addKurseUngelesenToTree(DefaultMutableTreeNode top, List<Directory> kurse) {
+		for (Directory adresse : kurse) {
+			if ((adresse instanceof Folder || adresse instanceof Forum) && noFurtherSubContent(adresse)) {
 				return;
 			}
 			DefaultMutableTreeNode topsChilds = new DefaultMutableTreeNode(adresse);
-			if (!adresse.isGelesen() && adresse.isPdf() || adresse.isFolder()) {
+			if (!((PDF) adresse).isRead() && adresse instanceof PDF || adresse instanceof Folder || adresse instanceof Forum) {
 				top.add(topsChilds);
 			}
-			for (Adresse subDir : adresse.getChildFolders()) {
+			for (Directory subDir : adresse.getChildFolders()) {
 				final DefaultMutableTreeNode subDirNode = new DefaultMutableTreeNode(subDir);
-				if (subDir.isFolder() && noFurtherSubContent(subDir)) {
+				if (subDir instanceof Folder || subDir instanceof Forum && noFurtherSubContent(subDir)) {
 					return;
 				}
-				if (subDir.isPdf() && !subDir.isGelesen()) {
+				if (subDir instanceof PDF && !((PDF) subDir).isRead()) {
 					topsChilds.add(subDirNode);
 				}
-				if (subDir.isFolder()) {
+				if (subDir instanceof Folder || subDir instanceof Forum) {
 					addKurseToTree(subDirNode, subDir.getChildFolders());
 					topsChilds.add(subDirNode);
 				}
@@ -49,8 +52,8 @@ public class JTreeContentFiller {
 		}
 	}
 
-	private boolean noFurtherSubContent(Adresse adresse) {
-		if (adresse.getChildFolders().isEmpty()) {
+	private boolean noFurtherSubContent(Directory directory) {
+		if (directory.getChildFolders().isEmpty()) {
 			return true;
 		}
 		return false;

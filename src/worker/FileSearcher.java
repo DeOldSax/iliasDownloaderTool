@@ -7,16 +7,16 @@ import java.util.List;
 
 import javax.swing.JTextField;
 
-import model.Adresse;
+import model.PDF;
 import view.DownloaderToolWindow;
 
 public class FileSearcher extends KeyAdapter {
 
-	private final List<Adresse> allPdfs;
+	private final List<PDF> allPdfs;
 	private final JTextField word;
 	private final DownloaderToolWindow window;
 
-	public FileSearcher(List<Adresse> allPdfs, JTextField word, DownloaderToolWindow window) {
+	public FileSearcher(List<PDF> allPdfs, JTextField word, DownloaderToolWindow window) {
 		this.allPdfs = allPdfs;
 		this.word = word;
 		this.window = window;
@@ -38,47 +38,48 @@ public class FileSearcher extends KeyAdapter {
 	}
 
 	private void act() {
-		List<Adresse> alreadyAddedStrings = new ArrayList<Adresse>();
+		List<PDF> alreadyAddedPDF = new ArrayList<PDF>();
 		window.clearResultList();
 		if (word.getText().isEmpty() || word.getText().equals(" ")) {
 			return;
 		}
-		for (Adresse pdf : allPdfs) {
+		for (PDF pdf : allPdfs) {
 			final String[] splitedStrings = pdf.getName().split(" ");
 			for (int i = 0; i < splitedStrings.length; i++) {
 				splitedStrings[i] = (splitedStrings[i] + " ").toLowerCase();
 			}
 			for (int i = 0; i < splitedStrings.length; i++) {
-				if (splitedStrings[i].startsWith(word.getText().toLowerCase()) && !alreadyAddedStrings.contains(pdf.getName())) {
+				if (splitedStrings[i].startsWith(word.getText().toLowerCase()) && !alreadyAddedPDF.contains(pdf)) {
 					window.addToResultList(pdf);
-					alreadyAddedStrings.add(pdf);
+					alreadyAddedPDF.add(pdf);
 					continue;
 				}
 				if (word.getText().contains(" ") && pdf.getName().toLowerCase().contains(word.getText().toLowerCase())
-						&& !alreadyAddedStrings.contains(pdf.getName())) {
+						&& !alreadyAddedPDF.contains(pdf)) {
 					window.addToResultList(pdf);
-					alreadyAddedStrings.add(pdf);
+					alreadyAddedPDF.add(pdf);
 					continue;
 				}
-				if (splitedStrings[i].toLowerCase().contains(word.getText().toLowerCase()) && !alreadyAddedStrings.contains(pdf.getName())) {
+				if (splitedStrings[i].toLowerCase().contains(word.getText().toLowerCase()) && !alreadyAddedPDF.contains(pdf)) {
 					window.addToResultList(pdf);
-					alreadyAddedStrings.add(pdf);
+					alreadyAddedPDF.add(pdf);
 					continue;
 				}
-				if (pdf.getParentFolder() != null) {
-					if (word.getText().length() > 3 && pdf.getParentFolder().getName().toLowerCase().contains(word.getText().toLowerCase())
-							&& !alreadyAddedStrings.contains(pdf.getName())) {
+				if (pdf.getParentDirectory() != null) {
+					if (word.getText().length() > 3
+							&& pdf.getParentDirectory().getName().toLowerCase().contains(word.getText().toLowerCase())
+							&& !alreadyAddedPDF.contains(pdf)) {
 						window.addToResultList(pdf);
-						alreadyAddedStrings.add(pdf);
+						alreadyAddedPDF.add(pdf);
 					}
 					continue;
 				}
-				if (pdf.getParentFolder().getParentFolder() != null) {
+				if (pdf.getParentDirectory().getParentDirectory() != null) {
 					if (word.getText().length() > 3
-							&& pdf.getParentFolder().getParentFolder().getName().toLowerCase().contains(word.getText().toLowerCase())
-							&& !alreadyAddedStrings.contains(pdf.getName())) {
+							&& pdf.getParentDirectory().getParentDirectory().getName().toLowerCase().contains(word.getText().toLowerCase())
+							&& !alreadyAddedPDF.contains(pdf)) {
 						window.addToResultList(pdf);
-						alreadyAddedStrings.add(pdf);
+						alreadyAddedPDF.add(pdf);
 					}
 					continue;
 				}
