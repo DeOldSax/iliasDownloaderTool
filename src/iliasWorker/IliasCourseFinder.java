@@ -12,7 +12,7 @@ import org.jsoup.nodes.Element;
 
 public class IliasCourseFinder {
 	/**
-	 * saves all subjects and urls from startpage in List subject<Adresse>
+	 * saves all subjects and urls from startpage in List subject<Directory>
 	 * 
 	 * @param html
 	 *            startPage

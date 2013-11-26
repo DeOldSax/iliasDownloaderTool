@@ -7,34 +7,42 @@ import java.net.URISyntaxException;
 
 import javax.swing.JOptionPane;
 
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import view.LookAndFeelChanger;
 
 public class VersionValidator {
 	private final int YES = 0;
-	private final String VERSION = "v0.1.0";
+	private final String VERSION = "v0.1.5";
 	private String LATEST_VERSION;
 
 	public boolean validate() {
 		LookAndFeelChanger.changeToNative();
-		// TODO call Version in git
 
 		DefaultHttpClient client = new DefaultHttpClient();
-		final HttpGet request = new HttpGet("https://github.com/repos/DeOldSax/iliasDownloaderTool/v0.1.0");
-		// final HttpGet request = new
-		// HttpGet("/repos/:owner/:repo/releases/:id");
+		final HttpGet request = new HttpGet("https://github.com/DeOldSax/iliasDownloaderTool/releases/latest");
 		HttpResponse response = null;
-		String content = null;
 		try {
 			response = client.execute(request);
-			HttpEntity entity = response.getEntity();
-			content = EntityUtils.toString(entity);
-			System.out.println(content);
+			String content = EntityUtils.toString(response.getEntity());
+			Document doc = Jsoup.parse(content);
+			final Elements select = doc.select("span");
+			for (Element element : select) {
+				if (element.attr("class").equals("css-truncate-target")) {
+					LATEST_VERSION = element.text();
+					if (!LATEST_VERSION.startsWith("v")) {
+						LATEST_VERSION = VERSION;
+					}
+				}
+			}
+
 		} catch (IOException e) {
 			e.printStackTrace();
 			return false;

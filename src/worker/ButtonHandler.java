@@ -9,11 +9,9 @@ import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
-import model.LocalDataReader;
 import model.PDF;
 import view.CustomNodeRenderer;
 import view.DownloaderToolWindow;
-import view.LocalFolderService;
 
 public class ButtonHandler implements MouseListener {
 
@@ -64,7 +62,7 @@ public class ButtonHandler implements MouseListener {
 		collapseAll(tree);
 		tree.setCellRenderer(new CustomNodeRenderer(iliasStarter));
 		tree.getSelectionModel().clearSelection();
-		final List<Integer> allLocalPdfSizes = new LocalDataReader().searchPdf(LocalFolderService.getLocalIliasPathString());
+		final List<Integer> allLocalPdfSizes = new LocalDataReader().getAllLocalPDFSizes();
 		for (PDF adresse : allPdf) {
 			if (!allLocalPdfSizes.contains(adresse.getSize())) {
 				final TreePath treePath = findTreePath(node, adresse);

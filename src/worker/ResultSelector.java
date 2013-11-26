@@ -16,13 +16,14 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
 import model.PDF;
+import model.SearchResult;
 
 public class ResultSelector extends KeyAdapter implements MouseListener {
 	private final DefaultMutableTreeNode allePdf;
 	private final JTree tree;
-	private final JList<PDF> resultList;
+	private final JList<SearchResult> resultList;
 
-	public ResultSelector(DefaultMutableTreeNode allePdf, JTree tree, JList<PDF> resultList) {
+	public ResultSelector(DefaultMutableTreeNode allePdf, JTree tree, JList<SearchResult> resultList) {
 		this.allePdf = allePdf;
 		this.tree = tree;
 		this.resultList = resultList;
@@ -70,12 +71,12 @@ public class ResultSelector extends KeyAdapter implements MouseListener {
 
 	private void openNodeInTree(InputEvent e) {
 		resultList.setSelectionForeground(Color.WHITE);
-		final JList<PDF> list = (JList<PDF>) e.getSource();
+		final JList<SearchResult> list = (JList<SearchResult>) e.getSource();
 		collapseAll(tree);
 		final int selectedIndex = list.getSelectedIndex();
-		PDF adresse = list.getModel().getElementAt(selectedIndex);
+		PDF pdf = list.getModel().getElementAt(selectedIndex).getPdf();
 
-		final TreePath path = find(allePdf, adresse);
+		final TreePath path = find(allePdf, pdf);
 		tree.scrollPathToVisible(path);
 		tree.getSelectionModel().clearSelection();
 		tree.getSelectionModel().setSelectionPath(path);

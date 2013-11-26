@@ -27,6 +27,7 @@ import laf.FocusBorderOfTree;
 import laf.TextFieldListener;
 import model.Directory;
 import model.PDF;
+import model.SearchResult;
 import worker.ButtonHandler;
 import worker.EmailOpener;
 import worker.FileSearcher;
@@ -44,8 +45,8 @@ public class DownloaderToolWindow {
 	private final JTree treeAllePdf;
 	private final JScrollPane treeAllePdfScrollPane, resultListScrollPane;
 	private final JTextField search;
-	private final Vector<PDF> resultVector;
-	private final JList<PDF> searchResults;
+	private final Vector<SearchResult> resultVector;
+	private final JList<SearchResult> searchResults;
 	private final JTreeContentFiller treeFiller;
 
 	/**
@@ -114,16 +115,16 @@ public class DownloaderToolWindow {
 		renderer.setBorderSelectionColor(Color.LIGHT_GRAY);
 		treeAllePdfScrollPane = new JScrollPane(treeAllePdf);
 		treeAllePdfScrollPane.setBorder(new LineBorder(Color.LIGHT_GRAY, 1, true));
-		treeAllePdf.addMouseListener(new PdfNodePopupMenu(iliasStarter));
+		treeAllePdf.addMouseListener(new PdfNodePopupMenu());
 		treeAllePdf.addMouseListener(new FocusBorderOfTree());
 		treeAllePdf.setCellRenderer(new CustomNodeRenderer(iliasStarter));
 
-		searchResults = new JList<PDF>();
+		searchResults = new JList<SearchResult>();
 		resultListScrollPane = new JScrollPane(searchResults);
 		searchResults.setSelectionBackground(Color.BLUE);
 		searchResults.setBorder(new LineBorder(Color.LIGHT_GRAY, 1, true));
 		searchResults.setFont(new Font("Calibri", Font.PLAIN, 14));
-		resultVector = new Vector<PDF>();
+		resultVector = new Vector<SearchResult>();
 		searchResults.addMouseListener(new ResultSelector(overview, treeAllePdf, searchResults));
 		searchResults.addMouseListener(new ResultListPopupMenu(iliasStarter));
 		searchResults.addKeyListener(new ResultSelector(overview, treeAllePdf, searchResults));
@@ -149,8 +150,8 @@ public class DownloaderToolWindow {
 		searchResults.setListData(resultVector);
 	}
 
-	public void addToResultList(PDF adresse) {
-		resultVector.add(adresse);
+	public void addToResultList(PDF pdf) {
+		resultVector.add(new SearchResult(pdf));
 		searchResults.setListData(resultVector);
 	}
 }

@@ -10,7 +10,6 @@ import java.io.IOException;
 
 import javax.swing.JFileChooser;
 
-import model.LocalDataReader;
 import model.PDF;
 
 import org.apache.http.HttpEntity;

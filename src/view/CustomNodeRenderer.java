@@ -9,12 +9,11 @@ import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
-import model.Directory;
 import model.Folder;
 import model.Forum;
-import model.LocalDataReader;
 import model.PDF;
 import worker.IliasStarter;
+import worker.LocalDataReader;
 
 public class CustomNodeRenderer extends DefaultTreeCellRenderer {
 
@@ -28,15 +27,10 @@ public class CustomNodeRenderer extends DefaultTreeCellRenderer {
 	private final Icon forumIcon;
 	private final List<Integer> localPdfSizes;
 	private final List<PDF> allPdfs;
-	private final List<Directory> allFolders;
-
-	private final List<Directory> allKurse;
 
 	public CustomNodeRenderer(IliasStarter iliasStarter) {
 		allPdfs = iliasStarter.getAllPdfs();
-		localPdfSizes = new LocalDataReader().searchPdf(LocalFolderService.getLocalIliasPathString());
-		allFolders = iliasStarter.getAllFolder();
-		allKurse = iliasStarter.getKurse();
+		localPdfSizes = new LocalDataReader().getAllLocalPDFSizes();
 		normalPdfIcon = new ImageIcon(CustomNodeRenderer.class.getResource("pdf_icon.png"));
 		unreadPdfIcon = new ImageIcon(CustomNodeRenderer.class.getResource("pdf_icon_unread.png"));
 		notInLocalFolderPdfIcon = new ImageIcon(CustomNodeRenderer.class.getResource("pdf_icon_notLocal.png"));
@@ -69,16 +63,13 @@ public class CustomNodeRenderer extends DefaultTreeCellRenderer {
 		}
 
 		if (node.getUserObject() instanceof Folder) {
-			setIcon(folderIcon);
+			Folder folder = (Folder) node.getUserObject();
+			if (folder.hasUnreadOrNotOnLocalFolderSubContent()) {
+				setIcon(folderIconUnread);
+			} else {
+				setIcon(folderIcon);
+			}
 		}
-
-		// if (!leaf || adresseIsFolder(value)) {
-		// // if (folderContainsUnreadSubContent(value)) {
-		// // setIcon(folderIconUnread);
-		// // break;
-		// // }
-		//
-		// }
 		return this;
 	}
 
@@ -100,36 +91,5 @@ public class CustomNodeRenderer extends DefaultTreeCellRenderer {
 			return false;
 		}
 		return !((PDF) node.getUserObject()).isRead();
-	}
-
-	private boolean folderContainsUnreadSubContent(Object value) {
-		if (!(value instanceof Folder)) {
-			return false;
-		}
-		DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
-		Folder folder = (Folder) node.getUserObject();
-		for (PDF pdf : allPdfs) {
-			if (pdf.equals(folder)) {
-
-			}
-		}
-		return false;
-	}
-
-	private boolean adresseIsFolder(Object value) {
-		return value instanceof Folder;
-		// DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
-		// Adresse dir = (Adresse) node.getUserObject();
-		// for (Adresse adresse : allFolders) {
-		// if (adresse.equals(dir)) {
-		// return adresse.isFolder();
-		// }
-		// }
-		// // for (Adresse adresse : allKurse) {
-		// // if (adresse.getName().equals(name)) {
-		// // return true;
-		// // }
-		// // }
-		// return false;
 	}
 }

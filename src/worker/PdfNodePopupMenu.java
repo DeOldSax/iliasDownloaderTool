@@ -22,15 +22,12 @@ public class PdfNodePopupMenu extends MouseAdapter {
 	private static final String HERUNTERLADEN = "herunterladen";
 	private static final String OEFFNEN = "öffnen";
 	private JPopupMenu menu;
-	private final IliasStarter iliasStarter;
 	private TreePath[] selectionPaths;
 	private final JMenuItem downloadMenuItem;
 	private final JMenuItem openForumMenuItem;
 
-	public PdfNodePopupMenu(IliasStarter iliasStarter) {
-		this.iliasStarter = iliasStarter;
+	public PdfNodePopupMenu() {
 		this.menu = new JPopupMenu();
-
 		downloadMenuItem = new JMenuItem(HERUNTERLADEN);
 		downloadMenuItem.setOpaque(true);
 		downloadMenuItem.setBackground(Color.WHITE);
@@ -73,9 +70,9 @@ public class PdfNodePopupMenu extends MouseAdapter {
 	private class Closer extends MouseAdapter {
 
 		@Override
-		public void mouseReleased(MouseEvent e) {
+		public void mouseReleased(MouseEvent event) {
 			menu.setVisible(false);
-			JMenuItem selectedAction = (JMenuItem) e.getSource();
+			JMenuItem selectedAction = (JMenuItem) event.getSource();
 			if (selectedAction.getText().equals(HERUNTERLADEN)) {
 				for (TreePath path : selectionPaths) {
 					final PDF pdf = (PDF) ((DefaultMutableTreeNode) path.getLastPathComponent()).getUserObject();
@@ -93,14 +90,5 @@ public class PdfNodePopupMenu extends MouseAdapter {
 				}
 			}
 		}
-	}
-
-	private PDF findAdresse(String filename) {
-		for (PDF adresse : iliasStarter.getAllPdfs()) {
-			if (adresse.getName().equals(filename)) {
-				return adresse;
-			}
-		}
-		return null;
 	}
 }
