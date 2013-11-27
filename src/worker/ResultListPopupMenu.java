@@ -10,19 +10,16 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
-import model.PDF;
+import model.SearchResult;
 
 public class ResultListPopupMenu extends MouseAdapter {
-	private static final String HERUNTERLADEN = "herunterladen";
+	private static final String DOWNLOAD = "herunterladen";
 	private final JPopupMenu menu;
-	private final IliasStarter iliasStarter;
-	private JList<PDF> list;
+	private JList<SearchResult> list;
 
-	public ResultListPopupMenu(IliasStarter iliasStarter) {
-		this.iliasStarter = iliasStarter;
+	public ResultListPopupMenu() {
 		this.menu = new JPopupMenu();
-
-		final JMenuItem downloadMenuItem = new JMenuItem(HERUNTERLADEN);
+		final JMenuItem downloadMenuItem = new JMenuItem(DOWNLOAD);
 		downloadMenuItem.setOpaque(true);
 		downloadMenuItem.setBackground(Color.WHITE);
 		downloadMenuItem.addMouseListener(new Closer());
@@ -30,11 +27,19 @@ public class ResultListPopupMenu extends MouseAdapter {
 	}
 
 	@Override
-	public void mouseReleased(MouseEvent e) {
-		list = (JList<PDF>) e.getSource();
+	public void mouseReleased(MouseEvent event) {
+		list = (JList<SearchResult>) event.getSource();
 
-		if (SwingUtilities.isRightMouseButton(e) && !(list.getSelectedValuesList().size() == 0)) {
-			showPopMenu(e);
+		if (SwingUtilities.isRightMouseButton(event) && !(list.getSelectedValuesList().size() == 0)) {
+			showPopMenu(event);
+		}
+	}
+
+	@Override
+	public void mouseClicked(MouseEvent event) {
+		list = (JList<SearchResult>) event.getSource();
+		if (event.getClickCount() == 2 && !(list.getSelectedValuesList().size() == 0)) {
+			startDownload();
 		}
 	}
 
@@ -47,24 +52,20 @@ public class ResultListPopupMenu extends MouseAdapter {
 		menu.setVisible(true);
 	}
 
+	private void startDownload() {
+		List<SearchResult> selectedValuesList = list.getSelectedValuesList();
+		for (SearchResult searchResult : selectedValuesList) {
+			new PdfDownloader().download(searchResult.getPdf());
+		}
+	}
+
 	private class Closer extends MouseAdapter {
 
 		@Override
 		public void mouseReleased(MouseEvent e) {
 			menu.setVisible(false);
-			List<PDF> selectedValuesList = list.getSelectedValuesList();
-			for (PDF pdf : selectedValuesList) {
-				new PdfDownloader().download(findAdresse(pdf));
-			}
+			startDownload();
 		}
-	}
 
-	private PDF findAdresse(PDF pdf) {
-		for (PDF adresse : iliasStarter.getAllPdfs()) {
-			if (adresse.equals(pdf)) {
-				return adresse;
-			}
-		}
-		return null;
 	}
 }

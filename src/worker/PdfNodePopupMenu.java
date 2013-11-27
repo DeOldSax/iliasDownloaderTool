@@ -45,6 +45,13 @@ public class PdfNodePopupMenu extends MouseAdapter {
 		}
 	}
 
+	@Override
+	public void mouseClicked(MouseEvent event) {
+		if (event.getClickCount() == 2) {
+
+		}
+	}
+
 	/**
 	 * @param e
 	 * @wbp.parser.entryPoint

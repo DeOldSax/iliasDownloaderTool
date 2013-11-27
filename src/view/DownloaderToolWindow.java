@@ -84,7 +84,7 @@ public class DownloaderToolWindow {
 		//
 
 		treeFiller.addKurseToTree(overview, iliasStarter.getKurse());
-		final Enumeration children = overview.children();
+		final Enumeration<?> children = overview.children();
 		while (children.hasMoreElements()) {
 			DefaultMutableTreeNode object = (DefaultMutableTreeNode) children.nextElement();
 			treeAllePdf.scrollPathToVisible(new TreePath(object.getPath()));
@@ -126,7 +126,7 @@ public class DownloaderToolWindow {
 		searchResults.setFont(new Font("Calibri", Font.PLAIN, 14));
 		resultVector = new Vector<SearchResult>();
 		searchResults.addMouseListener(new ResultSelector(overview, treeAllePdf, searchResults));
-		searchResults.addMouseListener(new ResultListPopupMenu(iliasStarter));
+		searchResults.addMouseListener(new ResultListPopupMenu());
 		searchResults.addKeyListener(new ResultSelector(overview, treeAllePdf, searchResults));
 
 		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, treeAllePdfScrollPane, resultListScrollPane);
