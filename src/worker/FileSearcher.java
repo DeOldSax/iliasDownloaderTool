@@ -38,12 +38,15 @@ public class FileSearcher extends KeyAdapter {
 	}
 
 	private void act() {
-		List<PDF> alreadyAddedPDF = new ArrayList<PDF>();
 		window.clearResultList();
+		List<PDF> alreadyAddedPDF = new ArrayList<PDF>();
 		if (word.getText().isEmpty() || word.getText().equals(" ")) {
 			return;
 		}
 		for (PDF pdf : allPdfs) {
+			if (pdf.isIgnored()) {
+				continue;
+			}
 			final String[] splitedStrings = pdf.getName().split(" ");
 			for (int i = 0; i < splitedStrings.length; i++) {
 				splitedStrings[i] = (splitedStrings[i] + " ").toLowerCase();

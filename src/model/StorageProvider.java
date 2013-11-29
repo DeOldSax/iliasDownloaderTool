@@ -61,4 +61,26 @@ public class StorageProvider {
 	public String getPassword() {
 		return myPrefs.get("password", "");
 	}
+
+	public void storeIgnoredPdfSize(PDF pdf) {
+		String key = createKey(pdf);
+		myPrefs.putInt(key, pdf.getSize());
+	}
+
+	public int isIgnored(PDF pdf) {
+		String key = createKey(pdf);
+		return myPrefs.getInt(key, -1);
+	}
+
+	public void removeIgnoredPdfSize(PDF pdf) {
+		myPrefs.remove(createKey(pdf));
+	}
+
+	private String createKey(PDF pdf) {
+		String key = pdf.getUrl();
+		final int beginIndex = key.indexOf("ref_id=");
+		final int endIndex = key.indexOf("&cmd=sendfile");
+		key = key.substring(beginIndex + 7, endIndex);
+		return key;
+	}
 }

@@ -10,6 +10,7 @@ import java.util.Vector;
 
 import javax.swing.JFrame;
 import javax.swing.JList;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
@@ -30,11 +31,13 @@ import model.PDF;
 import model.SearchResult;
 import worker.ButtonHandler;
 import worker.EmailOpener;
+import worker.FAQOpener;
 import worker.FileSearcher;
 import worker.IliasStarter;
 import worker.PdfNodePopupMenu;
 import worker.ResultListPopupMenu;
 import worker.ResultSelector;
+import worker.TreeCollapser;
 
 public class DownloaderToolWindow {
 
@@ -59,7 +62,6 @@ public class DownloaderToolWindow {
 		c = window.getContentPane();
 		c.setLayout(new BorderLayout());
 		backgroundNorth = new Background();
-		backgroundNorth.setLayout(new GridLayout(1, 0, 20, 20));
 		backgroundNorth.setBorder(new EmptyBorder(20, 20, 0, 20));
 		c.add(backgroundNorth, BorderLayout.NORTH);
 		backgroundSouth = new Background();
@@ -67,20 +69,30 @@ public class DownloaderToolWindow {
 		backgroundSouth.setBorder(new EmptyBorder(20, 20, 20, 20));
 		c.add(backgroundSouth, BorderLayout.SOUTH);
 
-		window.setSize(920, 500);
+		window.setSize(1200, 530);
 		window.setTitle("DownloaderTool");
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setResizable(true);
 		window.setLocationRelativeTo(null);
 
-		Button actionButton = new Button("   ungelesene Dateien anzeigen   ");
-		backgroundNorth.add(actionButton);
 		overview = new DefaultMutableTreeNode(new Directory("Übersicht", null, null));
 		treeAllePdf = new JTree(overview);
-		actionButton.addMouseListener(new ButtonHandler("ungelesen", treeAllePdf, overview, iliasStarter, this));
-		Button actionButton2 = new Button("   lokal nicht vorhandene Dateien anzeigen   ");
-		actionButton2.addMouseListener(new ButtonHandler("nicht_vorhanden", treeAllePdf, overview, iliasStarter, this));
-		backgroundNorth.add(actionButton2);
+		backgroundNorth.setLayout(new BorderLayout(20, 20));
+		Button collapseAll = new Button("   <   ");
+		backgroundNorth.add(collapseAll, BorderLayout.WEST);
+		collapseAll.addMouseListener(new TreeCollapser(treeAllePdf));
+		Background innerNorth = new Background();
+		innerNorth.setLayout(new GridLayout(1, 0, 20, 20));
+		backgroundNorth.add(innerNorth, BorderLayout.CENTER);
+		Button actionButton = new Button("ungelesene Dateien anzeigen");
+		innerNorth.add(actionButton);
+		actionButton.addMouseListener(new ButtonHandler("ungelesen", treeAllePdf, iliasStarter, this));
+		Button actionButton2 = new Button("lokal nicht vorhandene Dateien anzeigen");
+		actionButton2.addMouseListener(new ButtonHandler("nicht_vorhanden", treeAllePdf, iliasStarter, this));
+		innerNorth.add(actionButton2);
+		Button actionButton3 = new Button("ignorierte Dateien anzeigen");
+		actionButton3.addMouseListener(new ButtonHandler("ignorierte", treeAllePdf, iliasStarter, this));
+		innerNorth.add(actionButton3);
 		//
 
 		treeFiller.addKurseToTree(overview, iliasStarter.getKurse());
@@ -98,7 +110,7 @@ public class DownloaderToolWindow {
 		search.setBackground(new Color(255, 255, 255));
 		search.addKeyListener((new FileSearcher(iliasStarter.getAllPdfs(), search, this)));
 		search.addMouseListener(new TextFieldListener(search));
-		backgroundNorth.add(search);
+		innerNorth.add(search);
 
 		Background backgroundCenter = new Background();
 		backgroundCenter.setLayout(new BorderLayout());
@@ -130,17 +142,23 @@ public class DownloaderToolWindow {
 		searchResults.addKeyListener(new ResultSelector(overview, treeAllePdf, searchResults));
 
 		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, treeAllePdfScrollPane, resultListScrollPane);
-		splitPane.setDividerLocation(350);
+		splitPane.setDividerLocation(570);
 		splitPane.getComponent(2).setBackground(Color.BLUE);
 		backgroundCenter.add(splitPane, BorderLayout.CENTER);
 
 		CloseIcon closeIcon = new CloseIcon(Color.WHITE);
 		closeIcon.setToolTipText("Beenden");
 
+		JPanel southPanel = new JPanel(new GridLayout(1, 0, 4, 4));
 		Button contactDevButton = new Button("Entwickler kontaktieren");
 		contactDevButton.setHorizontalTextPosition(SwingConstants.CENTER);
 		contactDevButton.addMouseListener(new EmailOpener());
-		backgroundCenter.add(contactDevButton, BorderLayout.SOUTH);
+		Button openFAQ = new Button("FAQ");
+		openFAQ.setHorizontalAlignment(SwingConstants.CENTER);
+		openFAQ.addMouseListener(new FAQOpener());
+		southPanel.add(openFAQ);
+		southPanel.add(contactDevButton);
+		backgroundCenter.add(southPanel, BorderLayout.SOUTH);
 		// backgroundSouth.add(closeIcon);
 		window.setVisible(true);
 	}

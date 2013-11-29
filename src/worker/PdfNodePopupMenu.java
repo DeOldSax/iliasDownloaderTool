@@ -17,16 +17,23 @@ import javax.swing.tree.TreePath;
 
 import model.Forum;
 import model.PDF;
+import model.StorageProvider;
 
 public class PdfNodePopupMenu extends MouseAdapter {
 	private static final String HERUNTERLADEN = "herunterladen";
 	private static final String OEFFNEN = "öffnen";
+	private static final String IGNORE = "ignorieren";
+	private static final String REMOVE_IGNORE = "ignorieren aufheben";
 	private JPopupMenu menu;
 	private TreePath[] selectionPaths;
 	private final JMenuItem downloadMenuItem;
 	private final JMenuItem openForumMenuItem;
+	private final JMenuItem ignorePdf;
+	private final StorageProvider storageProvider;
+	private final JMenuItem removeIgnore;
 
 	public PdfNodePopupMenu() {
+		storageProvider = new StorageProvider();
 		this.menu = new JPopupMenu();
 		downloadMenuItem = new JMenuItem(HERUNTERLADEN);
 		downloadMenuItem.setOpaque(true);
@@ -36,19 +43,21 @@ public class PdfNodePopupMenu extends MouseAdapter {
 		openForumMenuItem.setOpaque(true);
 		openForumMenuItem.setBackground(Color.WHITE);
 		openForumMenuItem.addMouseListener(new Closer());
+		ignorePdf = new JMenuItem(IGNORE);
+		ignorePdf.setOpaque(true);
+		ignorePdf.setBackground(Color.WHITE);
+		ignorePdf.addMouseListener(new Closer());
+		removeIgnore = new JMenuItem(REMOVE_IGNORE);
+		removeIgnore.setOpaque(true);
+		removeIgnore.setBackground(Color.WHITE);
+		removeIgnore.addMouseListener(new Closer());
+
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
 		if (SwingUtilities.isRightMouseButton(e)) {
 			showPopMenu(e);
-		}
-	}
-
-	@Override
-	public void mouseClicked(MouseEvent event) {
-		if (event.getClickCount() == 2) {
-
 		}
 	}
 
@@ -67,6 +76,11 @@ public class PdfNodePopupMenu extends MouseAdapter {
 			}
 			if (selectedNode instanceof PDF) {
 				menu.add(downloadMenuItem);
+				if (((PDF) selectedNode).isIgnored()) {
+					menu.add(removeIgnore);
+				} else {
+					menu.add(ignorePdf);
+				}
 			}
 		}
 
@@ -94,6 +108,18 @@ public class PdfNodePopupMenu extends MouseAdapter {
 					} catch (IOException | URISyntaxException e1) {
 						e1.printStackTrace();
 					}
+				}
+			}
+			if (selectedAction.getText().equals(IGNORE)) {
+				for (TreePath path : selectionPaths) {
+					final PDF pdf = (PDF) ((DefaultMutableTreeNode) path.getLastPathComponent()).getUserObject();
+					storageProvider.storeIgnoredPdfSize(pdf);
+				}
+			}
+			if (selectedAction.getText().equals(REMOVE_IGNORE)) {
+				for (TreePath path : selectionPaths) {
+					final PDF pdf = (PDF) ((DefaultMutableTreeNode) path.getLastPathComponent()).getUserObject();
+					storageProvider.removeIgnoredPdfSize(pdf);
 				}
 			}
 		}

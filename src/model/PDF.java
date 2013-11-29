@@ -3,10 +3,12 @@ package model;
 public class PDF extends Directory {
 	private final int size;
 	private boolean read = true;
+	private final StorageProvider storageProvider;
 
 	public PDF(String name, String url, Directory parentDirectory, int size) {
 		super(name, url, parentDirectory);
 		this.size = size;
+		storageProvider = new StorageProvider();
 	}
 
 	public int getSize() {
@@ -21,4 +23,10 @@ public class PDF extends Directory {
 		this.read = read;
 	}
 
+	public boolean isIgnored() {
+		if (storageProvider.isIgnored(this) != -1) {
+			return true;
+		}
+		return false;
+	}
 }
