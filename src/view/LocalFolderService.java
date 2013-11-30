@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -20,10 +21,10 @@ import worker.IliasStarter;
 public class LocalFolderService implements ActionListener {
 	private static String localIliasPathString;
 	private static String localDownloadPathString;
-	private JFrame dialog;
+	private final JFrame dialog;
 
 	private BackgroundColorPanel background;
-	private Container c;
+	private final Container c;
 	private JLabel localIliasPath, downloadPath;
 	private final IliasStarter iliasStarter;
 	private final StorageProvider storageProvider;
@@ -33,6 +34,8 @@ public class LocalFolderService implements ActionListener {
 		localDownloadPathString = "";
 		localIliasPathString = "";
 		storageProvider = new StorageProvider();
+		dialog = new JFrame();
+		c = dialog.getContentPane();
 	}
 
 	@Override
@@ -46,8 +49,6 @@ public class LocalFolderService implements ActionListener {
 	public void showDialog() {
 
 		LookAndFeelChanger.changeToNative();
-		dialog = new JFrame();
-		c = dialog.getContentPane();
 		background = new BackgroundColorPanel();
 		c.add(background);
 		background.setLayout(null);
@@ -106,18 +107,24 @@ public class LocalFolderService implements ActionListener {
 		}
 
 		private void act() {
-			localDownloadPathString = downloadPath.getText();
-			localIliasPathString = localIliasPath.getText();
-			dialog.setVisible(false);
-			if (iliasStarter != null) {
-				storageProvider.storeDownloadPath(localDownloadPathString);
-				storageProvider.storeLocalIliasFolderPath(localIliasPathString);
-				new DownloaderToolWindow(iliasStarter);
+			localDownloadPathString = downloadPath.getText().replace("\\", "/");
+			File validationFile = new File(localDownloadPathString);
+			localIliasPathString = localIliasPath.getText().replace("\\", "/");
+			File validationFile2 = new File(localIliasPathString);
+			if (!validationFile.exists()) {
+				JOptionPane.showMessageDialog(null, "ungültiger Download Pfad", null, JOptionPane.ERROR_MESSAGE);
+			} else if (!validationFile2.exists()) {
+				JOptionPane.showMessageDialog(null, "ungültiger Ilias Ordner Pfad", null, JOptionPane.ERROR_MESSAGE);
 			} else {
-				JOptionPane.showMessageDialog(null, "Fehler aufgetreten!", null, JOptionPane.ERROR_MESSAGE);
-				System.exit(0);
+				dialog.setVisible(false);
+				if (iliasStarter != null) {
+					storageProvider.storeDownloadPath(localDownloadPathString);
+					storageProvider.storeLocalIliasFolderPath(localIliasPathString);
+					new DownloaderToolWindow(iliasStarter);
+				} else {
+					JOptionPane.showMessageDialog(null, "Fehler aufgetreten!", null, JOptionPane.ERROR_MESSAGE);
+				}
 			}
 		}
-
 	}
 }

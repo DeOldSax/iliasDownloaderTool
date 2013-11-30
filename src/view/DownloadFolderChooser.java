@@ -7,6 +7,7 @@ import java.io.File;
 
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.SwingUtilities;
 
 public class DownloadFolderChooser extends MouseAdapter {
 
@@ -21,7 +22,13 @@ public class DownloadFolderChooser extends MouseAdapter {
 	}
 
 	@Override
-	public void mouseClicked(MouseEvent e) {
+	public void mouseClicked(MouseEvent event) {
+		if (SwingUtilities.isLeftMouseButton(event)) {
+			openFileChooser();
+		}
+	}
+
+	private void openFileChooser() {
 		fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		final File selectedFile = new File(label.getText());
 		fileChooser.setCurrentDirectory(selectedFile);

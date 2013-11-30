@@ -17,16 +17,16 @@ public class ResultListPopupMenu extends MouseAdapter {
 	private static final String DOWNLOAD = "herunterladen";
 	private static final String IGNORE = "ignorieren";
 	private static final String REMOVE_IGNORE = "ignorieren aufheben";
-	private final JPopupMenu menu;
+	private JPopupMenu menu;
 	private JList<SearchResult> list;
 	private final JMenuItem ignorePdf;
 	private final StorageProvider storageProvider;
 	private final JMenuItem removeIgnore;
+	private final JMenuItem downloadMenuItem;
 
 	public ResultListPopupMenu() {
 		storageProvider = new StorageProvider();
-		this.menu = new JPopupMenu();
-		final JMenuItem downloadMenuItem = new JMenuItem(DOWNLOAD);
+		downloadMenuItem = new JMenuItem(DOWNLOAD);
 		downloadMenuItem.setOpaque(true);
 		downloadMenuItem.setBackground(Color.WHITE);
 		downloadMenuItem.addMouseListener(new Closer());
@@ -34,7 +34,6 @@ public class ResultListPopupMenu extends MouseAdapter {
 		ignorePdf.setOpaque(true);
 		ignorePdf.setBackground(Color.WHITE);
 		ignorePdf.addMouseListener(new Closer());
-		menu.add(downloadMenuItem);
 		removeIgnore = new JMenuItem(REMOVE_IGNORE);
 		removeIgnore.setOpaque(true);
 		removeIgnore.setBackground(Color.WHITE);
@@ -42,19 +41,13 @@ public class ResultListPopupMenu extends MouseAdapter {
 	}
 
 	@Override
-	public void mouseReleased(MouseEvent event) {
-		list = (JList<SearchResult>) event.getSource();
-
-		if (SwingUtilities.isRightMouseButton(event) && !(list.getSelectedValuesList().size() == 0)) {
-			showPopMenu(event);
-		}
-	}
-
-	@Override
 	public void mouseClicked(MouseEvent event) {
 		list = (JList<SearchResult>) event.getSource();
-		if (event.getClickCount() == 2 && !(list.getSelectedValuesList().size() == 0)) {
+		if (SwingUtilities.isLeftMouseButton(event) && event.getClickCount() == 2 && !(list.getSelectedValuesList().size() == 0)) {
 			startDownload();
+		}
+		if (SwingUtilities.isRightMouseButton(event) && !(list.getSelectedValuesList().size() == 0)) {
+			showPopMenu(event);
 		}
 	}
 
@@ -63,11 +56,12 @@ public class ResultListPopupMenu extends MouseAdapter {
 	 * @wbp.parser.entryPoint
 	 */
 	private void showPopMenu(MouseEvent e) {
+		this.menu = new JPopupMenu();
+		menu.add(downloadMenuItem);
 		List<SearchResult> selectedValuesList = list.getSelectedValuesList();
 		for (SearchResult searchResult : selectedValuesList) {
 			if (searchResult.getPdf().isIgnored()) {
 				menu.add(removeIgnore);
-				menu.remove(ignorePdf);
 				menu.show(e.getComponent(), e.getX(), e.getY());
 				menu.setVisible(true);
 				return;
