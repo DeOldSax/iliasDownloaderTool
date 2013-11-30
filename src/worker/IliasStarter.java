@@ -76,9 +76,9 @@ public class IliasStarter implements Runnable {
 			}
 		}
 
+		loginLoader.stopRunning();
 		allDirs = iliasPdfFinder.getAllDirs();
 		final LocalFolderService localFolderPath = new LocalFolderService(this);
-		loginLoader.stopRunning();
 		localFolderPath.showDialog();
 	}
 

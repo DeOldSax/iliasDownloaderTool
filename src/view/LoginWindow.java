@@ -89,6 +89,7 @@ public class LoginWindow {
 				JOptionPane.showMessageDialog(null, "ungültiger Benutzername", null, JOptionPane.ERROR_MESSAGE);
 				usernameField.requestFocus();
 				usernameField.selectAll();
+				return;
 			} else {
 				String password = "";
 				char pass[] = passwordField.getPassword();
@@ -96,6 +97,7 @@ public class LoginWindow {
 					JOptionPane.showMessageDialog(null, "ungültiges Passwort", null, JOptionPane.ERROR_MESSAGE);
 					passwordField.requestFocus();
 					passwordField.selectAll();
+					return;
 				}
 				for (int i = 0; i < pass.length; i++) {
 					password = password + pass[i];

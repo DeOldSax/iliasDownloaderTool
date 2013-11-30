@@ -23,7 +23,7 @@ public class StorageProvider {
 	}
 
 	public String loadLocalIliasFolderPath() {
-		return myPrefs.get(ILIAS_FOLDER, "../Kit/Semester XY");
+		return myPrefs.get(ILIAS_FOLDER, "..\\Kit\\Semester XY");
 	}
 
 	public String loadDownloadPath() {

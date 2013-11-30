@@ -1,19 +1,19 @@
 package view;
 
-import java.awt.Color;
 import java.awt.Container;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
-import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 
+import laf.Button;
 import model.StorageProvider;
 import worker.IliasStarter;
 
@@ -22,8 +22,9 @@ public class LocalFolderService implements ActionListener {
 	private static String localDownloadPathString;
 	private JFrame dialog;
 
+	private BackgroundColorPanel background;
 	private Container c;
-	private JTextField localIliasPath, downloadPath;
+	private JLabel localIliasPath, downloadPath;
 	private final IliasStarter iliasStarter;
 	private final StorageProvider storageProvider;
 
@@ -43,66 +44,49 @@ public class LocalFolderService implements ActionListener {
 	 * @wbp.parser.entryPoint
 	 */
 	public void showDialog() {
+
 		LookAndFeelChanger.changeToNative();
 		dialog = new JFrame();
 		c = dialog.getContentPane();
-		dialog.getContentPane().setBackground(new Color(102, 205, 170));
-		dialog.getContentPane().setForeground(new Color(46, 139, 87));
-		dialog.setForeground(new Color(46, 139, 87));
-		dialog.getContentPane().setLayout(null);
+		background = new BackgroundColorPanel();
+		c.add(background);
+		background.setLayout(null);
 
-		localIliasPath = new JTextField(storageProvider.loadLocalIliasFolderPath());
+		localIliasPath = new JLabel(storageProvider.loadLocalIliasFolderPath());
+		background.add(localIliasPath);
 		localIliasPath.setHorizontalAlignment(SwingConstants.CENTER);
 		localIliasPath.setFont(new Font("Calibri", Font.BOLD, 14));
-		localIliasPath.setBounds(10, 46, 396, 31);
+		localIliasPath.setBounds(10, 58, 392, 31);
 		localIliasPath.setBorder(null);
-		c.add(localIliasPath);
 
-		downloadPath = new JTextField();
+		downloadPath = new JLabel(storageProvider.loadDownloadPath());
+		background.add(downloadPath);
 		downloadPath.setBorder(null);
 		downloadPath.setHorizontalAlignment(SwingConstants.CENTER);
 		downloadPath.setFont(new Font("Calibri", Font.BOLD, 14));
 		downloadPath.setText(storageProvider.loadDownloadPath());
-		downloadPath.setBounds(10, 128, 396, 31);
-		downloadPath.addActionListener(new Starter());
-		dialog.getContentPane().add(downloadPath);
-		downloadPath.setColumns(10);
-		downloadPath.requestFocus();
+		downloadPath.setBounds(6, 138, 396, 31);
 
-		JButton btnStarten = new JButton("OK");
-		btnStarten.addActionListener(new Starter());
-		btnStarten.setBackground(new Color(32, 178, 170));
-		btnStarten.setBounds(169, 180, 89, 23);
-		dialog.getContentPane().add(btnStarten);
+		Button okButton = new Button("OK");
+		background.add(okButton);
+		okButton.addMouseListener(new Starter());
+		okButton.setBounds(162, 180, 89, 23);
 
-		JLabel lblMeinLokaleIlias = new JLabel("Mein Lokale Ilias Ordner:");
-		lblMeinLokaleIlias.setForeground(Color.BLACK);
-		lblMeinLokaleIlias.setFont(new Font("Tahoma", Font.BOLD, 12));
-		lblMeinLokaleIlias.setBounds(10, 11, 170, 24);
-		dialog.getContentPane().add(lblMeinLokaleIlias);
+		Button localIliasFolderPathButton = new Button("Hier möchte ich meine Downloads speichern");
+		background.add(localIliasFolderPathButton);
+		localIliasFolderPathButton.setBounds(10, 98, 392, 32);
+		localIliasFolderPathButton.addMouseListener(new DownloadFolderChooser(dialog, downloadPath));
 
-		JLabel lblHierMchteIch = new JLabel("Hier m\u00F6chte ich meine Downloads speichern:");
-		lblHierMchteIch.setForeground(Color.BLACK);
-		lblHierMchteIch.setFont(new Font("Tahoma", Font.BOLD, 12));
-		lblHierMchteIch.setBounds(10, 98, 298, 19);
-		dialog.getContentPane().add(lblHierMchteIch);
+		Button downloadPathButton = new Button("Mein Lokale Ilias Ordner");
+		background.add(downloadPathButton);
+		downloadPathButton.setBounds(10, 11, 392, 32);
+		downloadPathButton.addMouseListener(new DownloadFolderChooser(dialog, localIliasPath));
 
-		JButton btnffnen = new JButton("\u00F6ffnen...");
-		btnffnen.setBackground(new Color(32, 178, 170));
-		btnffnen.setBounds(317, 13, 89, 23);
-		btnffnen.addActionListener(new DownloadFolderChooser(dialog, localIliasPath));
-		dialog.getContentPane().add(btnffnen);
-
-		JButton btnffnen_1 = new JButton("\u00F6ffnen...");
-		btnffnen_1.setBackground(new Color(32, 178, 170));
-		btnffnen_1.setBounds(318, 94, 89, 23);
-		btnffnen_1.addActionListener(new DownloadFolderChooser(dialog, downloadPath));
-		dialog.getContentPane().add(btnffnen_1);
 		dialog.setSize(418, 250);
-		dialog.setVisible(true);
 		dialog.setLocationRelativeTo(null);
 		dialog.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		dialog.setResizable(false);
+		dialog.setVisible(true);
 	}
 
 	public static String getLocalIliasPathString() {
@@ -113,27 +97,27 @@ public class LocalFolderService implements ActionListener {
 		return localDownloadPathString;
 	}
 
-	private class Starter implements ActionListener {
+	private class Starter extends MouseAdapter {
 		@Override
-		public void actionPerformed(ActionEvent arg0) {
-			localDownloadPathString = downloadPath.getText().replace("\\", "/");
-			File validationFile = new File(localDownloadPathString);
-			localIliasPathString = localIliasPath.getText().replace("\\", "/");
-			File validationFile2 = new File(localIliasPathString);
-			if (!validationFile.exists()) {
-				JOptionPane.showMessageDialog(null, "ungültiger Download Pfad", null, JOptionPane.ERROR_MESSAGE);
-			} else if (!validationFile2.exists()) {
-				JOptionPane.showMessageDialog(null, "ungültiger Ilias Ordner Pfad", null, JOptionPane.ERROR_MESSAGE);
-			} else {
-				dialog.setVisible(false);
-				if (iliasStarter != null) {
-					storageProvider.storeDownloadPath(localDownloadPathString);
-					storageProvider.storeLocalIliasFolderPath(localIliasPathString);
-					new DownloaderToolWindow(iliasStarter);
-				} else {
-					JOptionPane.showMessageDialog(null, "Fehler aufgetreten!", null, JOptionPane.ERROR_MESSAGE);
-				}
+		public void mouseClicked(MouseEvent event) {
+			if (SwingUtilities.isLeftMouseButton(event)) {
+				act();
 			}
 		}
+
+		private void act() {
+			localDownloadPathString = downloadPath.getText();
+			localIliasPathString = localIliasPath.getText();
+			dialog.setVisible(false);
+			if (iliasStarter != null) {
+				storageProvider.storeDownloadPath(localDownloadPathString);
+				storageProvider.storeLocalIliasFolderPath(localIliasPathString);
+				new DownloaderToolWindow(iliasStarter);
+			} else {
+				JOptionPane.showMessageDialog(null, "Fehler aufgetreten!", null, JOptionPane.ERROR_MESSAGE);
+				System.exit(0);
+			}
+		}
+
 	}
 }
