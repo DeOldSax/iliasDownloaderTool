@@ -71,7 +71,7 @@ public class FileDownloader implements Runnable {
 	}
 
 	private boolean openFileChooser() {
-		fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		fileChooser.setCurrentDirectory(new File(targetPath));
 		fileChooser.setSelectedFile(new File(name + "." + type));
 		final int returnValue = fileChooser.showSaveDialog(null);

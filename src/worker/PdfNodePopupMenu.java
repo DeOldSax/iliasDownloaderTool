@@ -55,9 +55,12 @@ public class PdfNodePopupMenu extends MouseAdapter {
 	}
 
 	@Override
-	public void mouseReleased(MouseEvent e) {
-		if (SwingUtilities.isRightMouseButton(e)) {
-			showPopMenu(e);
+	public void mouseClicked(MouseEvent event) {
+		if (SwingUtilities.isRightMouseButton(event)) {
+			JTree tree = (JTree) event.getSource();
+			int row = tree.getClosestRowForLocation(event.getX(), event.getY());
+			tree.setSelectionRow(row);
+			showPopMenu(event);
 		}
 	}
 

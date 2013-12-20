@@ -1,8 +1,8 @@
 package worker;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -15,7 +15,7 @@ public class LocalDataReader {
 	private final Map<Integer, String> localPdfWithParents;
 
 	public LocalDataReader() {
-		this.localDataList = new LinkedList<Integer>();
+		this.localDataList = new ArrayList<Integer>();
 		this.localPdfWithParents = new HashMap<Integer, String>();
 	}
 

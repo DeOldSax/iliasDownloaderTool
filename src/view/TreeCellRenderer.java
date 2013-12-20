@@ -15,7 +15,7 @@ import model.PDF;
 import worker.IliasStarter;
 import worker.LocalDataReader;
 
-public class CustomNodeRenderer extends DefaultTreeCellRenderer {
+public class TreeCellRenderer extends DefaultTreeCellRenderer {
 
 	private static final long serialVersionUID = 1L;
 
@@ -28,15 +28,15 @@ public class CustomNodeRenderer extends DefaultTreeCellRenderer {
 	private final List<Integer> localPdfSizes;
 	private final List<PDF> allPdfs;
 
-	public CustomNodeRenderer(IliasStarter iliasStarter) {
+	public TreeCellRenderer(IliasStarter iliasStarter) {
 		allPdfs = iliasStarter.getAllPdfs();
 		localPdfSizes = new LocalDataReader().getAllLocalPDFSizes();
-		normalPdfIcon = new ImageIcon(CustomNodeRenderer.class.getResource("pdf_icon.png"));
-		unreadPdfIcon = new ImageIcon(CustomNodeRenderer.class.getResource("pdf_icon_unread.png"));
-		notInLocalFolderPdfIcon = new ImageIcon(CustomNodeRenderer.class.getResource("pdf_icon_notLocal.png"));
-		folderIcon = new ImageIcon(CustomNodeRenderer.class.getResource("folder_icon.jpg"));
-		folderIconUnread = new ImageIcon(CustomNodeRenderer.class.getResource("folder_icon_unread.jpg"));
-		forumIcon = new ImageIcon(CustomNodeRenderer.class.getResource("forum_icon.gif"));
+		normalPdfIcon = new ImageIcon(TreeCellRenderer.class.getResource("pdf_icon.png"));
+		unreadPdfIcon = new ImageIcon(TreeCellRenderer.class.getResource("pdf_icon_unread.png"));
+		notInLocalFolderPdfIcon = new ImageIcon(TreeCellRenderer.class.getResource("pdf_icon_notLocal.png"));
+		folderIcon = new ImageIcon(TreeCellRenderer.class.getResource("folder_icon.jpg"));
+		folderIconUnread = new ImageIcon(TreeCellRenderer.class.getResource("folder_icon_unread.jpg"));
+		forumIcon = new ImageIcon(TreeCellRenderer.class.getResource("forum_icon.gif"));
 	}
 
 	@Override

@@ -9,13 +9,13 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 
-public class DownloadFolderChooser extends MouseAdapter {
+public class LocalIliasFolderChooser extends MouseAdapter {
 
 	private final JFileChooser fileChooser;
 	private final Component parentComponent;
 	private final JLabel label;
 
-	public DownloadFolderChooser(Component parentComponent, JLabel label) {
+	public LocalIliasFolderChooser(Component parentComponent, JLabel label) {
 		this.parentComponent = parentComponent;
 		this.label = label;
 		fileChooser = new JFileChooser();

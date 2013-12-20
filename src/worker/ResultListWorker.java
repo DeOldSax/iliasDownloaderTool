@@ -7,8 +7,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JTree;
 
 import model.PDF;
-import view.CustomNodeRenderer;
 import view.DownloaderToolWindow;
+import view.TreeCellRenderer;
 
 public class ResultListWorker implements Runnable {
 
@@ -44,7 +44,7 @@ public class ResultListWorker implements Runnable {
 	}
 
 	private void expandAllMissing() {
-		tree.setCellRenderer(new CustomNodeRenderer(iliasStarter));
+		tree.setCellRenderer(new TreeCellRenderer(iliasStarter));
 		tree.getSelectionModel().clearSelection();
 		final List<Integer> allLocalPdfSizes = new LocalDataReader().getAllLocalPDFSizes();
 		for (PDF pdf : allPdf) {
@@ -59,7 +59,7 @@ public class ResultListWorker implements Runnable {
 	}
 
 	private void expandAllUnread() {
-		tree.setCellRenderer(new CustomNodeRenderer(iliasStarter));
+		tree.setCellRenderer(new TreeCellRenderer(iliasStarter));
 		tree.getSelectionModel().clearSelection();
 		for (PDF pdf : allPdf) {
 			if (pdf.isIgnored()) {
@@ -73,7 +73,6 @@ public class ResultListWorker implements Runnable {
 	}
 
 	private void showInResultList() {
-		boolean pdfAdded = false;
 		window.clearResultList();
 		if (pdfAddToResultList.isEmpty()) {
 			JOptionPane.showMessageDialog(null, "     keine gefunden!", null, JOptionPane.INFORMATION_MESSAGE);

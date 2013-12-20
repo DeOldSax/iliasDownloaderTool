@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Container;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.Image;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -19,7 +20,9 @@ public class LoginLoader {
 	Container c;
 
 	public LoginLoader() {
+		Image image = new ImageFactory().createImage("door_closed.png");
 		loader = new JFrame();
+		loader.setIconImage(image);
 		c = loader.getContentPane();
 		loader.getContentPane().setLayout(null);
 		loaderCircle = new JLabel(new ImageIcon(getClass().getResource("laden.gif")));

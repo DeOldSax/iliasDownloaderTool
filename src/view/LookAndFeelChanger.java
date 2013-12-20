@@ -19,5 +19,4 @@ public class LookAndFeelChanger {
 			e1.printStackTrace();
 		}
 	}
-
 }

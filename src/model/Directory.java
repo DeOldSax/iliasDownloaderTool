@@ -6,6 +6,7 @@ import java.util.List;
 public class Directory {
 	private final String url;
 	private final String name;
+	private String nameChangedByUser;
 	private final Directory parentFolder;
 	private final List<Directory> childFolders;
 
@@ -17,6 +18,7 @@ public class Directory {
 		}
 		this.parentFolder = parentDirectory;
 		this.childFolders = new LinkedList<Directory>();
+		this.nameChangedByUser = null;
 	}
 
 	public List<Directory> getChildFolders() {
@@ -29,6 +31,10 @@ public class Directory {
 
 	public String getName() {
 		return name;
+	}
+
+	public void setNameChangedByUser(String nameChangedByUser) {
+		this.nameChangedByUser = nameChangedByUser;
 	}
 
 	public Directory getParentDirectory() {
@@ -48,6 +54,9 @@ public class Directory {
 
 	@Override
 	public String toString() {
+		if (nameChangedByUser != null) {
+			return nameChangedByUser;
+		}
 		return name;
 	}
 }

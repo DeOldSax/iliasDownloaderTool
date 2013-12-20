@@ -44,8 +44,8 @@ public class Ilias {
 	private final RedirectStrategy strategy;
 	private HttpGet request1;
 	private HttpPost request2, request3, request4;
-	private HttpResponse response1, response2, response3, response4, responseX;
-	private HttpEntity entity1, entity2, entity3, entity4, entityX;
+	private HttpResponse response3, response4;
+	private HttpEntity entity;
 	private final LoginLoader loginLoader;
 
 	public Ilias(LoginLoader loginLoader) {
@@ -75,13 +75,12 @@ public class Ilias {
 
 		// Get methode ausführen
 		try {
-			response1 = client.execute(request1, context);
+			client.execute(request1, context);
 		} catch (ClientProtocolException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		entity1 = response1.getEntity();
 
 		// request schließen
 		request1.releaseConnection();
@@ -103,7 +102,7 @@ public class Ilias {
 
 		// POST request ausführen
 		try {
-			response2 = client.execute(request2, context);
+			client.execute(request2, context);
 		} catch (ClientProtocolException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -136,13 +135,13 @@ public class Ilias {
 		}
 
 		// Post Request erhalten
-		entity3 = response3.getEntity();
+		entity = response3.getEntity();
 
 		// hier noch name und value für den letzten aufruf holen
 
 		String html = null;
 		try {
-			html = EntityUtils.toString(entity3);
+			html = EntityUtils.toString(entity);
 		} catch (ParseException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -189,11 +188,11 @@ public class Ilias {
 		}
 
 		// Post Request erhalten
-		entity4 = response4.getEntity();
+		entity = response4.getEntity();
 
-		// System.out.println(entity4);
+		// System.out.println(entity);
 		try {
-			htmlStartpage = EntityUtils.toString(entity4);
+			htmlStartpage = EntityUtils.toString(entity);
 		} catch (ParseException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

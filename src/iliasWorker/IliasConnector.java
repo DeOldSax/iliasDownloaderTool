@@ -40,7 +40,6 @@ public class IliasConnector {
 	public int requestHead(String url) {
 		context = new BasicHttpContext();
 		HttpHead head = new HttpHead(url);
-		request = new HttpGet(url);
 		try {
 			response = Ilias.getClient().execute(head, context);
 		} catch (ClientProtocolException e) {
@@ -50,7 +49,6 @@ public class IliasConnector {
 		}
 		Header[] pdfSize = response.getHeaders("Content-Length");
 		final int size = Integer.parseInt(pdfSize[0].getValue());
-		request.releaseConnection();
 		return size;
 	}
 }

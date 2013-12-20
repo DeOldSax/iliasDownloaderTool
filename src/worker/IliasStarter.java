@@ -9,6 +9,9 @@ import java.util.List;
 
 import model.Directory;
 import model.PDF;
+import model.StorageProvider;
+import studport.Studierendenportal;
+import view.DownloaderToolWindow;
 import view.LocalFolderService;
 import view.LoginLoader;
 import view.LoginWindow;
@@ -23,6 +26,7 @@ public class IliasStarter implements Runnable {
 	private final String password;
 	private LoginLoader loginLoader;
 	private List<Directory> allDirs;
+	private Studierendenportal studierendenportal;
 
 	public IliasStarter(String username, String password) {
 		this.username = username;
@@ -36,8 +40,10 @@ public class IliasStarter implements Runnable {
 
 	public void work() {
 		loginLoader = new LoginLoader();
-		final boolean loginFailed = doLogin(username, password);
-		if (loginFailed) {
+		studierendenportal = new Studierendenportal(username, password);
+		new Thread(studierendenportal).start();
+		final boolean iliasLoginFailed = doLogin(username, password);
+		if (iliasLoginFailed) {
 			loginLoader.stopRunning();
 			EventQueue.invokeLater(new Runnable() {
 				@Override
@@ -75,11 +81,25 @@ public class IliasStarter implements Runnable {
 				e.printStackTrace();
 			}
 		}
+		final DownloaderToolWindow downloaderToolWindow = new DownloaderToolWindow(this);
+		final LocalFolderService localFolderPath = new LocalFolderService(this, downloaderToolWindow);
 
-		loginLoader.stopRunning();
+		while (!studierendenportal.isReady()) {
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+
 		allDirs = iliasPdfFinder.getAllDirs();
-		final LocalFolderService localFolderPath = new LocalFolderService(this);
-		localFolderPath.showDialog();
+		loginLoader.stopRunning();
+		localFolderPath.initDialog();
+		if (new StorageProvider().localIliasPathIsAlreadySet()) {
+			downloaderToolWindow.setVisible(true);
+			return;
+		}
+		LocalFolderService.setVisible(true);
 	}
 
 	public List<Directory> getKurse() {
@@ -92,5 +112,13 @@ public class IliasStarter implements Runnable {
 
 	public List<Directory> getAllFolder() {
 		return allDirs;
+	}
+
+	public String getUserName() {
+		return username;
+	}
+
+	public Studierendenportal getStudierendenportal() {
+		return studierendenportal;
 	}
 }

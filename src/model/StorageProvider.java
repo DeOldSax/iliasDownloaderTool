@@ -5,7 +5,6 @@ import java.util.prefs.Preferences;
 
 public class StorageProvider {
 	private static final String ILIAS_FOLDER = "1";
-	private static final String DOWNLOAD_PATH = "2";
 	private static Preferences prefsRoot;
 	private static Preferences myPrefs;
 
@@ -18,16 +17,8 @@ public class StorageProvider {
 		myPrefs.put(ILIAS_FOLDER, path);
 	}
 
-	public void storeDownloadPath(String path) {
-		myPrefs.put(DOWNLOAD_PATH, path);
-	}
-
 	public String loadLocalIliasFolderPath() {
-		return myPrefs.get(ILIAS_FOLDER, "..\\Kit\\Semester XY");
-	}
-
-	public String loadDownloadPath() {
-		return myPrefs.get(DOWNLOAD_PATH, "C:\\Users\\%USERNAME%\\Desktop");
+		return myPrefs.get(ILIAS_FOLDER, ".");
 	}
 
 	public void removeNode() {
@@ -36,14 +27,6 @@ public class StorageProvider {
 		} catch (BackingStoreException e) {
 			e.printStackTrace();
 		}
-	}
-
-	public void storeCommitVersion(String numberOfCommits) {
-		myPrefs.put("commitNumber", numberOfCommits);
-	}
-
-	public String getCommitVersion() {
-		return myPrefs.get("commitNumber", "-1");
 	}
 
 	public void storeUsername(String username) {
@@ -82,5 +65,17 @@ public class StorageProvider {
 		final int endIndex = key.indexOf("&cmd=sendfile");
 		key = key.substring(beginIndex + 7, endIndex);
 		return key;
+	}
+
+	public boolean localIliasPathIsAlreadySet() {
+		return myPrefs.getBoolean("localIliasPathIsAlreadySet", false);
+	}
+
+	public void setLocalIliasPathTrue() {
+		myPrefs.putBoolean("localIliasPathIsAlreadySet", true);
+	}
+
+	public static void main(String[] args) {
+		new StorageProvider().removeNode();
 	}
 }

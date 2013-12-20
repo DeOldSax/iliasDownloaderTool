@@ -8,6 +8,7 @@ import java.awt.GridLayout;
 import java.util.Enumeration;
 import java.util.Vector;
 
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -29,6 +30,7 @@ import laf.TextFieldListener;
 import model.Directory;
 import model.PDF;
 import model.SearchResult;
+import studport.Transcript;
 import worker.ButtonHandler;
 import worker.EmailOpener;
 import worker.FAQOpener;
@@ -37,13 +39,15 @@ import worker.IliasStarter;
 import worker.PdfNodePopupMenu;
 import worker.ResultListPopupMenu;
 import worker.ResultSelector;
+import worker.TranscriptSelector;
 import worker.TreeCollapser;
 
 public class DownloaderToolWindow {
 
 	private final Container c;
 	private final JFrame window;
-	private final Background backgroundNorth, backgroundSouth;
+	private final Background backgroundNorth;
+	private final BackgroundColorPanel backgroundSouth;
 	private final DefaultMutableTreeNode overview;
 	private final JTree treeAllePdf;
 	private final JScrollPane treeAllePdfScrollPane, resultListScrollPane;
@@ -51,12 +55,17 @@ public class DownloaderToolWindow {
 	private final Vector<SearchResult> resultVector;
 	private final JList<SearchResult> searchResults;
 	private final JTreeContentFiller treeFiller;
+	private static boolean isRunning;
+	private final IliasStarter iliasStarter;
 
 	/**
 	 * @wbp.parser.entryPoint
 	 */
 	public DownloaderToolWindow(IliasStarter iliasStarter) {
-		LookAndFeelChanger.changeToJava();
+		this.iliasStarter = iliasStarter;
+		if (!isRunning) {
+			LookAndFeelChanger.changeToJava();
+		}
 		treeFiller = new JTreeContentFiller();
 		window = new JFrame();
 		c = window.getContentPane();
@@ -64,33 +73,35 @@ public class DownloaderToolWindow {
 		backgroundNorth = new Background();
 		backgroundNorth.setBorder(new EmptyBorder(20, 20, 0, 20));
 		c.add(backgroundNorth, BorderLayout.NORTH);
-		backgroundSouth = new Background();
+		backgroundSouth = new BackgroundColorPanel();
 		backgroundSouth.setLayout(new GridLayout(1, 0, 20, 20));
 		backgroundSouth.setBorder(new EmptyBorder(20, 20, 20, 20));
 		c.add(backgroundSouth, BorderLayout.SOUTH);
 
 		window.setSize(1200, 530);
-		window.setTitle("DownloaderTool");
+		window.setTitle("DownloaderTool" + " - " + "Angemeldet als: " + iliasStarter.getUserName() + "@student.kit.edu");
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setResizable(true);
 		window.setLocationRelativeTo(null);
 
 		overview = new DefaultMutableTreeNode(new Directory("Übersicht", null, null));
 		treeAllePdf = new JTree(overview);
+		// treeAllePdf.setEditable(true);
 		backgroundNorth.setLayout(new BorderLayout(20, 20));
 		Button collapseAll = new Button("   <   ");
+		collapseAll.setToolTipText("Alle Ordner schließen");
 		backgroundNorth.add(collapseAll, BorderLayout.WEST);
 		collapseAll.addMouseListener(new TreeCollapser(treeAllePdf));
 		Background innerNorth = new Background();
 		innerNorth.setLayout(new GridLayout(1, 0, 20, 20));
 		backgroundNorth.add(innerNorth, BorderLayout.CENTER);
-		Button actionButton = new Button("ungelesene Dateien anzeigen");
+		Button actionButton = new Button("ungelesene Dateien");
 		innerNorth.add(actionButton);
 		actionButton.addMouseListener(new ButtonHandler("ungelesen", treeAllePdf, iliasStarter, this));
-		Button actionButton2 = new Button("lokal nicht vorhandene Dateien anzeigen");
+		Button actionButton2 = new Button("lokal nicht vorhandene Dateien");
 		actionButton2.addMouseListener(new ButtonHandler("nicht_vorhanden", treeAllePdf, iliasStarter, this));
 		innerNorth.add(actionButton2);
-		Button actionButton3 = new Button("ignorierte Dateien anzeigen");
+		Button actionButton3 = new Button("ignorierte Dateien");
 		actionButton3.addMouseListener(new ButtonHandler("ignorierte", treeAllePdf, iliasStarter, this));
 		innerNorth.add(actionButton3);
 		//
@@ -129,7 +140,7 @@ public class DownloaderToolWindow {
 		treeAllePdfScrollPane.setBorder(new LineBorder(Color.LIGHT_GRAY, 1, true));
 		treeAllePdf.addMouseListener(new PdfNodePopupMenu());
 		treeAllePdf.addMouseListener(new FocusBorderOfTree());
-		treeAllePdf.setCellRenderer(new CustomNodeRenderer(iliasStarter));
+		treeAllePdf.setCellRenderer(new TreeCellRenderer(iliasStarter));
 
 		searchResults = new JList<SearchResult>();
 		resultListScrollPane = new JScrollPane(searchResults);
@@ -160,7 +171,22 @@ public class DownloaderToolWindow {
 		southPanel.add(contactDevButton);
 		backgroundCenter.add(southPanel, BorderLayout.SOUTH);
 		// backgroundSouth.add(closeIcon);
-		window.setVisible(true);
+		final JComboBox<String> transcriptChoosingBox = new JComboBox<String>();
+		transcriptChoosingBox.setBackground(Color.WHITE);
+		transcriptChoosingBox.setForeground(Color.black);
+		transcriptChoosingBox.setFont(new Font("Calibri", Font.BOLD, 14));
+		transcriptChoosingBox.addItem(Transcript.ALLE_LEISTUNGEN_DEUTSCH);
+		transcriptChoosingBox.addItem(Transcript.BESTANDEN_DEUTSCH);
+		transcriptChoosingBox.addItem(Transcript.ALLE_LEISTUNGEN_ENGLISCH);
+		transcriptChoosingBox.addItem(Transcript.BESTANDEN_ENGLISCH);
+		backgroundSouth.add(transcriptChoosingBox);
+		final Button downloadTranscriptButton = new Button("Notenauszug herunterladen");
+		downloadTranscriptButton.addMouseListener(new TranscriptSelector(iliasStarter.getStudierendenportal(), transcriptChoosingBox));
+		backgroundSouth.add(downloadTranscriptButton);
+		final Button changeLocalIliasPath = new Button("Lokaler Ilias Ordner");
+		changeLocalIliasPath.addMouseListener(new ButtonHandler("lokalerIliasOrdner", treeAllePdf, iliasStarter, this));
+		backgroundSouth.add(changeLocalIliasPath);
+		backgroundSouth.add(new BackgroundColorPanel());
 	}
 
 	public void clearResultList() {
@@ -171,5 +197,19 @@ public class DownloaderToolWindow {
 	public void addToResultList(PDF pdf) {
 		resultVector.add(new SearchResult(pdf));
 		searchResults.setListData(resultVector);
+	}
+
+	public void setVisible(boolean b) {
+		setRunning();
+		treeAllePdf.setCellRenderer(new TreeCellRenderer(iliasStarter));
+		window.setVisible(b);
+	}
+
+	public static boolean isRunning() {
+		return isRunning;
+	}
+
+	public static void setRunning() {
+		isRunning = true;
 	}
 }
