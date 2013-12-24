@@ -20,7 +20,7 @@ import view.LookAndFeelChanger;
 
 public class VersionValidator {
 	private final int YES = 0;
-	private final String VERSION = "v0.1.7";
+	private final String VERSION = "v0.1.8";
 	private String LATEST_VERSION;
 
 	public boolean validate() {
