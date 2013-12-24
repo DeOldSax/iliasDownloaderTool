@@ -1,9 +1,9 @@
 package worker;
 
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JOptionPane;
 import javax.swing.JTree;
 
 import model.PDF;
@@ -18,12 +18,14 @@ public class ResultListWorker implements Runnable {
 	private final List<PDF> pdfAddToResultList;
 	private final DownloaderToolWindow window;
 	private final IliasStarter iliasStarter;
+	private final MouseEvent event;
 
-	public ResultListWorker(String status, JTree tree, IliasStarter iliasStarter, DownloaderToolWindow window) {
+	public ResultListWorker(String status, JTree tree, IliasStarter iliasStarter, DownloaderToolWindow window, MouseEvent event) {
 		this.status = status;
 		this.tree = tree;
 		this.iliasStarter = iliasStarter;
 		this.window = window;
+		this.event = event;
 		this.allPdf = iliasStarter.getAllPdfs();
 		pdfAddToResultList = new ArrayList<PDF>();
 	}
@@ -75,7 +77,7 @@ public class ResultListWorker implements Runnable {
 	private void showInResultList() {
 		window.clearResultList();
 		if (pdfAddToResultList.isEmpty()) {
-			JOptionPane.showMessageDialog(null, "     keine gefunden!", null, JOptionPane.INFORMATION_MESSAGE);
+			InformationWindow.initWindow("Keine Dateien vorhanden!", "OK", null, event);
 			return;
 		}
 		for (PDF pdfResult : pdfAddToResultList) {

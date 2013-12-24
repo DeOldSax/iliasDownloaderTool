@@ -1,11 +1,9 @@
-package worker;
+package studport;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import javax.swing.JComboBox;
-
-import studport.Studierendenportal;
 
 public class TranscriptSelector extends MouseAdapter {
 

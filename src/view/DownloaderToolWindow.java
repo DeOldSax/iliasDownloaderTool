@@ -31,6 +31,7 @@ import model.Directory;
 import model.PDF;
 import model.SearchResult;
 import studport.Transcript;
+import studport.TranscriptSelector;
 import worker.ButtonHandler;
 import worker.EmailOpener;
 import worker.FAQOpener;
@@ -39,7 +40,6 @@ import worker.IliasStarter;
 import worker.PdfNodePopupMenu;
 import worker.ResultListPopupMenu;
 import worker.ResultSelector;
-import worker.TranscriptSelector;
 import worker.TreeCollapser;
 
 public class DownloaderToolWindow {

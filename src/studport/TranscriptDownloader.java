@@ -7,6 +7,8 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 import javax.swing.JFileChooser;
 
@@ -16,7 +18,6 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.HttpContext;
 
 import view.LocalFolderService;
-import worker.InformationWindow;
 
 public class TranscriptDownloader implements Runnable {
 	private final DefaultHttpClient client;
@@ -44,9 +45,17 @@ public class TranscriptDownloader implements Runnable {
 		try {
 			final HttpGet httpGet = new HttpGet(downloadPdfUrl);
 			response = clonedClient.execute(httpGet, context);
-
 			File pdfTranscript = new File(saveDirectory);
-			BufferedInputStream in = new BufferedInputStream(response.getEntity().getContent());
+
+			final InputStream pdfContent = response.getEntity().getContent();
+			// if ("".contains("<!DOCTYPE html PUBLIC")) {
+			// InformationWindow.initWindow("Fehler beim laden des Notenauszugs (Zur Fehlerbehebung Programm neu starten)",
+			// "OK", null,
+			// null);
+			// httpGet.releaseConnection();
+			// return;
+			// }
+			BufferedInputStream in = new BufferedInputStream(pdfContent);
 
 			BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(pdfTranscript));
 
@@ -55,18 +64,19 @@ public class TranscriptDownloader implements Runnable {
 				out.write(inByte);
 			}
 
-			InformationWindow.createInformationMessage(filename, true);
 			in.close();
 			out.close();
 
-			if (Desktop.isDesktopSupported()) {
-				Desktop.getDesktop().open(pdfTranscript);
-			}
-
 			httpGet.releaseConnection();
 
+			if (Desktop.isDesktopSupported()) {
+				try {
+					Desktop.getDesktop().open(pdfTranscript);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
 		} catch (Exception e) {
-			InformationWindow.createErrorMessage("Downloader Thread Exception_D aufgetreten!");
 			e.printStackTrace();
 		}
 	}

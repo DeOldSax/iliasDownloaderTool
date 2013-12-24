@@ -37,7 +37,7 @@ public class ButtonHandler extends MouseAdapter {
 		if (status.equals("lokalerIliasOrdner")) {
 			LocalFolderService.setVisible(true);
 		}
-		new Thread(new ResultListWorker(status, tree, iliasStarter, window)).run();
+		new Thread(new ResultListWorker(status, tree, iliasStarter, window, event)).run();
 	}
 
 	private void showIgnoredPdfs() {
@@ -51,8 +51,6 @@ public class ButtonHandler extends MouseAdapter {
 		}
 		if (!addedPdf) {
 			InformationWindow.initWindow("Keine ignorierten Dateien vorhanden!", "OK", null, event);
-			// JOptionPane.showMessageDialog(null, "     keine gefunden!", null,
-			// JOptionPane.INFORMATION_MESSAGE);
 		}
 	}
 }

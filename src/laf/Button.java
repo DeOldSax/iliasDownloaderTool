@@ -18,6 +18,7 @@ public class Button extends JLabel {
 		super(text);
 		setHorizontalAlignment(SwingConstants.CENTER);
 
+		this.setFocusable(true);
 		this.setOpaque(true);
 		this.setBackground(DEFAULT_COLOR);
 		this.setForeground(Color.GRAY);
