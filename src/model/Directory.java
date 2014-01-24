@@ -1,6 +1,6 @@
 package model;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Directory {
@@ -17,7 +17,7 @@ public class Directory {
 			parentDirectory.getChildFolders().add(this);
 		}
 		this.parentFolder = parentDirectory;
-		this.childFolders = new LinkedList<Directory>();
+		this.childFolders = new ArrayList<Directory>();
 		this.nameChangedByUser = null;
 	}
 

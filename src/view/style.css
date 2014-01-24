@@ -1,0 +1,89 @@
+.root {
+		-fx-background-color: 	linear-gradient(royalblue, steelblue);
+}
+
+#userField {
+	-fx-background-color: 	white;
+	-fx-text-fill: 			black; 
+	-fx-prompt-text-fill: 	linear-gradient(lightgrey , white);
+    -fx-font-size: 			14;
+    -fx-font-weight: 		bold;
+    -fx-effect: 			innershadow( three-pass-box , 	black , 6, 0.0 , 0 , 2 );
+}
+
+#loginButton {
+ -fx-background-color: 
+        #c3c4c4,
+        linear-gradient(#d6d6d6 50%, white 100%),
+        radial-gradient(center 50% -40%, radius 200%, #e6e6e6 45%, rgba(230,230,230,0) 50%);
+    -fx-background-insets: 0,1,1;
+    -fx-text-fill: black;
+       -fx-font-size: 			14;
+    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 3, 0.0 , 0 , 1 );
+}
+#loginButton:hover {
+ -fx-background-color: 
+        #c3c4c4,
+        radial-gradient(center 50% -40%, radius 200%, #e6e6e6 45%, rgba(230,230,230,0) 50%);
+}
+
+#loginBackground {
+		
+}
+
+
+.button {
+	-fx-background-color:   #c3c4c4,
+					        linear-gradient(#d6d6d6 50%, white 100%),
+					        radial-gradient(center 50% -40%, radius 200%, #e6e6e6 45%, rgba(230,230,230,0) 50%);
+	-fx-text-fill: 			black; 
+    -fx-font-size: 			14;
+    -fx-font-weight: 		bold;
+    -fx-effect: 			dropshadow( three-pass-box , rgba(0,0,0,0.6) , 3, 0.0 , 0 , 1 );
+}
+
+.button:hover {
+		-fx-background-color: 
+     		   					#c3c4c4,
+     						   	linear-gradient(#d6d6d6 50%, white 100%);
+		-fx-text-fill: 			linear-gradient(royalblue, darkblue);
+}
+
+.button:pressed {
+	-fx-background-color: 	steelblue; 
+	-fx-text-fill:			white; 
+	 -fx-effect: 			innershadow( three-pass-box , rgba(0,0,0,0.7) , 6, 0.0 , 0 , 2 );
+}
+
+#searchField {
+	-fx-background-color: 	steelblue; 
+	-fx-text-fill: 			linear-gradient(white, white);
+	-fx-font-size: 			14;
+	-fx-prompt-text-fill: 	white;
+	-fx-effect:				innershadow( three-pass-box , rgba(0,0,0,0.7) , 6, 0.0 , 0 , 2 );
+}
+
+#facebook {
+	-fx-background-color: 	linear-gradient(royalblue, blue); 
+	-fx-text-fill: 			linear-gradient(white, white);
+	-fx-font-size: 			15;
+	-fx-font-weight: 		bold;
+}
+
+.tree-view {
+	-fx-font-size: 			14;
+	-fx-effect:				innershadow(three-pass-box , steelblue , 6, 0.0 , 0 , 2 );
+}
+
+#splitPane {
+	-fx-effect:				innershadow(three-pass-box , black , 6, 0.0 , 0 , 2 );
+}
+
+#splitPane  .split-pane-divider {
+	-fx-background-color: 	linear-gradient(royalblue, steelblue);
+}
+
+.separator{
+    -fx-background-color: white;
+    
+}

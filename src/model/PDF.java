@@ -29,4 +29,12 @@ public class PDF extends Directory {
 		}
 		return false;
 	}
+
+	public void setIgnored(boolean b) {
+		if (b) {
+			storageProvider.storeIgnoredPdfSize(this);
+		} else {
+			storageProvider.removeIgnoredPdfSize(this);
+		}
+	}
 }

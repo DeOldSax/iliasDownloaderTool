@@ -21,14 +21,6 @@ public class StorageProvider {
 		return myPrefs.get(ILIAS_FOLDER, ".");
 	}
 
-	public void removeNode() {
-		try {
-			myPrefs.removeNode();
-		} catch (BackingStoreException e) {
-			e.printStackTrace();
-		}
-	}
-
 	public void storeUsername(String username) {
 		myPrefs.put("username", username);
 	}
@@ -61,6 +53,10 @@ public class StorageProvider {
 
 	private String createKey(PDF pdf) {
 		String key = pdf.getUrl();
+		// FIXME !!!!!!!
+		if (key == null) {
+			return "";
+		}
 		final int beginIndex = key.indexOf("ref_id=");
 		final int endIndex = key.indexOf("&cmd=sendfile");
 		key = key.substring(beginIndex + 7, endIndex);
@@ -75,7 +71,11 @@ public class StorageProvider {
 		myPrefs.putBoolean("localIliasPathIsAlreadySet", true);
 	}
 
-	public static void main(String[] args) {
-		new StorageProvider().removeNode();
+	public void removeNode() {
+		try {
+			myPrefs.removeNode();
+		} catch (BackingStoreException e) {
+			e.printStackTrace();
+		}
 	}
 }

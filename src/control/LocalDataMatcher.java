@@ -1,0 +1,40 @@
+package control;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import model.PDF;
+import view.Dashboard;
+
+public class LocalDataMatcher implements EventHandler<ActionEvent> {
+	private final List<PDF> matchedPdfs = new ArrayList<PDF>();
+
+	@Override
+	public void handle(ActionEvent event) {
+		final List<PDF> allPdfFiles = FileSystem.getAllPdfFiles();
+
+		final List<Integer> allLocalPdfSizes = new LocalDataReader().getAllLocalPDFSizes();
+		for (PDF pdf : allPdfFiles) {
+			if (pdf.isIgnored()) {
+				continue;
+			}
+			if (!allLocalPdfSizes.contains(pdf.getSize())) {
+				matchedPdfs.add(pdf);
+			}
+		}
+		showInResultList();
+	}
+
+	private void showInResultList() {
+		Dashboard.clearResultList();
+		if (matchedPdfs.isEmpty()) {
+			// FIXME Show empty in gui
+			return;
+		}
+		for (PDF pdf : matchedPdfs) {
+			Dashboard.addToResultList(pdf);
+		}
+	}
+}

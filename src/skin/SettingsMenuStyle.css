@@ -1,0 +1,73 @@
+.root {
+		-fx-background-color: #4d4d4d;
+}
+
+#goBackButton {
+	-fx-background-radius:	20;
+	-fx-text-fill: 			linear-gradient(white, whitesmoke); 
+    -fx-font-size: 			14;
+    -fx-font-weight: 		bold;
+	-fx-background-color: 	linear-gradient(lime, limegreen);
+	-fx-effect: 			dropshadow( three-pass-box , rgba(0,0,0,0.6) , 3, 0.0 , 0 , 1 );
+}
+#goBackButton:hover {
+	-fx-background-color: 	linear-gradient(lime, limegreen);
+    -fx-effect: 			innershadow( three-pass-box , rgba(0,0,0,0.6) , 6, 0.0 , 0 , 1 );
+}
+#goBackButton:pressed {
+	-fx-background-color: 	linear-gradient(limegreen, lime);
+    -fx-effect: 			innershadow( three-pass-box , black , 3, 0.0 , 0 , 1 );
+}
+
+#help {
+	-fx-background-radius:	20;
+	-fx-text-fill: 			linear-gradient(white, whitesmoke); 
+    -fx-font-size: 			14;
+    -fx-font-weight: 		bold;
+	-fx-background-color: 	linear-gradient(lime, limegreen);
+}
+#help:hover {
+   	-fx-effect: 			dropshadow( three-pass-box , rgba(0,0,0,0.6) , 3, 0.0 , 0 , 1 );
+}
+#help:pressed {
+	-fx-effect: 			dropshadow( three-pass-box , rgba(0,0,0,0.6) , 3, 0.0 , 0 , 1 );
+}
+
+.tooltip {
+	-fx-text-fill: 			white;
+    -fx-font-size: 			14;
+	-fx-background-color: 	#4d4d4d;
+	-fx-effect: 			dropshadow( three-pass-box , rgba(0,0,0,0.6) , 3, 0.0 , 0 , 1 );
+}
+
+
+.label {
+	-fx-background-color: 	#4d4d4d;
+	-fx-background-radius:	22;
+	-fx-text-fill: 			lightgrey; 
+    -fx-font-size: 			14;
+    -fx-font-weight: 		bold;
+}
+
+
+
+.button {
+	-fx-background-color: 	#3d3d3d;
+	-fx-background-radius:	20;
+	-fx-text-fill: 			linear-gradient(white, whitesmoke); 
+    -fx-font-size: 			14;
+    -fx-font-weight: 		bold;
+    -fx-effect: 			innershadow( three-pass-box , rgba(0,0,0,0.6) , 4, 0.0 , 0 , 1 );
+}
+
+.button:hover {
+	-fx-background-color: 	linear-gradient(steelblue,royalblue); 
+	-fx-text-fill:			white; 
+	-fx-effect: 			dropshadow( three-pass-box , rgba(0,0,0,0.7) , 6, 0.0 , 0 , 2 );
+}
+
+.button:pressed {
+	-fx-background-color: 	linear-gradient(royalblue,steelblue); 
+	-fx-text-fill:			white; 
+	-fx-effect: 			innershadow( three-pass-box , #1d1d1d, 7, 0.0 , 0 , 2 );
+}

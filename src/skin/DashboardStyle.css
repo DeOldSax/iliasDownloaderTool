@@ -1,0 +1,179 @@
+.root {
+		-fx-background-color: #4d4d4d;
+}
+
+#userField {
+	-fx-background-color: 	#3d3d3d; 
+	-fx-background-radius:	20;
+	-fx-text-fill: 			#1d1d1d;
+	-fx-font-size: 			14;
+	-fx-text-fill: 			linear-gradient(white, whitesmoke);
+	-fx-prompt-text-fill: 	linear-gradient(white, whitesmoke);
+	-fx-font-weight: 		bold;
+}
+
+#userField:focused {
+	-fx-background-color: 	#c3c4c4,
+					        linear-gradient(#d6d6d6 50%, white 100%),
+					        radial-gradient(center 50% -40%, radius 200%, #e6e6e6 45%, rgba(230,230,230,0) 50%);
+	-fx-text-fill: 			linear-gradient(#1d1d1d,black);
+	-fx-prompt-text-fill: 	darkgrey;
+	-fx-effect:				innershadow( three-pass-box , black , 6, 0.0 , 0 , 2 );
+}
+
+
+#loginButton {
+	-fx-background-color: 	linear-gradient(steelblue,royalblue); 
+	-fx-background-radius:	20;
+	-fx-text-fill: 			linear-gradient(white, whitesmoke); 
+    -fx-font-size: 			14;
+    -fx-font-weight: 		bold;
+    -fx-effect: 			dropshadow( three-pass-box , rgba(0,0,0,0.6) , 3, 0.0 , 0 , 1 );
+}
+
+#loginButton:hover {
+	-fx-background-color: 	linear-gradient(steelblue,royalblue); 
+	-fx-effect: 			innershadow( three-pass-box , rgba(0,0,0,0.6) , 3, 0.0 , 0 , 1 );
+}
+
+#loginButton:pressed {
+	-fx-background-color: 	linear-gradient(royalblue,steelblue); 
+	-fx-effect: 			innershadow( three-pass-box , black , 6, 0.0 , 0 , 1 );
+}
+
+#loginButtonCancel {
+	-fx-background-color: 	#3d3d3d;
+	-fx-background-radius:	20;
+	-fx-text-fill: 			linear-gradient(white, whitesmoke); 
+    -fx-font-size: 			14;
+    -fx-font-weight: 		bold;
+    -fx-effect: 			innershadow( three-pass-box , rgba(0,0,0,0.6) , 3, 0.0 , 0 , 1 );
+}
+
+#loginButtonCancel:hover {
+	-fx-background-color: 	linear-gradient(red,darkred);
+	-fx-effect: 			dropshadow( three-pass-box , rgba(0,0,0,0.6) , 3, 0.0 , 0 , 1 );
+}
+
+#loginButtonCancel:pressed {
+	-fx-background-color: 	linear-gradient(darkred,red);
+    -fx-effect: 			innershadow( three-pass-box , rgba(0,0,0,0.6) , 3, 0.0 , 0 , 1 );
+}
+
+.radio-button .dot{
+	-fx-text-fill: 			darkgrey; 
+}
+.radio-button {
+	-fx-text-fill: 			darkgrey; 
+}
+
+#settingsBtn {
+	-fx-background-radius:	20;
+	-fx-background-color: 	#4d4d4d;
+	-fx-effect: 			innershadow( three-pass-box , #4d4d4d , 0, 0 , 0 , 0 );
+}
+
+#settingsBtn:hover {
+	-fx-effect: 			dropshadow( three-pass-box , rgba(0,0,0,0.7) , 6, 0.0 , 0 , 2 );
+}
+
+#settingsBtn:pressed{
+ 	-fx-effect: 			innershadow( three-pass-box , rgba(0,0,0,0.6) , 4, 0.0 , 0 , 1 );
+}
+
+.button {
+	-fx-background-color: 	#3d3d3d;
+	-fx-background-radius:	20;
+	-fx-text-fill: 			linear-gradient(white, whitesmoke); 
+    -fx-font-size: 			14;
+    -fx-font-weight: 		bold;
+    -fx-effect: 			innershadow( three-pass-box , rgba(0,0,0,0.6) , 4, 0.0 , 0 , 1 );
+}
+
+.button:hover {
+	-fx-background-color: 	linear-gradient(steelblue,royalblue); 
+	-fx-text-fill:			white; 
+	-fx-effect: 			dropshadow( three-pass-box , rgba(0,0,0,0.7) , 6, 0.0 , 0 , 2 );
+}
+
+.button:pressed {
+	-fx-background-color: 	linear-gradient(royalblue,steelblue); 
+	-fx-text-fill:			white; 
+	-fx-effect: 			innershadow( three-pass-box , #1d1d1d, 7, 0.0 , 0 , 2 );
+}
+
+#searchField {
+	-fx-background-color: 	#3d3d3d; 
+	-fx-background-radius:	20;
+	-fx-text-fill: 			#1d1d1d;
+	-fx-font-size: 			14;
+	-fx-text-fill: 			linear-gradient(white, whitesmoke);
+	-fx-prompt-text-fill: 	linear-gradient(white, whitesmoke);
+	-fx-font-weight: 		bold;
+}
+
+#searchField:focused {
+	-fx-background-color: 	#c3c4c4,
+					        linear-gradient(#d6d6d6 50%, white 100%),
+					        radial-gradient(center 50% -40%, radius 200%, #e6e6e6 45%, rgba(230,230,230,0) 50%);
+	-fx-text-fill: 			linear-gradient(#1d1d1d,black);
+	-fx-prompt-text-fill: 	darkgrey;
+	-fx-effect:				innershadow( three-pass-box , black , 6, 0.0 , 0 , 2 );
+}
+
+#searchField:hover {
+	-fx-background-color: 	#c3c4c4,
+					        linear-gradient(#d6d6d6 50%, white 100%),
+					        radial-gradient(center 50% -40%, radius 200%, #e6e6e6 45%, rgba(230,230,230,0) 50%);
+	-fx-effect:				innershadow( three-pass-box , silver , 6, 0.0 , 0 , 2 );
+	-fx-prompt-text-fill: 	darkgrey;
+	-fx-effect:				innershadow( three-pass-box , black , 6, 0.0 , 0 , 2 );
+}
+
+.tree-view {
+	-fx-font-size: 			14;
+	-fx-effect:				innershadow(three-pass-box , steelblue , 6, 0.0 , 0 , 2 );
+}
+
+#splitPane {
+	-fx-effect:				innershadow(three-pass-box , black , 6, 0.0 , 0 , 2 );
+}
+
+#splitPane  .split-pane-divider {
+	-fx-background-color: 	#3d3d3d;
+}
+
+.separator {
+    -fx-background-color: 	white;
+}
+
+.menu-item {
+	-fx-background-color: 	#c3c4c4,
+					        linear-gradient(#d6d6d6 50%, white 100%),
+					        radial-gradient(center 50% -40%, radius 200%, #e6e6e6 45%, rgba(230,230,230,0) 50%);
+	-fx-background-radius:	1;
+    -fx-font-size: 			14;
+}
+
+.menu-item:hover {
+	-fx-background-color: 	linear-gradient(steelblue,royalblue); 
+    -fx-effect: 			dropshadow( three-pass-box , rgba(0,0,0,0.6) , 3, 0.0 , 0 , 1 );
+}
+.menu-item:pressed {
+	-fx-background-color: 	linear-gradient(steelblue,royalblue); 
+	-fx-effect:				innershadow(three-pass-box , black , 3, 0.0 , 0 , 2 );
+}
+
+.context-menu {
+	-fx-background-color: 	#c3c4c4,
+					        linear-gradient(#d6d6d6 50%, white 100%),
+					        radial-gradient(center 50% -40%, radius 200%, #e6e6e6 45%, rgba(230,230,230,0) 50%);
+	-fx-background-radius:	3;
+    -fx-font-size: 			14;
+}
+
+#statusFooterText {
+	-fx-text-fill: 			white; 
+    -fx-font-size: 			12;
+    -fx-font-weight: 		bold;
+}
