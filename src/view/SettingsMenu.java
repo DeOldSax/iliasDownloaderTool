@@ -81,6 +81,12 @@ public class SettingsMenu implements EventHandler<ActionEvent> {
 		HBox box = new HBox();
 		box.setSpacing(20);
 		box.getChildren().addAll(doLogin, doUpdate);
+		if (storageProvider.autoLogin()) {
+			doLogin.setStyle("-fx-background-color: linear-gradient(steelblue,royalblue)");
+		}
+		if (storageProvider.autoUpdate()) {
+			doUpdate.setStyle("-fx-background-color: linear-gradient(steelblue,royalblue)");
+		}
 
 		gridPane.add(startActions, 0, 3);
 		gridPane.add(box, 1, 3);

@@ -31,7 +31,7 @@ public class Ignorer implements EventHandler<ActionEvent> {
 		} else {
 			pdf.setIgnored(true);
 			Dashboard.setStatusText(pdf.getName() + " wurde auf ignorieren gesetzt.", false);
-			findNodeAndDelete(courses.getRoot().getChildren());
+			// findNodeAndDelete(courses.getRoot().getChildren());
 		}
 		new IgnoredPdfFilter().filter();
 	}

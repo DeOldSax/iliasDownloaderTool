@@ -5,3 +5,13 @@
 #delete 	http://www.iconarchive.com/show/refresh-cl-icons-by-tpdkdesign.net/Symbols-Delete-icon.html
 
 #loader		http://www.loadinfo.net/
+
+#forum		http://www.iconarchive.com/show/essential-toolbar-icons-by-fasticon/user-group-icon.html
+			http://www.fasticon.com
+			
+#download	http://findicons.com/icon/203359/go_down_blue?id=344760
+
+#printer 	http://www.iconarchive.com/show/blueberry-basic-icons-by-icojam/printer-icon.html
+
+#check		http://www.iconarchive.com/show/must-have-icons-by-visualpharm/Check-icon.html
+			http://www.visualpharm.com

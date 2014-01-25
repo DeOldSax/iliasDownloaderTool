@@ -18,6 +18,8 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.protocol.BasicHttpContext;
 
+import view.Dashboard;
+
 public class FileDownloader implements Runnable {
 	private HttpGet request;
 	private HttpResponse response;
@@ -48,6 +50,7 @@ public class FileDownloader implements Runnable {
 			@Override
 			public void run() {
 				final File selectedFile = fileChooser.showSaveDialog(new Stage());
+				Dashboard.startDownloadAnimation();
 				if (selectedFile != null) {
 					targetPath = selectedFile.getAbsolutePath();
 					if (!targetPath.endsWith(".pdf")) {
@@ -62,7 +65,6 @@ public class FileDownloader implements Runnable {
 	private void download() {
 		try {
 			request = new HttpGet(pdf.getUrl());
-			System.out.println(targetPath);
 
 			response = Ilias.getClient().execute(request, context);
 			entity = response.getEntity();
@@ -82,5 +84,6 @@ public class FileDownloader implements Runnable {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		Dashboard.setStatusText("Download abgeschlossen", false);
 	}
 }

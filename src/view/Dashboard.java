@@ -1,6 +1,7 @@
 package view;
 
 import javafx.animation.Interpolator;
+import javafx.animation.ParallelTransition;
 import javafx.animation.TranslateTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -39,6 +40,7 @@ import control.FileSearcher;
 import control.FileSystem;
 import control.IgnoredPdfFilter;
 import control.IliasStarter;
+import control.InterpolatorDown;
 import control.JTreeContentFiller;
 import control.LocalDataMatcher;
 import control.LoginProvider;
@@ -50,6 +52,7 @@ public class Dashboard extends Application {
 	private static TreeItem<Directory> rootItem;
 	private static Scene scene;
 	private LoginFader loginFader;
+	private static Button settings;
 	private static Button loader;
 	private static Label statusFooterText;
 	private static TreeView<Directory> courses;
@@ -60,6 +63,7 @@ public class Dashboard extends Application {
 	private static ImageView loaderIcon;
 	private static ImageView loaderGif;
 	private static boolean loaderRunning;
+	private static ParallelTransition tp;
 
 	public static void main(String[] args) {
 		launch();
@@ -80,7 +84,7 @@ public class Dashboard extends Application {
 		loaderGif = new ImageView(new Image(getClass().getResourceAsStream("loader.gif")));
 		Dashboard.stage = stage;
 		final BorderPane background = new BorderPane();
-		background.setPadding(new Insets(10, 10, 10, 10));
+		background.setPadding(new Insets(10, 25, 10, 10));
 
 		menu = new GridPane();
 		menu.setPadding(new Insets(0, 0, 30, 0));
@@ -169,7 +173,7 @@ public class Dashboard extends Application {
 		searchField.setPromptText("Datei suchen");
 		searchField.setId("searchField");
 		searchField.setOnAction(new FileSearcher(searchField));
-		Button settings = new Button();
+		settings = new Button();
 		settings.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("settings.png"))));
 		settings.setId("settingsBtn");
 		settings.setOnAction(new SettingsMenu());
@@ -345,5 +349,27 @@ public class Dashboard extends Application {
 
 	public static ObservableList<TreeItem<Directory>> getSelectedItems() {
 		return courses.getSelectionModel().getSelectedItems();
+	}
+
+	public static void startDownloadAnimation() {
+		final Label downloadIcon = new Label();
+		final Label icon2 = new Label();
+		menu.add(downloadIcon, 6, 0);
+		menu.add(icon2, 6, 0);
+		downloadIcon.setGraphic(new ImageView("img/downloadArrow.png"));
+		icon2.setGraphic(new ImageView("img/downloadArrow.png"));
+
+		tp = new ParallelTransition();
+		final TranslateTransition t = new TranslateTransition(Duration.millis(2000), downloadIcon);
+		t.setInterpolator(new InterpolatorDown());
+		t.setFromX(downloadIcon.getLayoutX() + 50);
+		t.setByY(stage.getHeight() - 80);
+		final TranslateTransition t2 = new TranslateTransition(Duration.millis(2000), icon2);
+		t2.setDelay(Duration.millis(100));
+		t2.setInterpolator(new InterpolatorDown());
+		t2.setFromX(downloadIcon.getLayoutX() + 50);
+		t2.setByY(stage.getHeight() - 80);
+		tp.getChildren().addAll(t, t2);
+		tp.play();
 	}
 }
