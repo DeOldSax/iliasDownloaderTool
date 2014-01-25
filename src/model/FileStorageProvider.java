@@ -19,10 +19,10 @@ public class FileStorageProvider {
 		myPrefs = prefsRoot.node("DownloaderTool.preferences.files");
 	}
 
-	// public static void main(String[] args) {
-	// new FileStorageProvider().removeNode();
-	// new StorageProvider().removeNode();
-	// }
+	public static void main(String[] args) {
+		new FileStorageProvider().removeNode();
+		new StorageProvider().removeNode();
+	}
 
 	private void removeNode() {
 		try {
@@ -75,7 +75,6 @@ public class FileStorageProvider {
 			String value = dir.getName() + suffix + URL_DIVIDER + dir.getUrl();
 			if (dir instanceof PDF) {
 				value = value + SIZE_DIVIDER + ((PDF) dir).getSize();
-				System.out.println(value);
 			}
 			myPrefs.put(prefix + String.valueOf(counter), value);
 

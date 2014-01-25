@@ -78,4 +78,40 @@ public class StorageProvider {
 			e.printStackTrace();
 		}
 	}
+
+	public void setLogIn(boolean b) {
+		myPrefs.putBoolean("#LOGIN#", b);
+	}
+
+	public boolean userIsLoggedIn() {
+		return myPrefs.getBoolean("#LOGIN#", false);
+	}
+
+	public boolean updateCanceled() {
+		return myPrefs.getBoolean("UpdateCanceled!?", false);
+	}
+
+	public void cancelUpdate() {
+		myPrefs.putBoolean("UpdateCanceled!?", true);
+	}
+
+	public void setUpdateCanceled(boolean b) {
+		myPrefs.putBoolean("UpdateCanceled!?", b);
+	}
+
+	public void setAutoUpdate(boolean b) {
+		myPrefs.putBoolean("AUTO_UPDATE", b);
+	}
+
+	public boolean autoUpdate() {
+		return myPrefs.getBoolean("AUTO_UPDATE", false);
+	}
+
+	public void setAutoLogin(boolean b) {
+		myPrefs.putBoolean("AUTO_LOGIN", b);
+	}
+
+	public boolean autoLogin() {
+		return myPrefs.getBoolean("AUTO_LOGIN", false);
+	}
 }

@@ -12,9 +12,12 @@ import view.SettingsMenu;
 public class LocalIliasPathChooser implements EventHandler<ActionEvent> {
 	@Override
 	public void handle(ActionEvent event) {
-
 		final DirectoryChooser directoryChooser = new DirectoryChooser();
 		directoryChooser.setTitle("Lokaler Ilias-Ordner");
+		final String loadLocalIliasFolderPath = new StorageProvider().loadLocalIliasFolderPath();
+		if (!loadLocalIliasFolderPath.equals(".")) {
+			directoryChooser.setInitialDirectory(new File(loadLocalIliasFolderPath));
+		}
 
 		final File file = directoryChooser.showDialog(new Stage());
 

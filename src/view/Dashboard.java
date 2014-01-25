@@ -6,6 +6,8 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.Scene;
@@ -27,6 +29,7 @@ import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 import model.Directory;
 import model.FileStorageProvider;
@@ -35,8 +38,11 @@ import model.StorageProvider;
 import control.FileSearcher;
 import control.FileSystem;
 import control.IgnoredPdfFilter;
+import control.IliasStarter;
 import control.JTreeContentFiller;
 import control.LocalDataMatcher;
+import control.LoginProvider;
+import control.TreePopupShower;
 
 public class Dashboard extends Application {
 
@@ -44,12 +50,16 @@ public class Dashboard extends Application {
 	private static TreeItem<Directory> rootItem;
 	private static Scene scene;
 	private LoginFader loginFader;
+	private static Button loader;
 	private static Label statusFooterText;
 	private static TreeView<Directory> courses;
 	private static ObservableList<Directory> items;
 	private static Button signIn;
 	private static GridPane menu;
 	private static LoginFader loginFader2;
+	private static ImageView loaderIcon;
+	private static ImageView loaderGif;
+	private static boolean loaderRunning;
 
 	public static void main(String[] args) {
 		launch();
@@ -57,6 +67,17 @@ public class Dashboard extends Application {
 
 	@Override
 	public void start(Stage stage) throws Exception {
+		stage.addEventHandler(WindowEvent.WINDOW_CLOSE_REQUEST, new EventHandler<WindowEvent>() {
+			@Override
+			public void handle(WindowEvent event) {
+				final StorageProvider storageProvider = new StorageProvider();
+				storageProvider.setLogIn(false);
+				storageProvider.setUpdateCanceled(false);
+				System.exit(0);
+			};
+		});
+		loaderIcon = new ImageView(new Image(getClass().getResourceAsStream("loader.png")));
+		loaderGif = new ImageView(new Image(getClass().getResourceAsStream("loader.gif")));
 		Dashboard.stage = stage;
 		final BorderPane background = new BorderPane();
 		background.setPadding(new Insets(10, 10, 10, 10));
@@ -110,6 +131,29 @@ public class Dashboard extends Application {
 		Button collapseTree = new Button();
 		collapseTree.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("arrow.png"))));
 		collapseTree.prefWidthProperty().bind(menu.prefWidthProperty());
+		loader = new Button();
+		loader.setId("loader");
+		loader.setGraphic(loaderIcon);
+		loader.setMouseTransparent(true);
+		loader.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				if (loaderRunning) {
+					new StorageProvider().cancelUpdate();
+					showLoader(false);
+				} else {
+					showLoader(true);
+					if (new StorageProvider().userIsLoggedIn()) {
+						new Thread(new Runnable() {
+							@Override
+							public void run() {
+								new IliasStarter().watchForFolders();
+							}
+						}).start();
+					}
+				}
+			}
+		});
 		signIn = new Button("Anmelden");
 		signIn.setOnAction(new LoginFader(500, login, menu));
 		signIn.prefWidthProperty().bind(menu.prefWidthProperty());
@@ -124,13 +168,15 @@ public class Dashboard extends Application {
 		searchField.prefWidthProperty().bind(menu.prefWidthProperty());
 		searchField.setPromptText("Datei suchen");
 		searchField.setId("searchField");
-		searchField.setOnKeyPressed(new FileSearcher(searchField));
+		searchField.setOnAction(new FileSearcher(searchField));
 		Button settings = new Button();
 		settings.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("settings.png"))));
 		settings.setId("settingsBtn");
 		settings.setOnAction(new SettingsMenu());
 
 		ColumnConstraints col1 = new ColumnConstraints();
+		col1.setPercentWidth(5);
+		ColumnConstraints col15 = new ColumnConstraints();
 		col1.setPercentWidth(5);
 		ColumnConstraints col2 = new ColumnConstraints();
 		col2.setPercentWidth(15);
@@ -139,17 +185,18 @@ public class Dashboard extends Application {
 		ColumnConstraints col4 = new ColumnConstraints();
 		col4.setPercentWidth(20);
 		ColumnConstraints col5 = new ColumnConstraints();
-		col5.setPercentWidth(25);
+		col5.setPercentWidth(20);
 		ColumnConstraints col6 = new ColumnConstraints();
 		col6.setPercentWidth(5);
-		menu.getColumnConstraints().addAll(col1, col2, col3, col4, col5, col6);
+		menu.getColumnConstraints().addAll(col1, col15, col2, col3, col4, col5, col6);
 
 		menu.add(collapseTree, 0, 0);
-		menu.add(signIn, 1, 0);
-		menu.add(showLocalNotThere, 2, 0);
-		menu.add(showIgnored, 3, 0);
-		menu.add(searchField, 4, 0);
-		menu.add(settings, 5, 0);
+		menu.add(loader, 1, 0);
+		menu.add(signIn, 2, 0);
+		menu.add(showLocalNotThere, 3, 0);
+		menu.add(showIgnored, 4, 0);
+		menu.add(searchField, 5, 0);
+		menu.add(settings, 6, 0);
 
 		background.setTop(stack);
 
@@ -187,6 +234,19 @@ public class Dashboard extends Application {
 		setScene();
 		stage.show();
 		stage.setTitle("Ilias");
+
+		if (new StorageProvider().autoLogin()) {
+			Dashboard.setStatusText("", false);
+			Dashboard.showLoader(true);
+			Dashboard.setMenuTransparent(false);
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					final StorageProvider storageProvider = new StorageProvider();
+					new IliasStarter(storageProvider.getUsername(), storageProvider.getPassword()).login();
+				}
+			}).start();
+		}
 	}
 
 	public static void setScene(Scene scene, double minWidth) {
@@ -207,7 +267,12 @@ public class Dashboard extends Application {
 	}
 
 	public static void fadeInLogin() {
-		loginFader2.fadeIn();
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				loginFader2.fadeIn();
+			}
+		});
 	}
 
 	public static void clearResultList() {
@@ -215,44 +280,70 @@ public class Dashboard extends Application {
 	}
 
 	public static void addToResultList(final PDF pdf) {
-		Platform.runLater(new Runnable() {
-			@Override
-			public void run() {
-				items.add(pdf);
-			}
-		});
+		items.add(pdf);
 	}
 
 	public static void setMenuTransparent(boolean b) {
 		menu.setMouseTransparent(b);
 	}
 
-	public static void showLoader(boolean show) {
-		signIn.setMouseTransparent(show);
-		if (show) {
-			signIn.setOpacity(0.5);
-		} else {
-			signIn.setOpacity(1);
-		}
+	public static void showLoader(final boolean show) {
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				signIn.setMouseTransparent(show);
+				if (show) {
+					loader.setGraphic(loaderGif);
+					loaderRunning = true;
+					signIn.setOpacity(0.5);
+				} else {
+					loader.setGraphic(loaderIcon);
+					loaderRunning = false;
+					loader.setMouseTransparent(false);
+					signIn.setOpacity(1);
+				}
+			}
+		});
 	}
 
 	public static void setTitle(String title) {
 		stage.setTitle(title);
 	}
 
-	public static void setStatusText(String text, boolean alert) {
-		TranslateTransition t = new TranslateTransition(Duration.millis(600), statusFooterText);
+	public static void setStatusText(final String text, boolean alert) {
+		final TranslateTransition t = new TranslateTransition(Duration.millis(600), statusFooterText);
 		t.setInterpolator(Interpolator.EASE_BOTH);
 		t.setFromX(statusFooterText.getLayoutX() - 500);
 		t.setToX(statusFooterText.getLayoutX());
 		if (alert) {
-			statusFooterText.setStyle(statusFooterText.getStyle() + "-fx-text-fill: red");
+			statusFooterText.setStyle("-fx-text-fill: orange");
+		} else {
+			statusFooterText.setStyle("-fx-text-fill: white");
 		}
-		statusFooterText.setText(text);
+		Platform.runLater(new Runnable() {
+
+			@Override
+			public void run() {
+				statusFooterText.setText(text);
+			}
+		});
 		t.play();
 	}
 
-	public static TreeItem<Directory> getSelectedTreeItem() {
-		return courses.getSelectionModel().getSelectedItem();
+	public static void setStatusText(final String text) {
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				statusFooterText.setText(text);
+			}
+		});
+	}
+
+	public static Directory getSelectedItem() {
+		return courses.getSelectionModel().getSelectedItem().getValue();
+	}
+
+	public static ObservableList<TreeItem<Directory>> getSelectedItems() {
+		return courses.getSelectionModel().getSelectedItems();
 	}
 }

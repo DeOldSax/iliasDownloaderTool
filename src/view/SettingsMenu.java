@@ -8,6 +8,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
 import model.StorageProvider;
 import control.LocalIliasPathChooser;
@@ -17,6 +18,7 @@ public class SettingsMenu implements EventHandler<ActionEvent> {
 	private final StorageProvider storageProvider;
 	private final GridPane gridPane;
 	private static Scene scene;
+	private static boolean promptUpdater;
 
 	public SettingsMenu() {
 		storageProvider = new StorageProvider();
@@ -71,11 +73,30 @@ public class SettingsMenu implements EventHandler<ActionEvent> {
 		Text txtrDerLokaleIlias = new Text();
 		txtrDerLokaleIlias.setText(helpText);
 
+		Label startActions = new Label("Bei jedem Start ausführen:          ");
+		final Button doLogin = new Button("Anmelden");
+		doLogin.setOnAction(new Selector());
+		Button doUpdate = new Button("Aktualisieren");
+		doUpdate.setOnAction(new Selector());
+		HBox box = new HBox();
+		box.setSpacing(20);
+		box.getChildren().addAll(doLogin, doUpdate);
+
+		gridPane.add(startActions, 0, 3);
+		gridPane.add(box, 1, 3);
 	}
 
 	public static void updateLocalIliasFolderPath() {
 		final StorageProvider storageProvider = new StorageProvider();
 		localIliasPath.setText(storageProvider.loadLocalIliasFolderPath());
 		storageProvider.setLocalIliasPathTrue();
+		if (promptUpdater) {
+			Dashboard.update();
+			promptUpdater = false;
+		}
+	}
+
+	public static void activatePromptUpdater() {
+		promptUpdater = true;
 	}
 }

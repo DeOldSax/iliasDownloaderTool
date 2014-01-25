@@ -8,10 +8,13 @@ import model.Directory;
 import model.Folder;
 import model.Forum;
 import model.PDF;
+import model.StorageProvider;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+
+import view.Dashboard;
 
 public class IliasPdfFinder {
 
@@ -32,6 +35,9 @@ public class IliasPdfFinder {
 	}
 
 	private void startScanner(List<Directory> kurse) {
+		if (new StorageProvider().updateCanceled()) {
+			return;
+		}
 		threadCount.incrementAndGet();
 		new Thread(new IliasDirectoryScanner(this, kurse)).start();
 	}
@@ -61,7 +67,9 @@ public class IliasPdfFinder {
 		@Override
 		public void run() {
 			for (Directory kurs : kurse) {
-				// final Directory kurs = kurse.get(0);
+				if (new StorageProvider().updateCanceled()) {
+					break;
+				}
 				List<Element> directory = openFolder(kurs);
 				for (Element dir : directory) {
 					final boolean dirIstPdfFile = dir.attr("href").contains("cmd=sendfile");
@@ -73,6 +81,8 @@ public class IliasPdfFinder {
 						final int size = new IliasConnector().requestHead(dir.attr("abs:href"));
 						PDF newPdfFile = createPDF(kurs, dir, size);
 						allPdfs.add(newPdfFile);
+
+						Dashboard.setStatusText(String.valueOf(allPdfs.size()) + " Dateien wurden bereits geladen.");
 
 						List<Element> elemse = dir.parent().parent().siblingElements().select("div").select("span");
 						for (Element el : elemse) {

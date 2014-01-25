@@ -1,15 +1,12 @@
-package view;
+package control;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
-
-import javax.swing.JOptionPane;
-
 import model.StorageProvider;
-import control.IliasStarter;
+import view.Dashboard;
 
 public class LoginProvider implements EventHandler<ActionEvent> {
 
@@ -27,21 +24,26 @@ public class LoginProvider implements EventHandler<ActionEvent> {
 
 	@Override
 	public void handle(ActionEvent event) {
+		Dashboard.setStatusText("", false);
 		Dashboard.showLoader(true);
 		Dashboard.setMenuTransparent(false);
 		final String username = usernameField.getText();
 		final boolean validUsername = username.length() != 5 || !username.startsWith("u");
 		if (validUsername) {
-			JOptionPane.showMessageDialog(null, "ungültiger Benutzername", null, JOptionPane.ERROR_MESSAGE);
+			Dashboard.setStatusText("Ungültiger Benutzername", true);
 			usernameField.requestFocus();
 			usernameField.selectAll();
+			Dashboard.fadeInLogin();
+			Dashboard.showLoader(false);
 			return;
 		} else {
 			final String password = passwordField.getText();
 			if (password.length() < 1) {
-				JOptionPane.showMessageDialog(null, "ungültiges Passwort", null, JOptionPane.ERROR_MESSAGE);
+				Dashboard.setStatusText("Ungültiges Passwort", true);
 				passwordField.requestFocus();
 				passwordField.selectAll();
+				Dashboard.fadeInLogin();
+				Dashboard.showLoader(false);
 				return;
 			}
 			if (savePwd.isSelected()) {

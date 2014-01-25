@@ -24,6 +24,8 @@ public class LocalDataMatcher implements EventHandler<ActionEvent> {
 				matchedPdfs.add(pdf);
 			}
 		}
+		Dashboard.setStatusText("Gesamt: " + allPdfFiles.size() + ", davon sind " + matchedPdfs.size() + " noch nicht im Ilias Ordner.",
+				false);
 		showInResultList();
 	}
 

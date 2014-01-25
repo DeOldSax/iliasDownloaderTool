@@ -1,9 +1,12 @@
 package model;
 
+import java.io.File;
+
 public class PDF extends Directory {
 	private final int size;
 	private boolean read = true;
 	private final StorageProvider storageProvider;
+	private File fileOnLocalDisk = null;
 
 	public PDF(String name, String url, Directory parentDirectory, int size) {
 		super(name, url, parentDirectory);
@@ -36,5 +39,17 @@ public class PDF extends Directory {
 		} else {
 			storageProvider.removeIgnoredPdfSize(this);
 		}
+	}
+
+	public void setFileOnLocalDisk(File fileOnLocalDisk) {
+		this.fileOnLocalDisk = fileOnLocalDisk;
+	}
+
+	public File getFileOnLocalDisk() {
+		return fileOnLocalDisk;
+	}
+
+	public File getParentFolderOnLocalDisk() {
+		return fileOnLocalDisk.getParentFile();
 	}
 }

@@ -14,6 +14,7 @@ public class LocalDataReader {
 	private final List<Integer> localDataList;
 	private final Map<Integer, String> localPdfWithParents;
 	private final StorageProvider storageProvider;
+	private File file;
 
 	public LocalDataReader() {
 		this.localDataList = new ArrayList<Integer>();
@@ -64,5 +65,28 @@ public class LocalDataReader {
 			}
 		}
 		return storageProvider.loadLocalIliasFolderPath();
+	}
+
+	public File findFileOnLocalDisk(PDF pdf) {
+		scanForPath(storageProvider.loadLocalIliasFolderPath(), pdf);
+		if (file != null) {
+			return file;
+		}
+		return null;
+	}
+
+	private void scanForPath(String path, PDF pdf) {
+		File dir = new File(path);
+
+		File[] files = dir.listFiles();
+
+		for (File file : files) {
+			if (file.isDirectory()) {
+				scanForPath(file.getAbsolutePath(), pdf);
+			}
+			if ((int) file.length() == pdf.getSize()) {
+				this.file = file;
+			}
+		}
 	}
 }

@@ -3,13 +3,13 @@ package control;
 import java.util.ArrayList;
 import java.util.List;
 
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.TextField;
-import javafx.scene.input.KeyEvent;
 import model.PDF;
 import view.Dashboard;
 
-public class FileSearcher implements EventHandler<KeyEvent> {
+public class FileSearcher implements EventHandler<ActionEvent> {
 
 	private List<PDF> allPdfs = null;
 	private final TextField word;
@@ -19,8 +19,11 @@ public class FileSearcher implements EventHandler<KeyEvent> {
 	}
 
 	@Override
-	public void handle(KeyEvent event) {
+	public void handle(ActionEvent event) {
 		this.allPdfs = FileSystem.getAllPdfFiles();
+		if (allPdfs.isEmpty()) {
+			Dashboard.setStatusText("Keine passende Datei gefunden.", false);
+		}
 		act();
 	}
 
@@ -73,6 +76,9 @@ public class FileSearcher implements EventHandler<KeyEvent> {
 					}
 					continue;
 				}
+			}
+			if (alreadyAddedPDF.isEmpty()) {
+				Dashboard.setStatusText("Keine passende Datei gefunden.");
 			}
 		}
 	}
