@@ -33,6 +33,7 @@ public class IliasStarter {
 		final boolean usernameOrPasswordWrong = doLogin(username, password);
 		if (usernameOrPasswordWrong) {
 			Dashboard.showLoader(false);
+			Dashboard.setSigInTransparent(true);
 			Dashboard.fadeInLogin();
 			Dashboard.setStatusText("Falsches Passwort!", true);
 			return false;
@@ -43,12 +44,9 @@ public class IliasStarter {
 		new Thread(studierendenportal).start();
 		new StorageProvider().setLogIn(true);
 		Dashboard.showLoader(false);
-		try {
-			Thread.sleep(5000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+		Dashboard.setSignInColor();
 		Dashboard.setStatusText("Aktualisiere über den Button in der Menüleiste die Kurse auf deinem Schreibtisch!", false);
+		Dashboard.setSigInTransparent(true);
 		return true;
 	}
 
@@ -76,14 +74,18 @@ public class IliasStarter {
 		if (!(new StorageProvider().updateCanceled())) {
 			FileSystem.setAllPdfFiles(allPdfs);
 			FileSystem.setAllFiles(iliasPdfFinder.getKurse());
+			new StorageProvider().setUpdateCanceled(false);
+		} else {
+			new StorageProvider().setUpdateCanceled(false);
+			Dashboard.setStatusText("");
+			return;
 		}
-		new StorageProvider().setUpdateCanceled(false);
 
 		if (new StorageProvider().localIliasPathIsAlreadySet()) {
 			Platform.runLater(new Runnable() {
 				@Override
 				public void run() {
-					Dashboard.update();
+					Dashboard.update(true);
 					Dashboard.showLoader(false);
 				}
 			});

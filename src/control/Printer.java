@@ -11,7 +11,7 @@ import view.Dashboard;
 public class Printer implements EventHandler<ActionEvent> {
 	@Override
 	public void handle(ActionEvent event) {
-		PDF pdf = (PDF) Dashboard.getSelectedItem();
+		PDF pdf = (PDF) Dashboard.getSelectedDirectory();
 		if (Desktop.isDesktopSupported()) {
 			try {
 				Desktop.getDesktop().print(pdf.getFileOnLocalDisk());

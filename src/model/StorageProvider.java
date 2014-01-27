@@ -91,10 +91,6 @@ public class StorageProvider {
 		return myPrefs.getBoolean("UpdateCanceled!?", false);
 	}
 
-	public void cancelUpdate() {
-		myPrefs.putBoolean("UpdateCanceled!?", true);
-	}
-
 	public void setUpdateCanceled(boolean b) {
 		myPrefs.putBoolean("UpdateCanceled!?", b);
 	}
@@ -113,5 +109,13 @@ public class StorageProvider {
 
 	public boolean autoLogin() {
 		return myPrefs.getBoolean("AUTO_LOGIN", false);
+	}
+
+	public boolean oneInstanceIsAlreadyOpen() {
+		return myPrefs.getBoolean("INSTANCE_ALREADY_OPEN", false);
+	}
+
+	public void setOpen(boolean open) {
+		myPrefs.putBoolean("INSTANCE_ALREADY_OPEN", open);
 	}
 }

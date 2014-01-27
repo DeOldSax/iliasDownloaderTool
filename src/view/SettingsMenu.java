@@ -1,5 +1,10 @@
 package view;
 
+import java.awt.Desktop;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -23,7 +28,7 @@ public class SettingsMenu implements EventHandler<ActionEvent> {
 	public SettingsMenu() {
 		storageProvider = new StorageProvider();
 		gridPane = new GridPane();
-		gridPane.setPadding(new Insets(20, 30, 30, 20));
+		gridPane.setPadding(new Insets(50, 50, 50, 50));
 		gridPane.setHgap(20);
 		gridPane.setVgap(20);
 		initDialog();
@@ -90,6 +95,35 @@ public class SettingsMenu implements EventHandler<ActionEvent> {
 
 		gridPane.add(startActions, 0, 3);
 		gridPane.add(box, 1, 3);
+
+		Label contactDeveloper = new Label("Noch Fragen?:         ");
+		Button emailAdress = new Button("DeOldSax@gmx.de");
+		emailAdress.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				try {
+					Desktop.getDesktop().mail(new URI("mailto:DeOldSax@gmx.de?subject=Bugreport/Verbesserungsvorschlag/Frage"));
+				} catch (IOException | URISyntaxException e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		Button faq = new Button("FAQ");
+		faq.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				try {
+					Desktop.getDesktop().browse(new URI("https://github.com/DeOldSax/iliasDownloaderTool/wiki"));
+				} catch (IOException | URISyntaxException e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		HBox box2 = new HBox();
+		box2.setSpacing(20);
+		box2.getChildren().addAll(faq, emailAdress);
+		gridPane.add(contactDeveloper, 0, 4);
+		gridPane.add(box2, 1, 4);
 	}
 
 	public static void updateLocalIliasFolderPath() {
@@ -97,7 +131,7 @@ public class SettingsMenu implements EventHandler<ActionEvent> {
 		localIliasPath.setText(storageProvider.loadLocalIliasFolderPath());
 		storageProvider.setLocalIliasPathTrue();
 		if (promptUpdater) {
-			Dashboard.update();
+			Dashboard.update(true);
 			promptUpdater = false;
 		}
 	}

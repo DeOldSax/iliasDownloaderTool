@@ -50,7 +50,7 @@ public class FileDownloader implements Runnable {
 			@Override
 			public void run() {
 				final File selectedFile = fileChooser.showSaveDialog(new Stage());
-				Dashboard.startDownloadAnimation();
+				// Dashboard.startDownloadAnimation();
 				if (selectedFile != null) {
 					targetPath = selectedFile.getAbsolutePath();
 					if (!targetPath.endsWith(".pdf")) {

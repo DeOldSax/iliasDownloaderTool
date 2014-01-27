@@ -7,15 +7,15 @@
 	-fx-text-fill: 			linear-gradient(white, whitesmoke); 
     -fx-font-size: 			14;
     -fx-font-weight: 		bold;
-	-fx-background-color: 	linear-gradient(lime, limegreen);
+	-fx-background-color: 	linear-gradient(cyan, deepskyblue);
 	-fx-effect: 			dropshadow( three-pass-box , rgba(0,0,0,0.6) , 3, 0.0 , 0 , 1 );
 }
 #goBackButton:hover {
-	-fx-background-color: 	linear-gradient(lime, limegreen);
+	-fx-background-color: 	linear-gradient(cyan, deepskyblue);
     -fx-effect: 			innershadow( three-pass-box , rgba(0,0,0,0.6) , 6, 0.0 , 0 , 1 );
 }
 #goBackButton:pressed {
-	-fx-background-color: 	linear-gradient(limegreen, lime);
+	-fx-background-color: 	linear-gradient(cyan, deepskyblue);
     -fx-effect: 			innershadow( three-pass-box , black , 3, 0.0 , 0 , 1 );
 }
 
@@ -24,7 +24,7 @@
 	-fx-text-fill: 			linear-gradient(white, whitesmoke); 
     -fx-font-size: 			14;
     -fx-font-weight: 		bold;
-	-fx-background-color: 	linear-gradient(lime, limegreen);
+	-fx-background-color: 	linear-gradient(cyan, deepskyblue);
 }
 #help:hover {
    	-fx-effect: 			dropshadow( three-pass-box , rgba(0,0,0,0.6) , 3, 0.0 , 0 , 1 );

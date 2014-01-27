@@ -1,10 +1,5 @@
 package control;
 
-import java.awt.Desktop;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import model.Forum;
@@ -18,13 +13,14 @@ public class ForumOpener implements EventHandler<ActionEvent> {
 	}
 
 	public void open() {
-		final Forum forum = (Forum) Dashboard.getSelectedItem();
-		if (Desktop.isDesktopSupported()) {
-			try {
-				Desktop.getDesktop().browse(new URI(forum.getUrl()));
-			} catch (IOException | URISyntaxException e) {
-				e.printStackTrace();
-			}
-		}
+		final Forum forum = (Forum) Dashboard.getSelectedDirectory();
+		// if (Desktop.isDesktopSupported()) {
+		// try {
+		// Desktop.getDesktop().browse(new URI(forum.getUrl()));
+		// } catch (IOException | URISyntaxException e) {
+		// e.printStackTrace();
+		// }
+		// }
+		Dashboard.browse(forum.getUrl());
 	}
 }

@@ -21,6 +21,7 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Separator;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.image.Image;
@@ -29,6 +30,8 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Duration;
@@ -41,10 +44,15 @@ import control.FileSystem;
 import control.IgnoredPdfFilter;
 import control.IliasStarter;
 import control.InterpolatorDown;
-import control.JTreeContentFiller;
+import control.ListItemRemoverAndSelector;
+import control.ListPopUpShower;
 import control.LocalDataMatcher;
 import control.LoginProvider;
+import control.TreeCollapser;
+import control.TreeItemSearcher;
 import control.TreePopupShower;
+import control.TreeViewContentFiller;
+import control.VersionValidator;
 
 public class Dashboard extends Application {
 
@@ -52,6 +60,13 @@ public class Dashboard extends Application {
 	private static TreeItem<Directory> rootItem;
 	private static Scene scene;
 	private LoginFader loginFader;
+	private static SplitPane splitPane;
+	private static StackPane stackPane;
+	private static GridPane updatePane;
+	private static BorderPane background;
+	private static WebView webView;
+	private static Label lastUpdateTime;
+	private static ListView<Directory> listView;
 	private static Button settings;
 	private static Button loader;
 	private static Label statusFooterText;
@@ -64,8 +79,18 @@ public class Dashboard extends Application {
 	private static ImageView loaderGif;
 	private static boolean loaderRunning;
 	private static ParallelTransition tp;
+	private static StorageProvider storageProvider;
+	private static FileStorageProvider fileStorageProvider;
 
 	public static void main(String[] args) {
+		boolean newVersionCalled = new VersionValidator().validate();
+		if (newVersionCalled) {
+			System.exit(0);
+		}
+		storageProvider = new StorageProvider();
+		fileStorageProvider = new FileStorageProvider();
+
+		storageProvider.setOpen(true);
 		launch();
 	}
 
@@ -74,17 +99,17 @@ public class Dashboard extends Application {
 		stage.addEventHandler(WindowEvent.WINDOW_CLOSE_REQUEST, new EventHandler<WindowEvent>() {
 			@Override
 			public void handle(WindowEvent event) {
-				final StorageProvider storageProvider = new StorageProvider();
 				storageProvider.setLogIn(false);
 				storageProvider.setUpdateCanceled(false);
+				storageProvider.setOpen(false);
 				System.exit(0);
 			};
 		});
 		loaderIcon = new ImageView(new Image(getClass().getResourceAsStream("loader.png")));
 		loaderGif = new ImageView(new Image(getClass().getResourceAsStream("loader.gif")));
 		Dashboard.stage = stage;
-		final BorderPane background = new BorderPane();
-		background.setPadding(new Insets(10, 25, 10, 10));
+		background = new BorderPane();
+		background.setPadding(new Insets(20, 50, 50, 50));
 
 		menu = new GridPane();
 		menu.setPadding(new Insets(0, 0, 30, 0));
@@ -101,9 +126,9 @@ public class Dashboard extends Application {
 		TextField username = new TextField();
 		username.setId("userField");
 		username.setPromptText("Benutzererkennung");
-		username.setText(new StorageProvider().getUsername());
+		username.setText(storageProvider.getUsername());
 		PasswordField password = new PasswordField();
-		password.setText(new StorageProvider().getPassword());
+		password.setText(storageProvider.getPassword());
 		password.setId("userField");
 		password.setPromptText("Passwort");
 		RadioButton savePwd = new RadioButton("Speichern");
@@ -125,17 +150,30 @@ public class Dashboard extends Application {
 		login.add(separator, 4, 0);
 		login.setOpacity(0);
 
-		StackPane stack = new StackPane();
-		stack.getChildren().add(login);
-		stack.getChildren().add(menu);
+		updatePane = new GridPane();
+		updatePane.setHgap(10);
+		updatePane.setVgap(5);
+		lastUpdateTime = new Label(fileStorageProvider.getActualisationDate());
+		lastUpdateTime.setId("lastUpdateTimeLbl");
+		updatePane.add(new Label(), 0, 0);
+		updatePane.add(new Label(), 0, 1);
+		updatePane.add(lastUpdateTime, 0, 2);
+
+		stackPane = new StackPane();
+		stackPane.getChildren().add(updatePane);
+		stackPane.getChildren().add(login);
+		stackPane.getChildren().add(menu);
 
 		menu.prefWidthProperty().bind(background.widthProperty());
 		menu.setHgap(10);
 
 		Button collapseTree = new Button();
+		collapseTree.setOnAction(new TreeCollapser());
 		collapseTree.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("arrow.png"))));
 		collapseTree.prefWidthProperty().bind(menu.prefWidthProperty());
 		loader = new Button();
+		final Tooltip tooltip = new Tooltip("Aktualisieren");
+		loader.setTooltip(tooltip);
 		loader.setId("loader");
 		loader.setGraphic(loaderIcon);
 		loader.setMouseTransparent(true);
@@ -143,11 +181,11 @@ public class Dashboard extends Application {
 			@Override
 			public void handle(ActionEvent event) {
 				if (loaderRunning) {
-					new StorageProvider().cancelUpdate();
+					storageProvider.setUpdateCanceled(true);
 					showLoader(false);
 				} else {
 					showLoader(true);
-					if (new StorageProvider().userIsLoggedIn()) {
+					if (storageProvider.userIsLoggedIn()) {
 						new Thread(new Runnable() {
 							@Override
 							public void run() {
@@ -202,9 +240,9 @@ public class Dashboard extends Application {
 		menu.add(searchField, 5, 0);
 		menu.add(settings, 6, 0);
 
-		background.setTop(stack);
+		background.setTop(stackPane);
 
-		SplitPane splitPane = new SplitPane();
+		splitPane = new SplitPane();
 		splitPane.setId("splitPane");
 
 		rootItem = new TreeItem<Directory>(new Directory("Übersicht", null, null));
@@ -214,8 +252,10 @@ public class Dashboard extends Application {
 		courses.setShowRoot(false);
 		courses.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 		items = FXCollections.observableArrayList();
-		ListView<Directory> listView = new ListView<Directory>(items);
+		listView = new ListView<Directory>(items);
 		listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+		listView.setOnMouseClicked(new ListPopUpShower(listView));
+		listView.setOnKeyPressed(new ListItemRemoverAndSelector(listView));
 
 		splitPane.setDividerPositions(0.6f, 0.4f);
 
@@ -230,27 +270,37 @@ public class Dashboard extends Application {
 		statusFooter.add(statusFooterText, 0, 0);
 		background.setBottom(statusFooter);
 
-		setStatusText(new FileStorageProvider().getActualisationDate(), false);
-		update();
-
 		scene = new Scene(background);
 		scene.getStylesheets().add("skin/DashboardStyle.css");
 		setScene();
-		stage.show();
 		stage.setTitle("Ilias");
+		update(false);
+		stage.show();
 
-		if (new StorageProvider().autoLogin()) {
+		if (storageProvider.autoLogin()) {
+			signIn.setMouseTransparent(true);
 			Dashboard.setStatusText("", false);
 			Dashboard.showLoader(true);
 			Dashboard.setMenuTransparent(false);
 			new Thread(new Runnable() {
 				@Override
 				public void run() {
-					final StorageProvider storageProvider = new StorageProvider();
-					new IliasStarter(storageProvider.getUsername(), storageProvider.getPassword()).login();
+					final IliasStarter iliasStarter = new IliasStarter(storageProvider.getUsername(), storageProvider.getPassword());
+					final boolean loginSuccessfull = iliasStarter.login();
+					if (loginSuccessfull && storageProvider.autoUpdate()) {
+						// Platform.runLater(new Runnable() {
+						// @Override
+						// public void run() {
+						// loader.setGraphic(loaderGif);
+						// loaderRunning = true;
+						// }
+						// });
+						// iliasStarter.watchForFolders();
+					}
 				}
 			}).start();
 		}
+
 	}
 
 	public static void setScene(Scene scene, double minWidth) {
@@ -265,9 +315,20 @@ public class Dashboard extends Application {
 		stage.sizeToScene();
 	}
 
-	public static void update() {
+	public static void update(boolean showFinishText) {
 		courses.getRoot().getChildren().clear();
-		new JTreeContentFiller().addKurseToTree(rootItem, FileSystem.getAllFiles());
+		final TreeViewContentFiller treeViewContentFiller = new TreeViewContentFiller();
+		treeViewContentFiller.addKurseToTree(rootItem, FileSystem.getAllFiles());
+		treeViewContentFiller.markCourses(rootItem);
+		if (showFinishText) {
+			setStatusText("Aktualisierung beendet.", true);
+			updateUpdateTime();
+		}
+	}
+
+	public static void updateUpdateTime() {
+		fileStorageProvider.setActualisationDate();
+		lastUpdateTime.setText(fileStorageProvider.getActualisationDate());
 	}
 
 	public static void fadeInLogin() {
@@ -291,23 +352,30 @@ public class Dashboard extends Application {
 		menu.setMouseTransparent(b);
 	}
 
+	public static void setSigInTransparent(boolean b) {
+		signIn.setMouseTransparent(b);
+	}
+
 	public static void showLoader(final boolean show) {
 		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {
-				signIn.setMouseTransparent(show);
 				if (show) {
 					loader.setGraphic(loaderGif);
 					loaderRunning = true;
-					signIn.setOpacity(0.5);
 				} else {
 					loader.setGraphic(loaderIcon);
 					loaderRunning = false;
 					loader.setMouseTransparent(false);
+					signIn.setText("Angemeldet");
 					signIn.setOpacity(1);
 				}
 			}
 		});
+	}
+
+	public static void setSignInColor() {
+		signIn.setStyle("-fx-background-color: linear-gradient(cyan, deepskyblue)");
 	}
 
 	public static void setTitle(String title) {
@@ -320,7 +388,7 @@ public class Dashboard extends Application {
 		t.setFromX(statusFooterText.getLayoutX() - 500);
 		t.setToX(statusFooterText.getLayoutX());
 		if (alert) {
-			statusFooterText.setStyle("-fx-text-fill: orange");
+			statusFooterText.setStyle("-fx-text-fill: linear-gradient(cyan, deepskyblue)");
 		} else {
 			statusFooterText.setStyle("-fx-text-fill: white");
 		}
@@ -338,17 +406,21 @@ public class Dashboard extends Application {
 		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {
+				statusFooterText.setStyle("-fx-text-fill: white");
 				statusFooterText.setText(text);
 			}
 		});
 	}
 
-	public static Directory getSelectedItem() {
-		return courses.getSelectionModel().getSelectedItem().getValue();
+	public static Directory getSelectedDirectory() {
+		if (courses.isFocused()) {
+			return courses.getSelectionModel().getSelectedItem().getValue();
+		}
+		return listView.getSelectionModel().getSelectedItem();
 	}
 
-	public static ObservableList<TreeItem<Directory>> getSelectedItems() {
-		return courses.getSelectionModel().getSelectedItems();
+	public static TreeView<Directory> getCoursesView() {
+		return courses;
 	}
 
 	public static void startDownloadAnimation() {
@@ -371,5 +443,43 @@ public class Dashboard extends Application {
 		t2.setByY(stage.getHeight() - 80);
 		tp.getChildren().addAll(t, t2);
 		tp.play();
+	}
+
+	public static TreeItem<Directory> getLinkedTreeItem(PDF pdf) {
+		return new TreeItemSearcher(courses).get(pdf);
+	}
+
+	public static void expandTreeItem(Directory selectedDirectory) {
+		new TreeCollapser().act();
+		final TreeItem<Directory> linkedTreeItem = Dashboard.getLinkedTreeItem((PDF) selectedDirectory);
+		linkedTreeItem.setExpanded(true);
+		courses.getSelectionModel().clearSelection();
+		courses.getSelectionModel().select(linkedTreeItem);
+		final int selectedIndex = courses.getSelectionModel().getSelectedIndex();
+		courses.scrollTo(selectedIndex);
+	}
+
+	public static void browse(String url) {
+		webView = new WebView();
+		background.setCenter(webView);
+		final GridPane webControllerPane = new GridPane();
+		webControllerPane.add(new Label(), 0, 0);
+		webControllerPane.add(new Label(), 0, 1);
+		final Button button = new Button("X");
+		button.setId("closeBrowser");
+		button.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				stackPane.getChildren().remove(webControllerPane);
+				background.setCenter(splitPane);
+			}
+		});
+		webControllerPane.add(button, 0, 3);
+
+		stackPane.getChildren().add(webControllerPane);
+
+		background.setCenter(webView);
+		WebEngine engine = webView.getEngine();
+		engine.load(url);
 	}
 }

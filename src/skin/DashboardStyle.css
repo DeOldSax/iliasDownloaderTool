@@ -173,8 +173,13 @@
 }
 
 #statusFooterText {
-    -fx-font-size: 			12;
+    -fx-font-size: 			14;
     -fx-font-weight: 		bold;
+}
+
+#lastUpdateTimeLbl {
+	-fx-font-size: 			12;
+	-fx-text-fill: 			lightgrey; 
 }
 
 #loader {
@@ -187,4 +192,27 @@
 	-fx-background-radius:	20;
 	-fx-background-color: 	#4d4d4d;
 	-fx-effect: 			innershadow( three-pass-box , rgba(0,0,0,0.7) , 6, 0.0 , 0 , 2 );
+}
+
+.tooltip {
+	-fx-background-radius: 20 20 20 20;
+	-fx-background-color: 	#c3c4c4,
+					        linear-gradient(#d6d6d6 50%, white 100%),
+					        radial-gradient(center 50% -40%, radius 200%, #e6e6e6 45%, rgba(230,230,230,0) 50%);
+	-fx-text-fill: 			black;
+    -fx-font-size: 			14;
+	-fx-effect: 			dropshadow( three-pass-box , rgba(0,0,0,0.6) , 3, 0.0 , 0 , 1 );
+}
+
+.page-corner {
+    -fx-shape: " ";
+}
+
+#closeBrowser {
+	-fx-background-color: 	#3d3d3d;
+	-fx-background-radius:	20;
+    -fx-font-size: 			14;
+    -fx-font-weight: 		bold;
+	-fx-background-color: 	linear-gradient(red,darkred);
+	-fx-effect: 			dropshadow( three-pass-box , rgba(0,0,0,0.6) , 3, 0.0 , 0 , 1 );
 }

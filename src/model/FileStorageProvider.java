@@ -8,7 +8,8 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 public class FileStorageProvider {
-	private static final String LAST_UPDATE = "LAST_UPDATE";
+	private static final String LAST_UPDATE_TIME = "LAST_UPDATE_TIME";
+	private static final String LAST_UPDATE_DAY = "LAST_UPDATE_DAY";
 	private static final String URL_DIVIDER = "#URL_DIVIDER_#";
 	private static final String SIZE_DIVIDER = "#SIZE_DIVIDER_#";
 	private static Preferences prefsRoot;
@@ -125,16 +126,34 @@ public class FileStorageProvider {
 	}
 
 	public String getActualisationDate() {
-		String time = myPrefs.get(LAST_UPDATE, "-");
-		if (time.equals("-")) {
-			return "";
+		final String currentDay = new SimpleDateFormat("D'-'M'-'Y").format(Calendar.getInstance().getTime());
+
+		String time = myPrefs.get(LAST_UPDATE_TIME, "-");
+		String day = myPrefs.get(LAST_UPDATE_DAY, "-");
+
+		if (time != "-") {
+			if (currentDay.equals(day)) {
+				final int index = time.indexOf(',');
+				time = time.substring(index);
+				time = "Heute" + time;
+			} else {
+				final String[] split = day.split("-");
+				final String[] split2 = currentDay.split("-");
+				if (Integer.valueOf(split[0]) < Integer.valueOf(split2[0]) && Integer.valueOf(split[1]) == Integer.valueOf(split2[1])) {
+					final int index = time.indexOf(',');
+					time = time.substring(index);
+					time = "Gestern" + time;
+				}
+			}
 		}
 
 		return "Letzte Aktualisierung: " + time;
 	}
 
 	public void setActualisationDate() {
-		final String time = new SimpleDateFormat("EEEE HH:mm:ss").format(Calendar.getInstance().getTime());
-		myPrefs.put(LAST_UPDATE, time);
+		final String time = new SimpleDateFormat("EEEE',' HH:mm").format(Calendar.getInstance().getTime());
+		final String day = new SimpleDateFormat("D'-'M'-'Y").format(Calendar.getInstance().getTime());
+		myPrefs.put(LAST_UPDATE_TIME, time);
+		myPrefs.put(LAST_UPDATE_DAY, day);
 	}
 }

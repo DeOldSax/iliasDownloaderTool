@@ -4,9 +4,9 @@ import java.io.File;
 
 public class PDF extends Directory {
 	private final int size;
-	private boolean read = true;
 	private final StorageProvider storageProvider;
 	private File fileOnLocalDisk = null;
+	private boolean lnt;
 
 	public PDF(String name, String url, Directory parentDirectory, int size) {
 		super(name, url, parentDirectory);
@@ -16,14 +16,6 @@ public class PDF extends Directory {
 
 	public int getSize() {
 		return size;
-	}
-
-	public boolean isRead() {
-		return read;
-	}
-
-	public void setRead(boolean read) {
-		this.read = read;
 	}
 
 	public boolean isIgnored() {
@@ -51,5 +43,18 @@ public class PDF extends Directory {
 
 	public File getParentFolderOnLocalDisk() {
 		return fileOnLocalDisk.getParentFile();
+	}
+
+	public void setLocalNotThere(boolean b) {
+		this.lnt = b;
+		((Folder) this.getParentDirectory()).setContainsPdfsLocalNothThere(true);
+	}
+
+	public boolean isLocalNotThere() {
+		return lnt;
+	}
+
+	public void setRead(boolean b) {
+
 	}
 }

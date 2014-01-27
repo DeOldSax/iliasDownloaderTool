@@ -27,6 +27,7 @@ public class LoginProvider implements EventHandler<ActionEvent> {
 		Dashboard.setStatusText("", false);
 		Dashboard.showLoader(true);
 		Dashboard.setMenuTransparent(false);
+		Dashboard.setSigInTransparent(true);
 		final String username = usernameField.getText();
 		final boolean validUsername = username.length() != 5 || !username.startsWith("u");
 		if (validUsername) {

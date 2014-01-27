@@ -1,54 +1,62 @@
 package control;
 
 import javafx.application.Platform;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeView;
+import javafx.scene.image.ImageView;
 import model.Directory;
 import model.PDF;
 import view.Dashboard;
 
 public class Ignorer implements EventHandler<ActionEvent> {
-	private final TreeView<Directory> courses;
-	private TreeItem<Directory> treeItem;
-
-	public Ignorer(TreeView<Directory> courses) {
-		this.courses = courses;
-	}
+	private Directory selectedDirectory;
 
 	@Override
 	public void handle(ActionEvent event) {
-		treeItem = courses.getSelectionModel().getSelectedItem();
-		if (!(treeItem.getValue() instanceof PDF)) {
+		act();
+	}
+
+	public void act() {
+		selectedDirectory = Dashboard.getSelectedDirectory();
+
+		if (!(selectedDirectory instanceof PDF)) {
 			return;
 		}
-		PDF pdf = (PDF) treeItem.getValue();
+		PDF pdf = (PDF) selectedDirectory;
 		if (pdf.isIgnored()) {
 			pdf.setIgnored(false);
-			Dashboard.setStatusText(pdf.getName() + " wurde ignorieren aufgehoben.", false);
+			Dashboard.setStatusText(pdf.getName() + " wird nicht mehr ignoriert.", false);
 		} else {
 			pdf.setIgnored(true);
 			Dashboard.setStatusText(pdf.getName() + " wurde auf ignorieren gesetzt.", false);
-			// findNodeAndDelete(courses.getRoot().getChildren());
 		}
+		changeGraphicInTreeView(pdf);
 		new IgnoredPdfFilter().filter();
 	}
 
-	private void findNodeAndDelete(final ObservableList<TreeItem<Directory>> list) {
-		for (final TreeItem<Directory> treeItem : list) {
-			if (treeItem.equals(this.treeItem)) {
-				Platform.runLater(new Runnable() {
-					@Override
-					public void run() {
-						list.remove(treeItem);
-					}
-				});
-				return;
-			} else {
-				findNodeAndDelete(treeItem.getChildren());
-			}
+	private void changeGraphicInTreeView(PDF pdf) {
+		TreeItem<Directory> treeItem = Dashboard.getLinkedTreeItem(pdf);
+		ImageView image;
+		if (new LocalDataReader().getAllLocalPDFSizes().contains(pdf.getSize())) {
+			image = new ImageView("img/pdf.png");
+		} else {
+			image = new ImageView("img/pdf_local_not_there.png");
 		}
+		if (pdf.isIgnored()) {
+			image = new ImageView("img/pdf_ignored.png");
+		}
+		setGraphic(image, treeItem);
+	}
+
+	private void setGraphic(final ImageView image, final TreeItem<Directory> treeItem) {
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				treeItem.setExpanded(false);
+				treeItem.setGraphic(image);
+				treeItem.setExpanded(true);
+			}
+		});
 	}
 }

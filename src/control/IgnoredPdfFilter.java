@@ -27,7 +27,6 @@ public class IgnoredPdfFilter implements EventHandler<ActionEvent> {
 		if (ignoredPdf.isEmpty()) {
 			Dashboard.setStatusText("Keine ignorierten PDF-Dateien vorhanden.", true);
 		} else {
-			Dashboard.setStatusText("", false);
 			for (PDF pdf : ignoredPdf) {
 				Dashboard.addToResultList(pdf);
 			}
