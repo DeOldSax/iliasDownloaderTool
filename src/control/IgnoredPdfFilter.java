@@ -24,6 +24,7 @@ public class IgnoredPdfFilter implements EventHandler<ActionEvent> {
 			}
 		}
 		Dashboard.clearResultList();
+		Dashboard.setListHeader(" Ignorierte Dateien " + "(" + String.valueOf(ignoredPdf.size()) + ")", "red");
 		if (ignoredPdf.isEmpty()) {
 			Dashboard.setStatusText("Keine ignorierten PDF-Dateien vorhanden.", true);
 		} else {

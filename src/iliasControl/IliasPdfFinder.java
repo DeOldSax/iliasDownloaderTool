@@ -82,7 +82,7 @@ public class IliasPdfFinder {
 						PDF newPdfFile = createPDF(kurs, dir, size);
 						allPdfs.add(newPdfFile);
 
-						Dashboard.setStatusText(String.valueOf(allPdfs.size()) + " Dateien wurden bereits geladen.");
+						Dashboard.setStatusText(String.valueOf(allPdfs.size()) + " Dateien wurden bereits überprüft.");
 
 						List<Element> elemse = dir.parent().parent().siblingElements().select("div").select("span");
 						for (Element el : elemse) {

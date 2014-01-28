@@ -30,6 +30,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.text.TextAlignment;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
@@ -52,7 +53,6 @@ import control.TreeCollapser;
 import control.TreeItemSearcher;
 import control.TreePopupShower;
 import control.TreeViewContentFiller;
-import control.VersionValidator;
 
 public class Dashboard extends Application {
 
@@ -60,6 +60,8 @@ public class Dashboard extends Application {
 	private static TreeItem<Directory> rootItem;
 	private static Scene scene;
 	private LoginFader loginFader;
+	private static GridPane help;
+	private static Label listHeader;
 	private static SplitPane splitPane;
 	private static StackPane stackPane;
 	private static GridPane updatePane;
@@ -83,10 +85,10 @@ public class Dashboard extends Application {
 	private static FileStorageProvider fileStorageProvider;
 
 	public static void main(String[] args) {
-		boolean newVersionCalled = new VersionValidator().validate();
-		if (newVersionCalled) {
-			System.exit(0);
-		}
+		// boolean newVersionCalled = new VersionValidator().validate();
+		// if (newVersionCalled) {
+		// System.exit(0);
+		// }
 		storageProvider = new StorageProvider();
 		fileStorageProvider = new FileStorageProvider();
 
@@ -211,7 +213,7 @@ public class Dashboard extends Application {
 		searchField.prefWidthProperty().bind(menu.prefWidthProperty());
 		searchField.setPromptText("Datei suchen");
 		searchField.setId("searchField");
-		searchField.setOnAction(new FileSearcher(searchField));
+		searchField.setOnKeyReleased(new FileSearcher(searchField));
 		settings = new Button();
 		settings.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("settings.png"))));
 		settings.setId("settingsBtn");
@@ -257,10 +259,23 @@ public class Dashboard extends Application {
 		listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 		listView.setOnMouseClicked(new ListPopUpShower(listView));
 		listView.setOnKeyPressed(new ListItemRemoverAndSelector(listView));
+		listView.setId("listView");
 
 		splitPane.setDividerPositions(0.6f, 0.4f);
 
-		splitPane.getItems().addAll(courses, listView);
+		help = new GridPane();
+		BorderPane listPane = new BorderPane();
+
+		help.setId("listHeader");
+		listPane.setCenter(listView);
+
+		listHeader = new Label();
+		listHeader.setId("listHeaderText");
+		listHeader.setTextAlignment(TextAlignment.CENTER);
+		listPane.setTop(help);
+		help.add(listHeader, 0, 0);
+
+		splitPane.getItems().addAll(courses, listPane);
 
 		background.setCenter(splitPane);
 
@@ -306,8 +321,8 @@ public class Dashboard extends Application {
 
 	public static void setScene(Scene scene, double minWidth) {
 		stage.setMinWidth(minWidth);
-		stage.setScene(scene);
 		stage.sizeToScene();
+		stage.setScene(scene);
 	}
 
 	public static void setScene() {
@@ -376,7 +391,7 @@ public class Dashboard extends Application {
 	}
 
 	public static void setSignInColor() {
-		signIn.setStyle("-fx-background-color: linear-gradient(cyan, deepskyblue)");
+		signIn.setStyle("-fx-background-color: linear-gradient(lime, limegreen)");
 	}
 
 	public static void setTitle(String title) {
@@ -451,7 +466,7 @@ public class Dashboard extends Application {
 	}
 
 	public static void expandTreeItem(Directory selectedDirectory) {
-		new TreeCollapser().act(false);
+		new TreeCollapser().act();
 		final TreeItem<Directory> linkedTreeItem = Dashboard.getLinkedTreeItem((PDF) selectedDirectory);
 		linkedTreeItem.setExpanded(true);
 		courses.getSelectionModel().clearSelection();
@@ -482,5 +497,21 @@ public class Dashboard extends Application {
 		background.setCenter(webView);
 		WebEngine engine = webView.getEngine();
 		engine.load(url);
+	}
+
+	public static void setListHeader(String text, String color) {
+		String textColor = "-fx-text-fill: #3d3d3d";
+		listHeader.setText(text);
+		if (color.equals("red")) {
+			color = "-fx-background-color: linear-gradient(red, darkred)";
+			textColor = "-fx-text-fill: white";
+		} else if (color.equals("green")) {
+			color = "-fx-background-color: linear-gradient(lime, limegreen)";
+			textColor = "-fx-text-fill: white";
+		} else {
+			color = "-fx-background-color: 	#c3c4c4,linear-gradient(#d6d6d6 50%, white 100%),radial-gradient(center 50% -40%, radius 200%, #e6e6e6 45%, rgba(230,230,230,0) 50%);";
+		}
+		help.setStyle(color);
+		listHeader.setStyle(textColor);
 	}
 }

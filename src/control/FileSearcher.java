@@ -3,13 +3,13 @@ package control;
 import java.util.ArrayList;
 import java.util.List;
 
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyEvent;
 import model.PDF;
 import view.Dashboard;
 
-public class FileSearcher implements EventHandler<ActionEvent> {
+public class FileSearcher implements EventHandler<KeyEvent> {
 
 	private List<PDF> allPdfs = null;
 	private final TextField word;
@@ -19,10 +19,16 @@ public class FileSearcher implements EventHandler<ActionEvent> {
 	}
 
 	@Override
-	public void handle(ActionEvent event) {
+	public void handle(KeyEvent event) {
+		if (word.getText().length() == 0) {
+			Dashboard.clearResultList();
+			Dashboard.setListHeader(" Gefundene Dateien " + "(" + String.valueOf(0) + ")", "green");
+			return;
+		}
 		this.allPdfs = FileSystem.getAllPdfFiles();
 		if (allPdfs.isEmpty()) {
 			Dashboard.setStatusText("Keine passende Datei gefunden.", false);
+			return;
 		}
 		act();
 	}
@@ -43,18 +49,15 @@ public class FileSearcher implements EventHandler<ActionEvent> {
 			}
 			for (int i = 0; i < splitedStrings.length; i++) {
 				if (splitedStrings[i].startsWith(word.getText().toLowerCase()) && !alreadyAddedPDF.contains(pdf)) {
-					Dashboard.addToResultList(pdf);
 					alreadyAddedPDF.add(pdf);
 					continue;
 				}
 				if (word.getText().contains(" ") && pdf.getName().toLowerCase().contains(word.getText().toLowerCase())
 						&& !alreadyAddedPDF.contains(pdf)) {
-					Dashboard.addToResultList(pdf);
 					alreadyAddedPDF.add(pdf);
 					continue;
 				}
 				if (splitedStrings[i].toLowerCase().contains(word.getText().toLowerCase()) && !alreadyAddedPDF.contains(pdf)) {
-					Dashboard.addToResultList(pdf);
 					alreadyAddedPDF.add(pdf);
 					continue;
 				}
@@ -62,7 +65,6 @@ public class FileSearcher implements EventHandler<ActionEvent> {
 					if (word.getText().length() > 3
 							&& pdf.getParentDirectory().getName().toLowerCase().contains(word.getText().toLowerCase())
 							&& !alreadyAddedPDF.contains(pdf)) {
-						Dashboard.addToResultList(pdf);
 						alreadyAddedPDF.add(pdf);
 					}
 					continue;
@@ -71,14 +73,18 @@ public class FileSearcher implements EventHandler<ActionEvent> {
 					if (word.getText().length() > 3
 							&& pdf.getParentDirectory().getParentDirectory().getName().toLowerCase().contains(word.getText().toLowerCase())
 							&& !alreadyAddedPDF.contains(pdf)) {
-						Dashboard.addToResultList(pdf);
 						alreadyAddedPDF.add(pdf);
 					}
 					continue;
 				}
 			}
-			if (alreadyAddedPDF.isEmpty()) {
-				Dashboard.setStatusText("Keine passende Datei gefunden.");
+		}
+		Dashboard.setListHeader(" Gefundene Dateien " + "(" + String.valueOf(alreadyAddedPDF.size()) + ")", "green");
+		if (alreadyAddedPDF.isEmpty()) {
+			Dashboard.setStatusText("Keine Datei gefunden.");
+		} else {
+			for (PDF pdf : alreadyAddedPDF) {
+				Dashboard.addToResultList(pdf);
 			}
 		}
 	}

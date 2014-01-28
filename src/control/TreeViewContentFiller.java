@@ -16,7 +16,10 @@ public class TreeViewContentFiller {
 	public void addKurseToTree(TreeItem<Directory> rootItem, List<Directory> kurse) {
 		for (Directory directory : kurse) {
 			TreeItem<Directory> topsChilds = new TreeItem<Directory>(directory);
+
 			if (directory.getParentDirectory() == null || directory instanceof Folder) {
+				// topsChilds.addEventHandler(TreeItem.branchCollapsedEvent(),
+				// new NodeCollapseHandler());
 				topsChilds.setGraphic(new ImageView("view/folder.png"));
 				rootItem.getChildren().add(topsChilds);
 			}
@@ -39,6 +42,8 @@ public class TreeViewContentFiller {
 				}
 				if (subDir instanceof Folder) {
 					subDirNode.setGraphic(new ImageView("view/folder.png"));
+					// subDirNode.addEventHandler(TreeItem.branchCollapsedEvent(),
+					// new NodeCollapseHandler());
 					addKurseToTree(subDirNode, subDir.getChildFolders());
 					topsChilds.getChildren().add(subDirNode);
 				}

@@ -132,19 +132,26 @@
 
 .tree-view {
 	-fx-font-size: 			14;
-	-fx-effect:				innershadow(three-pass-box , steelblue , 6, 0.0 , 0 , 2 );
+	-fx-effect:				innershadow(three-pass-box , #4d4d4d , 6, 0.0 , 0 , 3 );
+	-fx-border-color: 		#4d4d4d; 
+}
+
+#listView {
+	-fx-effect:				innershadow(three-pass-box , #4d4d4d , 6, 0.0 , 0 , 3 );
+	-fx-border-color: 		#4d4d4d; 
 }
 
 #splitPane {
-	-fx-effect:				innershadow(three-pass-box , black , 6, 0.0 , 0 , 2 );
+	-fx-border-color: 		#4d4d4d; 
+	-fx-background-color: 	#4d4d4d;
 }
 
 #splitPane  .split-pane-divider {
-	-fx-background-color: 	#3d3d3d;
+	-fx-background-color: 	#4d4d4d;
 }
 
 .separator {
-    -fx-background-color: 	white;
+    -fx-background-color: 	#4d4d4d;
 }
 
 .menu-item {
@@ -216,3 +223,17 @@
 	-fx-background-color: 	linear-gradient(red,darkred);
 	-fx-effect: 			dropshadow( three-pass-box , rgba(0,0,0,0.6) , 3, 0.0 , 0 , 1 );
 }
+
+#listHeader {
+	-fx-background-color: 	#c3c4c4,
+					        linear-gradient(#d6d6d6 50%, white 100%),
+					        radial-gradient(center 50% -40%, radius 200%, #e6e6e6 45%, rgba(230,230,230,0) 50%);
+	-fx-background-radius:	0;
+	-fx-effect: 			dropshadow( three-pass-box , rgba(0,0,0,0.6) , 3, 0.0 , 0 , 1 );
+}
+#listHeaderText {
+    -fx-font-size: 			14;
+	-fx-text-fill:			#3d3d3d; 
+	-fx-font-weight: 		bold;
+}
+

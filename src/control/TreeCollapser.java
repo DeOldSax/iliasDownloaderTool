@@ -11,14 +11,11 @@ public class TreeCollapser implements EventHandler<ActionEvent> {
 
 	@Override
 	public void handle(ActionEvent event) {
-		act(true);
+		act();
 	}
 
-	public void act(boolean clearResultList) {
+	public void act() {
 		collapse(Dashboard.getCoursesView().getRoot().getChildren());
-		if (clearResultList) {
-			Dashboard.clearResultList();
-		}
 	}
 
 	private void collapse(ObservableList<TreeItem<Directory>> items) {

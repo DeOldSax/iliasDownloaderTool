@@ -42,7 +42,7 @@ public class SettingsMenu implements EventHandler<ActionEvent> {
 	}
 
 	public static void show() {
-		Dashboard.setScene(scene, 0);
+		Dashboard.setScene(scene, 950);
 	}
 
 	private void initDialog() {

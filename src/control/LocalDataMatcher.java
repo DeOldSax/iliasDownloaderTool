@@ -31,6 +31,7 @@ public class LocalDataMatcher implements EventHandler<ActionEvent> {
 	}
 
 	private void showInResultList() {
+		Dashboard.setListHeader(" Lokal nicht vorhandene Dateien " + "(" + String.valueOf(matchedPdfs.size()) + ")", "");
 		Dashboard.clearResultList();
 		for (PDF pdf : matchedPdfs) {
 			Dashboard.addToResultList(pdf);
