@@ -96,6 +96,7 @@ public class Dashboard extends Application {
 
 	@Override
 	public void start(Stage stage) throws Exception {
+		stage.getIcons().add(new Image("img/folder.png"));
 		stage.addEventHandler(WindowEvent.WINDOW_CLOSE_REQUEST, new EventHandler<WindowEvent>() {
 			@Override
 			public void handle(WindowEvent event) {
@@ -450,7 +451,7 @@ public class Dashboard extends Application {
 	}
 
 	public static void expandTreeItem(Directory selectedDirectory) {
-		new TreeCollapser().act();
+		new TreeCollapser().act(false);
 		final TreeItem<Directory> linkedTreeItem = Dashboard.getLinkedTreeItem((PDF) selectedDirectory);
 		linkedTreeItem.setExpanded(true);
 		courses.getSelectionModel().clearSelection();

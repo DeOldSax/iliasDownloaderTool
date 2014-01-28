@@ -13,6 +13,7 @@ public class LocalDataMatcher implements EventHandler<ActionEvent> {
 
 	@Override
 	public void handle(ActionEvent event) {
+		matchedPdfs.clear();
 		final List<PDF> allPdfFiles = FileSystem.getAllPdfFiles();
 
 		final List<Integer> allLocalPdfSizes = new LocalDataReader().getAllLocalPDFSizes();
@@ -31,10 +32,6 @@ public class LocalDataMatcher implements EventHandler<ActionEvent> {
 
 	private void showInResultList() {
 		Dashboard.clearResultList();
-		if (matchedPdfs.isEmpty()) {
-			// FIXME Show empty in gui
-			return;
-		}
 		for (PDF pdf : matchedPdfs) {
 			Dashboard.addToResultList(pdf);
 		}

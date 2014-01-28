@@ -56,7 +56,12 @@ public class FileDownloader implements Runnable {
 					if (!targetPath.endsWith(".pdf")) {
 						targetPath = targetPath + ".pdf";
 					}
-					download();
+					Platform.runLater(new Runnable() {
+						@Override
+						public void run() {
+							download();
+						}
+					});
 				}
 			}
 		});
@@ -85,5 +90,6 @@ public class FileDownloader implements Runnable {
 			e.printStackTrace();
 		}
 		Dashboard.setStatusText("Download abgeschlossen", false);
+		new TreeNodeGraphicChanger().changeGraphicInTreeView(pdf);
 	}
 }
