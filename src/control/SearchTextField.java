@@ -9,37 +9,40 @@ import javafx.scene.input.KeyEvent;
 import model.PDF;
 import view.Dashboard;
 
-public class FileSearcher implements EventHandler<KeyEvent> {
+public class SearchTextField extends TextField {
 
-	private List<PDF> allPdfs = null;
-	private final TextField word;
-
-	public FileSearcher(TextField searchField) {
-		this.word = searchField;
+	public SearchTextField() {
+		super();
+		setId("searchTextField");
+		setPromptText("Datei suchen");
+		setOnKeyReleased(new EventHandler<KeyEvent>() {
+			@Override
+			public void handle(KeyEvent event) {
+				searchPdf(getText());
+			};
+		});
 	}
 
-	@Override
-	public void handle(KeyEvent event) {
-		if (word.getText().length() == 0) {
+	private void searchPdf(String inputString) {
+		Dashboard.clearResultList();
+
+		if (inputString.length() == 0 || inputString.equals(" ")) {
 			Dashboard.clearResultList();
 			Dashboard.setListHeader(" Gefundene Dateien " + "(" + String.valueOf(0) + ")", "green");
 			return;
 		}
-		this.allPdfs = FileSystem.getAllPdfFiles();
-		if (allPdfs.isEmpty()) {
+
+		final List<PDF> allPdfFiles = FileSystem.getAllPdfFiles();
+
+		if (allPdfFiles.isEmpty()) {
+			Dashboard.clearResultList();
 			Dashboard.setStatusText("Keine passende Datei gefunden.", false);
 			return;
 		}
-		act();
-	}
 
-	private void act() {
-		Dashboard.clearResultList();
 		List<PDF> alreadyAddedPDF = new ArrayList<PDF>();
-		if (word.getText().isEmpty() || word.getText().equals(" ")) {
-			return;
-		}
-		for (PDF pdf : allPdfs) {
+
+		for (PDF pdf : allPdfFiles) {
 			if (pdf.isIgnored()) {
 				continue;
 			}
@@ -48,30 +51,29 @@ public class FileSearcher implements EventHandler<KeyEvent> {
 				splitedStrings[i] = (splitedStrings[i] + " ").toLowerCase();
 			}
 			for (int i = 0; i < splitedStrings.length; i++) {
-				if (splitedStrings[i].startsWith(word.getText().toLowerCase()) && !alreadyAddedPDF.contains(pdf)) {
+				if (splitedStrings[i].startsWith(inputString.toLowerCase()) && !alreadyAddedPDF.contains(pdf)) {
 					alreadyAddedPDF.add(pdf);
 					continue;
 				}
-				if (word.getText().contains(" ") && pdf.getName().toLowerCase().contains(word.getText().toLowerCase())
+				if (inputString.contains(" ") && pdf.getName().toLowerCase().contains(inputString.toLowerCase())
 						&& !alreadyAddedPDF.contains(pdf)) {
 					alreadyAddedPDF.add(pdf);
 					continue;
 				}
-				if (splitedStrings[i].toLowerCase().contains(word.getText().toLowerCase()) && !alreadyAddedPDF.contains(pdf)) {
+				if (splitedStrings[i].toLowerCase().contains(inputString.toLowerCase()) && !alreadyAddedPDF.contains(pdf)) {
 					alreadyAddedPDF.add(pdf);
 					continue;
 				}
 				if (pdf.getParentDirectory() != null) {
-					if (word.getText().length() > 3
-							&& pdf.getParentDirectory().getName().toLowerCase().contains(word.getText().toLowerCase())
+					if (inputString.length() > 3 && pdf.getParentDirectory().getName().toLowerCase().contains(inputString.toLowerCase())
 							&& !alreadyAddedPDF.contains(pdf)) {
 						alreadyAddedPDF.add(pdf);
 					}
 					continue;
 				}
 				if (pdf.getParentDirectory().getParentDirectory() != null) {
-					if (word.getText().length() > 3
-							&& pdf.getParentDirectory().getParentDirectory().getName().toLowerCase().contains(word.getText().toLowerCase())
+					if (inputString.length() > 3
+							&& pdf.getParentDirectory().getParentDirectory().getName().toLowerCase().contains(inputString.toLowerCase())
 							&& !alreadyAddedPDF.contains(pdf)) {
 						alreadyAddedPDF.add(pdf);
 					}

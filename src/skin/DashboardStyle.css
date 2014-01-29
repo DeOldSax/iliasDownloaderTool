@@ -102,7 +102,7 @@
 	-fx-effect: 			innershadow( three-pass-box , #1d1d1d, 7, 0.0 , 0 , 2 );
 }
 
-#searchField {
+#searchTextField {
 	-fx-background-color: 	#3d3d3d; 
 	-fx-background-radius:	20;
 	-fx-text-fill: 			#1d1d1d;
@@ -112,7 +112,7 @@
 	-fx-font-weight: 		bold;
 }
 
-#searchField:focused {
+#searchTextField:focused {
 	-fx-background-color: 	#c3c4c4,
 					        linear-gradient(#d6d6d6 50%, white 100%),
 					        radial-gradient(center 50% -40%, radius 200%, #e6e6e6 45%, rgba(230,230,230,0) 50%);
@@ -121,7 +121,7 @@
 	-fx-effect:				innershadow( three-pass-box , black , 6, 0.0 , 0 , 2 );
 }
 
-#searchField:hover {
+#searchTextField:hover {
 	-fx-background-color: 	#c3c4c4,
 					        linear-gradient(#d6d6d6 50%, white 100%),
 					        radial-gradient(center 50% -40%, radius 200%, #e6e6e6 45%, rgba(230,230,230,0) 50%);
