@@ -97,27 +97,21 @@ public class SettingsMenu implements EventHandler<ActionEvent> {
 		gridPane.add(box, 1, 3);
 
 		Label contactDeveloper = new Label("Noch Fragen?:         ");
-		Button emailAdress = new Button("DeOldSax@gmx.de");
+		Button emailAdress = new Button("Entwickler kontaktieren");
 		emailAdress.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				try {
-					Desktop.getDesktop().mail(new URI("mailto:DeOldSax@gmx.de?subject=Bugreport/Verbesserungsvorschlag/Frage"));
-				} catch (IOException | URISyntaxException e) {
-					e.printStackTrace();
-				}
+				openEmailDialog();
 			}
+
 		});
 		Button faq = new Button("FAQ");
 		faq.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				try {
-					Desktop.getDesktop().browse(new URI("https://github.com/DeOldSax/iliasDownloaderTool/wiki"));
-				} catch (IOException | URISyntaxException e) {
-					e.printStackTrace();
-				}
+				openIliasWiki();
 			}
+
 		});
 		HBox box2 = new HBox();
 		box2.setSpacing(20);
@@ -138,5 +132,21 @@ public class SettingsMenu implements EventHandler<ActionEvent> {
 
 	public static void activatePromptUpdater() {
 		promptUpdater = true;
+	}
+
+	private void openEmailDialog() {
+		try {
+			Desktop.getDesktop().mail(new URI("mailto:DeOldSax@gmx.de?subject=Bugreport/Verbesserungsvorschlag/Frage"));
+		} catch (IOException | URISyntaxException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void openIliasWiki() {
+		try {
+			Desktop.getDesktop().browse(new URI("https://github.com/DeOldSax/iliasDownloaderTool/wiki"));
+		} catch (IOException | URISyntaxException e) {
+			e.printStackTrace();
+		}
 	}
 }

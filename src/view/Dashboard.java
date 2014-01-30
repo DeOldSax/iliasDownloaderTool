@@ -279,19 +279,18 @@ public class Dashboard extends Application {
 					final IliasStarter iliasStarter = new IliasStarter(storageProvider.getUsername(), storageProvider.getPassword());
 					final boolean loginSuccessfull = iliasStarter.login();
 					if (loginSuccessfull && storageProvider.autoUpdate()) {
-						// Platform.runLater(new Runnable() {
-						// @Override
-						// public void run() {
-						// loader.setGraphic(loaderGif);
-						// loaderRunning = true;
-						// }
-						// });
-						// iliasStarter.watchForFolders();
+						Platform.runLater(new Runnable() {
+							@Override
+							public void run() {
+								loader.setGraphic(loaderGif);
+								loaderRunning = true;
+							}
+						});
+						iliasStarter.watchForFolders();
 					}
 				}
 			}).start();
 		}
-
 	}
 
 	public static void setScene(Scene scene, double minWidth) {
@@ -381,7 +380,6 @@ public class Dashboard extends Application {
 			statusFooterText.setStyle("-fx-text-fill: white");
 		}
 		Platform.runLater(new Runnable() {
-
 			@Override
 			public void run() {
 				statusFooterText.setText(text);
