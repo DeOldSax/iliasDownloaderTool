@@ -160,7 +160,8 @@ public class Dashboard extends Application {
 				courses.collapse();
 			}
 		});
-		collapseTree.setGraphic(new ImageView("img/arrow.png"));
+		collapseTree.setTooltip(new Tooltip("Alle Ordner schlieﬂen"));
+		collapseTree.setGraphic(new ImageView("img/collapse.png"));
 		collapseTree.prefWidthProperty().bind(menu.prefWidthProperty());
 		loader = new Button();
 		final Tooltip tooltip = new Tooltip("Aktualisieren");
@@ -375,7 +376,7 @@ public class Dashboard extends Application {
 		t.setFromX(statusFooterText.getLayoutX() - 500);
 		t.setToX(statusFooterText.getLayoutX());
 		if (alert) {
-			statusFooterText.setStyle("-fx-text-fill: linear-gradient(cyan, deepskyblue)");
+			statusFooterText.setStyle("-fx-text-fill: linear-gradient(lime, limegreen)");
 		} else {
 			statusFooterText.setStyle("-fx-text-fill: white");
 		}

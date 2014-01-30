@@ -68,8 +68,10 @@ public class LocalDataReader {
 	}
 
 	public File findFileOnLocalDisk(PDF pdf) {
+		file = null;
 		scanForPath(settings.loadLocalIliasFolderPath(), pdf);
 		if (file != null) {
+			pdf.setFileOnLocalDisk(file);
 			return file;
 		}
 		return null;

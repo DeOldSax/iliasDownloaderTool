@@ -12,6 +12,8 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import model.Directory;
 import model.PDF;
+import model.Settings;
+import control.Downloader;
 import control.Ignorer;
 
 public class ResultList extends ListView<Directory> {
@@ -30,24 +32,30 @@ public class ResultList extends ListView<Directory> {
 		setOnMouseClicked(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
-				showContextMenu(event);
+				if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2 && Settings.getInstance().userIsLoggedIn()) {
+					new Downloader().download(((ResultList) event.getSource()).getSelectionModel().getSelectedItem());
+				} else {
+					showContextMenu(event);
+				}
 			};
 		});
 		setOnKeyPressed(new EventHandler<KeyEvent>() {
 			@Override
 			public void handle(KeyEvent event) {
-				deleteSelectedItemFromList(event);
+				handleKeyEvents(event);
 			};
 		});
 	}
 
-	private void deleteSelectedItemFromList(KeyEvent event) {
+	private void handleKeyEvents(KeyEvent event) {
 		if (event.getCode() == KeyCode.DELETE) {
 			new Ignorer().act();
 			getSelectionModel().selectNext();
 		} else if (event.getCode() == KeyCode.UP || event.getCode() == KeyCode.DOWN) {
 			final Directory selectedDirectory = ((ResultList) event.getSource()).getSelectionModel().getSelectedItem();
 			courses.expandTreeItem(selectedDirectory);
+		} else if (event.getCode() == KeyCode.ENTER && Settings.getInstance().userIsLoggedIn()) {
+			new Downloader().download((Directory) event.getSource());
 		}
 	}
 

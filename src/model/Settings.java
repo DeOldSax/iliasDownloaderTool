@@ -9,6 +9,7 @@ public class Settings {
 	private static final String ILIAS_FOLDER = "ILIAS_FOLDER";
 	private static final String USERNAME = "USERNAME";
 	private static final String PASSWORD = "PASSWORD";
+	private static final String LNT = "LNT_*";
 	private static Preferences prefsRoot;
 	private static Preferences myPrefs;
 
@@ -48,30 +49,16 @@ public class Settings {
 		return myPrefs.get(PASSWORD, "");
 	}
 
-	public void storeIgnoredPdfSize(PDF pdf) {
-		String key = createKey(pdf);
-		myPrefs.putInt(key, pdf.getSize());
+	public void storeIgnoredPdfSize(String key, int size) {
+		myPrefs.putInt(key, size);
 	}
 
-	public int isIgnored(PDF pdf) {
-		String key = createKey(pdf);
+	public int isIgnored(String key) {
 		return myPrefs.getInt(key, -1);
 	}
 
-	public void removeIgnoredPdfSize(PDF pdf) {
-		myPrefs.remove(createKey(pdf));
-	}
-
-	private String createKey(PDF pdf) {
-		String key = pdf.getUrl();
-		// FIXME !!!!!!!
-		if (key == null) {
-			return "";
-		}
-		final int beginIndex = key.indexOf("ref_id=");
-		final int endIndex = key.indexOf("&cmd=sendfile");
-		key = key.substring(beginIndex + 7, endIndex);
-		return key;
+	public void removeIgnoredPdfSize(String key) {
+		myPrefs.remove(key);
 	}
 
 	public boolean localIliasPathIsAlreadySet() {
@@ -89,6 +76,10 @@ public class Settings {
 			e.printStackTrace();
 		}
 	}
+
+	// public static void main(String[] args) {
+	// getInstance().removeNode();
+	// }
 
 	public void setLogIn(boolean b) {
 		myPrefs.putBoolean("#LOGIN#", b);
@@ -128,5 +119,13 @@ public class Settings {
 
 	public void setOpen(boolean open) {
 		myPrefs.putBoolean("INSTANCE_ALREADY_OPEN", open);
+	}
+
+	public void storeLocalNotThere(String key, boolean value) {
+		myPrefs.putBoolean(key + LNT, value);
+	}
+
+	public boolean loadLocalNotThere(String key) {
+		return myPrefs.getBoolean(key + LNT, true);
 	}
 }

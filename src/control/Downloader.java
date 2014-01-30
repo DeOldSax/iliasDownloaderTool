@@ -3,24 +3,19 @@ package control;
 import java.util.List;
 
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import model.Directory;
 import model.PDF;
-import view.Dashboard;
 
-public class Downloader implements EventHandler<ActionEvent> {
-	@Override
-	public void handle(ActionEvent event) {
+public class Downloader {
+	public void download(final Directory directory) {
 		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {
 				final List<PDF> allPdfFiles = FileSystem.getAllPdfFiles();
-				final Directory selectedDirectory = Dashboard.getSelectedDirectory();
 
 				for (PDF pdf : allPdfFiles) {
-					if (selectedDirectory instanceof PDF) {
-						if (pdf.getUrl().equals(selectedDirectory.getUrl())) {
+					if (directory instanceof PDF) {
+						if (pdf.getUrl().equals(directory.getUrl())) {
 							Platform.runLater(new FileDownloader(pdf, ".pdf"));
 						}
 					}

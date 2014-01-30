@@ -1,5 +1,9 @@
 package view;
 
+import java.awt.Desktop;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 
 import javafx.application.Platform;
@@ -15,6 +19,8 @@ import javafx.scene.input.MouseEvent;
 import model.Directory;
 import model.Forum;
 import model.PDF;
+import model.Settings;
+import control.Downloader;
 import control.FileSystem;
 import control.LocalDataReader;
 import control.TreeViewContentFiller;
@@ -41,18 +47,38 @@ public class CoursesTreeView extends TreeView<Directory> {
 				if (selectedItem == null) {
 					return;
 				}
-				if (selectedItem.getValue() instanceof Forum && event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2) {
-					Dashboard.browse(selectedItem.getValue().getUrl());
-					return;
+				if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2) {
+					if (selectedItem.getValue() instanceof Forum) {
+						openForum();
+						return;
+					} else if (selectedItem.getValue() instanceof PDF) {
+						if (Settings.getInstance().userIsLoggedIn()) {
+							new Downloader().download(((CoursesTreeView) event.getSource()).getSelectionModel().getSelectedItem()
+									.getValue());
+						}
+					}
 				}
 				if (event.getButton() == MouseButton.SECONDARY) {
-					if (!(selectedItem.getValue() instanceof PDF)) {
+					if (!(selectedItem.getValue() instanceof PDF || selectedItem.getValue() instanceof Forum)) {
 						return;
 					}
 					showContextMenu(selectedItem, event);
 				}
 			};
 		});
+	}
+
+	private void openForum() {
+		final Forum forum = (Forum) Dashboard.getSelectedDirectory();
+		if (Desktop.isDesktopSupported()) {
+			try {
+				Desktop.getDesktop().browse(new URI(forum.getUrl()));
+			} catch (IOException | URISyntaxException e) {
+				e.printStackTrace();
+			}
+		} else {
+			Dashboard.browse(forum.getUrl());
+		}
 	}
 
 	private void showContextMenu(TreeItem<Directory> item, MouseEvent event) {
@@ -91,6 +117,7 @@ public class CoursesTreeView extends TreeView<Directory> {
 	}
 
 	public TreeItem<Directory> getLinkedTreeItem(final PDF pdf) {
+		tempItemDummy = null;
 		return search(rootItem.getChildren(), pdf);
 	}
 

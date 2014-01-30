@@ -3,11 +3,11 @@ package view;
 import java.util.ArrayList;
 import java.util.List;
 
-import control.FileSystem;
 import javafx.event.EventHandler;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
 import model.PDF;
+import control.FileSystem;
 
 public class SearchTextField extends TextField {
 
@@ -39,6 +39,7 @@ public class SearchTextField extends TextField {
 			Dashboard.setStatusText("Keine passende Datei gefunden.", false);
 			return;
 		}
+		Dashboard.setStatusText("");
 
 		List<PDF> alreadyAddedPDF = new ArrayList<PDF>();
 

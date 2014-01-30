@@ -9,15 +9,17 @@ import model.PDF;
 import view.Dashboard;
 
 public class IgnoredPdfFilter implements EventHandler<ActionEvent> {
+	private ArrayList<PDF> ignoredPdf;
 
 	@Override
 	public void handle(ActionEvent event) {
 		filter();
+		Dashboard.setStatusText(ignoredPdf.size() + " ignorierte Dateien in Ignorieren-Liste.", false);
 	}
 
 	public void filter() {
 		final List<PDF> allPdfFiles = FileSystem.getAllPdfFiles();
-		final List<PDF> ignoredPdf = new ArrayList<PDF>();
+		ignoredPdf = new ArrayList<PDF>();
 		for (PDF pdf : allPdfFiles) {
 			if (pdf.isIgnored()) {
 				ignoredPdf.add(pdf);
@@ -25,12 +27,8 @@ public class IgnoredPdfFilter implements EventHandler<ActionEvent> {
 		}
 		Dashboard.clearResultList();
 		Dashboard.setListHeader(" Ignorierte Dateien " + "(" + String.valueOf(ignoredPdf.size()) + ")", "red");
-		if (ignoredPdf.isEmpty()) {
-			Dashboard.setStatusText("Keine ignorierten PDF-Dateien vorhanden.", true);
-		} else {
-			for (PDF pdf : ignoredPdf) {
-				Dashboard.addToResultList(pdf);
-			}
+		for (PDF pdf : ignoredPdf) {
+			Dashboard.addToResultList(pdf);
 		}
 	}
 }

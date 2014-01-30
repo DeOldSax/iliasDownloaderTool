@@ -6,7 +6,7 @@ public class PDF extends Directory {
 	private final int size;
 	private final Settings settings;
 	private File fileOnLocalDisk = null;
-	private boolean lnt;
+	private boolean localNotThere = true;
 
 	public PDF(String name, String url, Directory parentDirectory, int size) {
 		super(name, url, parentDirectory);
@@ -19,17 +19,14 @@ public class PDF extends Directory {
 	}
 
 	public boolean isIgnored() {
-		if (settings.isIgnored(this) != -1) {
-			return true;
-		}
-		return false;
+		return settings.isIgnored(createStoreKey()) != -1;
 	}
 
 	public void setIgnored(boolean b) {
 		if (b) {
-			settings.storeIgnoredPdfSize(this);
+			settings.storeIgnoredPdfSize(createStoreKey(), getSize());
 		} else {
-			settings.removeIgnoredPdfSize(this);
+			settings.removeIgnoredPdfSize(createStoreKey());
 		}
 	}
 
@@ -46,15 +43,26 @@ public class PDF extends Directory {
 	}
 
 	public void setLocalNotThere(boolean b) {
-		this.lnt = b;
-		((Folder) this.getParentDirectory()).setContainsPdfsLocalNothThere(true);
+		this.localNotThere = b;
+		Settings.getInstance().storeLocalNotThere(createStoreKey(), b);
+		((Folder) this.getParentDirectory()).setContainsPdfsLocalNothThere(b);
 	}
 
 	public boolean isLocalNotThere() {
-		return lnt;
+		final boolean loadLocalNotThere = Settings.getInstance().loadLocalNotThere(createStoreKey());
+		localNotThere = loadLocalNotThere;
+		return loadLocalNotThere;
 	}
 
 	public void setRead(boolean b) {
 
+	}
+
+	private String createStoreKey() {
+		String key = getUrl();
+		final int beginIndex = key.indexOf("ref_id=");
+		final int endIndex = key.indexOf("&cmd=sendfile");
+		key = key.substring(beginIndex + 7, endIndex);
+		return key;
 	}
 }

@@ -89,6 +89,8 @@ public class FileDownloader implements Runnable {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		pdf.setFileOnLocalDisk(new File(targetPath));
+		pdf.setLocalNotThere(false);
 		Dashboard.setStatusText("Download abgeschlossen", false);
 		Dashboard.updateGraphicInTree(pdf);
 	}
