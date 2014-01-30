@@ -20,11 +20,6 @@ public class FileStorageProvider {
 		myPrefs = prefsRoot.node("DownloaderTool.preferences.files");
 	}
 
-	public static void main(String[] args) {
-		new FileStorageProvider().removeNode();
-		new StorageProvider().removeNode();
-	}
-
 	private void removeNode() {
 		try {
 			myPrefs.removeNode();

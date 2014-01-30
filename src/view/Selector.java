@@ -3,29 +3,29 @@ package view;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
-import model.StorageProvider;
+import model.Settings;
 
 public class Selector implements EventHandler<ActionEvent> {
 	@Override
 	public void handle(ActionEvent event) {
-		final StorageProvider storageProvider = new StorageProvider();
+		Settings settings = Settings.getInstance();
 		Button btn = (Button) event.getSource();
 		if (btn.getText().equals("Anmelden")) {
-			if (storageProvider.autoLogin()) {
-				storageProvider.setAutoLogin(false);
+			if (settings.autoLogin()) {
+				settings.setAutoLogin(false);
 				btn.setStyle("-fx-background-color: 	#3d3d3d;");
 			} else {
-				storageProvider.setAutoLogin(true);
+				settings.setAutoLogin(true);
 				btn.setStyle("-fx-background-color: 	linear-gradient(steelblue,royalblue)");
 			}
 			return;
 		}
 		if (btn.getText().equals("Aktualisieren")) {
-			if (storageProvider.autoUpdate()) {
-				storageProvider.setAutoUpdate(false);
+			if (settings.autoUpdate()) {
+				settings.setAutoUpdate(false);
 				btn.setStyle("-fx-background-color: 	#3d3d3d;");
 			} else {
-				storageProvider.setAutoUpdate(true);
+				settings.setAutoUpdate(true);
 				btn.setStyle("-fx-background-color: 	linear-gradient(steelblue,royalblue)");
 			}
 			return;

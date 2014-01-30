@@ -90,6 +90,6 @@ public class FileDownloader implements Runnable {
 			e.printStackTrace();
 		}
 		Dashboard.setStatusText("Download abgeschlossen", false);
-		new TreeNodeGraphicChanger().changeGraphicInTreeView(pdf);
+		Dashboard.updateGraphicInTree(pdf);
 	}
 }

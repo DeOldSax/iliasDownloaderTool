@@ -8,7 +8,7 @@ import model.Directory;
 import model.Folder;
 import model.Forum;
 import model.PDF;
-import model.StorageProvider;
+import model.Settings;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -35,7 +35,7 @@ public class IliasPdfFinder {
 	}
 
 	private void startScanner(List<Directory> kurse) {
-		if (new StorageProvider().updateCanceled()) {
+		if (Settings.getInstance().updateCanceled()) {
 			return;
 		}
 		threadCount.incrementAndGet();
@@ -67,7 +67,7 @@ public class IliasPdfFinder {
 		@Override
 		public void run() {
 			for (Directory kurs : kurse) {
-				if (new StorageProvider().updateCanceled()) {
+				if (Settings.getInstance().updateCanceled()) {
 					break;
 				}
 				List<Element> directory = openFolder(kurs);

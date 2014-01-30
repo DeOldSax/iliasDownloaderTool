@@ -15,18 +15,18 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
-import model.StorageProvider;
+import model.Settings;
 import control.LocalIliasPathChooser;
 
 public class SettingsMenu implements EventHandler<ActionEvent> {
 	private static Button localIliasPath;
-	private final StorageProvider storageProvider;
+	private final Settings settings;
 	private final GridPane gridPane;
 	private static Scene scene;
 	private static boolean promptUpdater;
 
 	public SettingsMenu() {
-		storageProvider = new StorageProvider();
+		settings = Settings.getInstance();
 		gridPane = new GridPane();
 		gridPane.setPadding(new Insets(50, 50, 50, 50));
 		gridPane.setHgap(20);
@@ -60,7 +60,7 @@ public class SettingsMenu implements EventHandler<ActionEvent> {
 		Label selectIliasLocalBtn = new Label("Mein Lokaler Ilias Ordner:            ");
 		gridPane.add(selectIliasLocalBtn, 0, 1);
 
-		String loadLocalIliasFolderPath = storageProvider.loadLocalIliasFolderPath();
+		String loadLocalIliasFolderPath = settings.loadLocalIliasFolderPath();
 		if (loadLocalIliasFolderPath.equals(".")) {
 			loadLocalIliasFolderPath = "..\\Kit\\Semester XY";
 		}
@@ -86,10 +86,10 @@ public class SettingsMenu implements EventHandler<ActionEvent> {
 		HBox box = new HBox();
 		box.setSpacing(20);
 		box.getChildren().addAll(doLogin, doUpdate);
-		if (storageProvider.autoLogin()) {
+		if (settings.autoLogin()) {
 			doLogin.setStyle("-fx-background-color: linear-gradient(steelblue,royalblue)");
 		}
-		if (storageProvider.autoUpdate()) {
+		if (settings.autoUpdate()) {
 			doUpdate.setStyle("-fx-background-color: linear-gradient(steelblue,royalblue)");
 		}
 
@@ -127,9 +127,9 @@ public class SettingsMenu implements EventHandler<ActionEvent> {
 	}
 
 	public static void updateLocalIliasFolderPath() {
-		final StorageProvider storageProvider = new StorageProvider();
-		localIliasPath.setText(storageProvider.loadLocalIliasFolderPath());
-		storageProvider.setLocalIliasPathTrue();
+		final Settings settings = Settings.getInstance();
+		localIliasPath.setText(settings.loadLocalIliasFolderPath());
+		settings.setLocalIliasPathTrue();
 		if (promptUpdater) {
 			Dashboard.update(true);
 			promptUpdater = false;

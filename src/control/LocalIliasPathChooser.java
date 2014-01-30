@@ -6,7 +6,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
-import model.StorageProvider;
+import model.Settings;
 import view.SettingsMenu;
 
 public class LocalIliasPathChooser implements EventHandler<ActionEvent> {
@@ -14,7 +14,7 @@ public class LocalIliasPathChooser implements EventHandler<ActionEvent> {
 	public void handle(ActionEvent event) {
 		final DirectoryChooser directoryChooser = new DirectoryChooser();
 		directoryChooser.setTitle("Lokaler Ilias-Ordner");
-		final String loadLocalIliasFolderPath = new StorageProvider().loadLocalIliasFolderPath();
+		final String loadLocalIliasFolderPath = Settings.getInstance().loadLocalIliasFolderPath();
 		if (!loadLocalIliasFolderPath.equals(".")) {
 			directoryChooser.setInitialDirectory(new File(loadLocalIliasFolderPath));
 		}
@@ -22,7 +22,7 @@ public class LocalIliasPathChooser implements EventHandler<ActionEvent> {
 		final File file = directoryChooser.showDialog(new Stage());
 
 		if (file != null) {
-			new StorageProvider().storeLocalIliasFolderPath(file.getAbsolutePath());
+			Settings.getInstance().storeLocalIliasFolderPath(file.getAbsolutePath());
 		}
 		SettingsMenu.updateLocalIliasFolderPath();
 	}

@@ -28,7 +28,7 @@ public class Ignorer implements EventHandler<ActionEvent> {
 			pdf.setIgnored(true);
 			Dashboard.setStatusText(pdf.getName() + " wurde auf ignorieren gesetzt.", false);
 		}
-		new TreeNodeGraphicChanger().changeGraphicInTreeView(pdf);
+		Dashboard.updateGraphicInTree(pdf);
 		new IgnoredPdfFilter().filter();
 	}
 }

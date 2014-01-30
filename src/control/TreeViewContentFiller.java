@@ -18,9 +18,7 @@ public class TreeViewContentFiller {
 			TreeItem<Directory> topsChilds = new TreeItem<Directory>(directory);
 
 			if (directory.getParentDirectory() == null || directory instanceof Folder) {
-				// topsChilds.addEventHandler(TreeItem.branchCollapsedEvent(),
-				// new NodeCollapseHandler());
-				topsChilds.setGraphic(new ImageView("view/folder.png"));
+				topsChilds.setGraphic(new ImageView("img/folder.png"));
 				rootItem.getChildren().add(topsChilds);
 			}
 			if (directory instanceof PDF) {
@@ -37,13 +35,11 @@ public class TreeViewContentFiller {
 					checkIfContainsPdfNotLocal(topsChilds, subDir, subDirNode);
 				}
 				if (subDir instanceof Forum) {
-					subDirNode.setGraphic(new ImageView("view/forum.png"));
+					subDirNode.setGraphic(new ImageView("img/forum.png"));
 					topsChilds.getChildren().add(subDirNode);
 				}
 				if (subDir instanceof Folder) {
-					subDirNode.setGraphic(new ImageView("view/folder.png"));
-					// subDirNode.addEventHandler(TreeItem.branchCollapsedEvent(),
-					// new NodeCollapseHandler());
+					subDirNode.setGraphic(new ImageView("img/folder.png"));
 					addKurseToTree(subDirNode, subDir.getChildFolders());
 					topsChilds.getChildren().add(subDirNode);
 				}
@@ -80,4 +76,5 @@ public class TreeViewContentFiller {
 			}
 		}
 	}
+
 }

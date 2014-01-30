@@ -5,8 +5,6 @@ import javafx.animation.ParallelTransition;
 import javafx.animation.TranslateTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -14,16 +12,12 @@ import javafx.geometry.Orientation;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.RadioButton;
-import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Separator;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
@@ -39,25 +33,15 @@ import javafx.util.Duration;
 import model.Directory;
 import model.FileStorageProvider;
 import model.PDF;
-import model.StorageProvider;
-import control.FileSystem;
+import model.Settings;
 import control.IgnoredPdfFilter;
 import control.IliasStarter;
-import control.InterpolatorDown;
-import control.ListItemRemoverAndSelector;
-import control.ListPopUpShower;
 import control.LocalDataMatcher;
 import control.LoginProvider;
-import control.SearchTextField;
-import control.TreeCollapser;
-import control.TreeItemSearcher;
-import control.TreePopupShower;
-import control.TreeViewContentFiller;
 
 public class Dashboard extends Application {
 
 	private static Stage stage;
-	private static TreeItem<Directory> rootItem;
 	private static Scene scene;
 	private LoginFader loginFader;
 	private static GridPane help;
@@ -68,12 +52,11 @@ public class Dashboard extends Application {
 	private static BorderPane background;
 	private static WebView webView;
 	private static Label lastUpdateTime;
-	private static ListView<Directory> listView;
+	private static ResultList resultList;
 	private static Button settings;
 	private static Button loader;
 	private static Label statusFooterText;
-	private static TreeView<Directory> courses;
-	private static ObservableList<Directory> items;
+	private static CoursesTreeView courses;
 	private static Button signIn;
 	private static GridPane menu;
 	private static LoginFader loginFader2;
@@ -81,7 +64,7 @@ public class Dashboard extends Application {
 	private static ImageView loaderGif;
 	private static boolean loaderRunning;
 	private static ParallelTransition tp;
-	private static StorageProvider storageProvider;
+	private static Settings storageProvider;
 	private static FileStorageProvider fileStorageProvider;
 
 	public static void main(String[] args) {
@@ -89,7 +72,7 @@ public class Dashboard extends Application {
 		// if (newVersionCalled) {
 		// System.exit(0);
 		// }
-		storageProvider = new StorageProvider();
+		storageProvider = Settings.getInstance();
 		fileStorageProvider = new FileStorageProvider();
 
 		storageProvider.setOpen(true);
@@ -108,8 +91,8 @@ public class Dashboard extends Application {
 				System.exit(0);
 			};
 		});
-		loaderIcon = new ImageView(new Image(getClass().getResourceAsStream("loader.png")));
-		loaderGif = new ImageView(new Image(getClass().getResourceAsStream("loader.gif")));
+		loaderIcon = new ImageView("img/loader.png");
+		loaderGif = new ImageView("img/loader.gif");
 		Dashboard.stage = stage;
 		background = new BorderPane();
 		background.setPadding(new Insets(20, 50, 50, 50));
@@ -171,8 +154,13 @@ public class Dashboard extends Application {
 		menu.setHgap(10);
 
 		Button collapseTree = new Button();
-		collapseTree.setOnAction(new TreeCollapser());
-		collapseTree.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("arrow.png"))));
+		collapseTree.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				courses.collapse();
+			}
+		});
+		collapseTree.setGraphic(new ImageView("img/arrow.png"));
 		collapseTree.prefWidthProperty().bind(menu.prefWidthProperty());
 		loader = new Button();
 		final Tooltip tooltip = new Tooltip("Aktualisieren");
@@ -212,7 +200,7 @@ public class Dashboard extends Application {
 		TextField searchField = new SearchTextField();
 		searchField.prefWidthProperty().bind(menu.prefWidthProperty());
 		settings = new Button();
-		settings.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("settings.png"))));
+		settings.setGraphic(new ImageView("img/settings.png"));
 		settings.setId("settingsBtn");
 		settings.setOnAction(new SettingsMenu());
 
@@ -245,18 +233,8 @@ public class Dashboard extends Application {
 		splitPane = new SplitPane();
 		splitPane.setId("splitPane");
 
-		rootItem = new TreeItem<Directory>(new Directory("Übersicht", null, null));
-		rootItem.setExpanded(true);
-		courses = new TreeView<Directory>(rootItem);
-		courses.setOnMouseClicked(new TreePopupShower(courses));
-		courses.setShowRoot(false);
-		courses.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-		items = FXCollections.observableArrayList();
-		listView = new ListView<Directory>(items);
-		listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-		listView.setOnMouseClicked(new ListPopUpShower(listView));
-		listView.setOnKeyPressed(new ListItemRemoverAndSelector(listView));
-		listView.setId("listView");
+		courses = new CoursesTreeView();
+		resultList = new ResultList(courses);
 
 		splitPane.setDividerPositions(0.6f, 0.4f);
 
@@ -264,7 +242,7 @@ public class Dashboard extends Application {
 		BorderPane listPane = new BorderPane();
 
 		help.setId("listHeader");
-		listPane.setCenter(listView);
+		listPane.setCenter(resultList);
 
 		listHeader = new Label();
 		listHeader.setId("listHeaderText");
@@ -329,10 +307,7 @@ public class Dashboard extends Application {
 	}
 
 	public static void update(boolean showFinishText) {
-		courses.getRoot().getChildren().clear();
-		final TreeViewContentFiller treeViewContentFiller = new TreeViewContentFiller();
-		treeViewContentFiller.addKurseToTree(rootItem, FileSystem.getAllFiles());
-		treeViewContentFiller.markCourses(rootItem);
+		courses.update();
 		if (showFinishText) {
 			setStatusText("Aktualisierung beendet.", true);
 			updateUpdateTime();
@@ -354,11 +329,11 @@ public class Dashboard extends Application {
 	}
 
 	public static void clearResultList() {
-		items.clear();
+		resultList.clear();
 	}
 
 	public static void addToResultList(final PDF pdf) {
-		items.add(pdf);
+		resultList.add(pdf);
 	}
 
 	public static void setMenuTransparent(boolean b) {
@@ -429,11 +404,7 @@ public class Dashboard extends Application {
 		if (courses.isFocused()) {
 			return courses.getSelectionModel().getSelectedItem().getValue();
 		}
-		return listView.getSelectionModel().getSelectedItem();
-	}
-
-	public static TreeView<Directory> getCoursesView() {
-		return courses;
+		return resultList.getSelectionModel().getSelectedItem();
 	}
 
 	public static void startDownloadAnimation() {
@@ -446,30 +417,30 @@ public class Dashboard extends Application {
 
 		tp = new ParallelTransition();
 		final TranslateTransition t = new TranslateTransition(Duration.millis(2000), downloadIcon);
-		t.setInterpolator(new InterpolatorDown());
+		t.setInterpolator(new Interpolator() {
+			@Override
+			protected double curve(double x) {
+				return Math.sqrt(x);
+			}
+		});
 		t.setFromX(downloadIcon.getLayoutX() + 50);
 		t.setByY(stage.getHeight() - 80);
 		final TranslateTransition t2 = new TranslateTransition(Duration.millis(2000), icon2);
 		t2.setDelay(Duration.millis(100));
-		t2.setInterpolator(new InterpolatorDown());
+		t2.setInterpolator(new Interpolator() {
+			@Override
+			protected double curve(double x) {
+				return Math.sqrt(x);
+			}
+		});
 		t2.setFromX(downloadIcon.getLayoutX() + 50);
 		t2.setByY(stage.getHeight() - 80);
 		tp.getChildren().addAll(t, t2);
 		tp.play();
 	}
 
-	public static TreeItem<Directory> getLinkedTreeItem(PDF pdf) {
-		return new TreeItemSearcher(courses).get(pdf);
-	}
-
-	public static void expandTreeItem(Directory selectedDirectory) {
-		new TreeCollapser().act();
-		final TreeItem<Directory> linkedTreeItem = Dashboard.getLinkedTreeItem((PDF) selectedDirectory);
-		linkedTreeItem.setExpanded(true);
-		courses.getSelectionModel().clearSelection();
-		courses.getSelectionModel().select(linkedTreeItem);
-		final int selectedIndex = courses.getSelectionModel().getSelectedIndex();
-		courses.scrollTo(selectedIndex);
+	public static void updateGraphicInTree(PDF pdf) {
+		courses.updateGraphic(pdf);
 	}
 
 	public static void browse(String url) {

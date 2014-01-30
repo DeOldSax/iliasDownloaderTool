@@ -5,7 +5,7 @@ import javafx.event.EventHandler;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
-import model.StorageProvider;
+import model.Settings;
 import view.Dashboard;
 
 public class LoginProvider implements EventHandler<ActionEvent> {
@@ -13,13 +13,13 @@ public class LoginProvider implements EventHandler<ActionEvent> {
 	private final TextField usernameField;
 	private final PasswordField passwordField;
 	private final RadioButton savePwd;
-	private final StorageProvider storageProvider;
+	private final Settings settings;
 
 	public LoginProvider(TextField usernameField, PasswordField passwordField, RadioButton savePwd) {
 		this.usernameField = usernameField;
 		this.passwordField = passwordField;
 		this.savePwd = savePwd;
-		this.storageProvider = new StorageProvider();
+		this.settings = Settings.getInstance();
 	}
 
 	@Override
@@ -48,11 +48,11 @@ public class LoginProvider implements EventHandler<ActionEvent> {
 				return;
 			}
 			if (savePwd.isSelected()) {
-				storageProvider.storeUsername(username);
-				storageProvider.storePassword(password);
+				settings.storeUsername(username);
+				settings.storePassword(password);
 			} else {
-				storageProvider.storeUsername("");
-				storageProvider.storePassword("");
+				settings.storeUsername("");
+				settings.storePassword("");
 			}
 
 			new Thread(new Runnable() {

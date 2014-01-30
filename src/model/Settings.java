@@ -3,14 +3,25 @@ package model;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
-public class StorageProvider {
-	private static final String ILIAS_FOLDER = "1";
+public class Settings {
+	private static Settings settings = null;
+
+	private static final String ILIAS_FOLDER = "ILIAS_FOLDER";
+	private static final String USERNAME = "USERNAME";
+	private static final String PASSWORD = "PASSWORD";
 	private static Preferences prefsRoot;
 	private static Preferences myPrefs;
 
-	public StorageProvider() {
+	public Settings() {
 		prefsRoot = Preferences.userRoot();
 		myPrefs = prefsRoot.node("DownloaderTool.preferences");
+	}
+
+	public static Settings getInstance() {
+		if (settings == null) {
+			settings = new Settings();
+		}
+		return settings;
 	}
 
 	public void storeLocalIliasFolderPath(String path) {
@@ -22,19 +33,19 @@ public class StorageProvider {
 	}
 
 	public void storeUsername(String username) {
-		myPrefs.put("username", username);
+		myPrefs.put(USERNAME, username);
 	}
 
 	public void storePassword(String password) {
-		myPrefs.put("password", password);
+		myPrefs.put(PASSWORD, password);
 	}
 
 	public String getUsername() {
-		return myPrefs.get("username", "");
+		return myPrefs.get(USERNAME, "");
 	}
 
 	public String getPassword() {
-		return myPrefs.get("password", "");
+		return myPrefs.get(PASSWORD, "");
 	}
 
 	public void storeIgnoredPdfSize(PDF pdf) {

@@ -8,26 +8,26 @@ import java.util.Map;
 
 import model.Directory;
 import model.PDF;
-import model.StorageProvider;
+import model.Settings;
 
 public class LocalDataReader {
 	private final List<Integer> localDataList;
 	private final Map<Integer, String> localPdfWithParents;
-	private final StorageProvider storageProvider;
+	private final Settings settings;
 	private File file;
 
 	public LocalDataReader() {
 		this.localDataList = new ArrayList<Integer>();
 		this.localPdfWithParents = new HashMap<Integer, String>();
-		this.storageProvider = new StorageProvider();
+		this.settings = Settings.getInstance();
 	}
 
 	public List<Integer> getAllLocalPDFSizes() {
-		return scanFolders(storageProvider.loadLocalIliasFolderPath());
+		return scanFolders(settings.loadLocalIliasFolderPath());
 	}
 
 	public Map<Integer, String> getAllLocalPDFSizesAsMap() {
-		scanFolders(storageProvider.loadLocalIliasFolderPath());
+		scanFolders(settings.loadLocalIliasFolderPath());
 		return localPdfWithParents;
 	}
 
@@ -48,7 +48,7 @@ public class LocalDataReader {
 	}
 
 	private String searchLocalParentFolder(PDF onlineAdresse) {
-		scanFolders(storageProvider.loadLocalIliasFolderPath());
+		scanFolders(settings.loadLocalIliasFolderPath());
 		final int size = onlineAdresse.getSize();
 		final String path = localPdfWithParents.get(size);
 		return path;
@@ -64,11 +64,11 @@ public class LocalDataReader {
 				}
 			}
 		}
-		return storageProvider.loadLocalIliasFolderPath();
+		return settings.loadLocalIliasFolderPath();
 	}
 
 	public File findFileOnLocalDisk(PDF pdf) {
-		scanForPath(storageProvider.loadLocalIliasFolderPath(), pdf);
+		scanForPath(settings.loadLocalIliasFolderPath(), pdf);
 		if (file != null) {
 			return file;
 		}

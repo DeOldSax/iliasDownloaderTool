@@ -9,7 +9,7 @@ import java.util.List;
 import javafx.application.Platform;
 import model.Directory;
 import model.PDF;
-import model.StorageProvider;
+import model.Settings;
 import studportControl.Studierendenportal;
 import view.Dashboard;
 import view.SettingsMenu;
@@ -42,7 +42,7 @@ public class IliasStarter {
 		Dashboard.setStatusText("Angemeldet als: " + username, false);
 		studierendenportal = new Studierendenportal(username, password);
 		new Thread(studierendenportal).start();
-		new StorageProvider().setLogIn(true);
+		Settings.getInstance().setLogIn(true);
 		Dashboard.showLoader(false);
 		Dashboard.setSignInColor();
 		Dashboard.setStatusText("Aktualisiere über den Button in der Menüleiste die Kurse auf deinem Schreibtisch!", false);
@@ -71,17 +71,17 @@ public class IliasStarter {
 				e.printStackTrace();
 			}
 		}
-		if (!(new StorageProvider().updateCanceled())) {
+		if (!(Settings.getInstance().updateCanceled())) {
 			FileSystem.setAllPdfFiles(allPdfs);
 			FileSystem.setAllFiles(iliasPdfFinder.getKurse());
-			new StorageProvider().setUpdateCanceled(false);
+			Settings.getInstance().setUpdateCanceled(false);
 		} else {
-			new StorageProvider().setUpdateCanceled(false);
+			Settings.getInstance().setUpdateCanceled(false);
 			Dashboard.setStatusText("");
 			return;
 		}
 
-		if (new StorageProvider().localIliasPathIsAlreadySet()) {
+		if (Settings.getInstance().localIliasPathIsAlreadySet()) {
 			Platform.runLater(new Runnable() {
 				@Override
 				public void run() {

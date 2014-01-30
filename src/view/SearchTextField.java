@@ -1,13 +1,13 @@
-package control;
+package view;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import control.FileSystem;
 import javafx.event.EventHandler;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
 import model.PDF;
-import view.Dashboard;
 
 public class SearchTextField extends TextField {
 

@@ -4,14 +4,14 @@ import java.io.File;
 
 public class PDF extends Directory {
 	private final int size;
-	private final StorageProvider storageProvider;
+	private final Settings settings;
 	private File fileOnLocalDisk = null;
 	private boolean lnt;
 
 	public PDF(String name, String url, Directory parentDirectory, int size) {
 		super(name, url, parentDirectory);
 		this.size = size;
-		storageProvider = new StorageProvider();
+		settings = Settings.getInstance();
 	}
 
 	public int getSize() {
@@ -19,7 +19,7 @@ public class PDF extends Directory {
 	}
 
 	public boolean isIgnored() {
-		if (storageProvider.isIgnored(this) != -1) {
+		if (settings.isIgnored(this) != -1) {
 			return true;
 		}
 		return false;
@@ -27,9 +27,9 @@ public class PDF extends Directory {
 
 	public void setIgnored(boolean b) {
 		if (b) {
-			storageProvider.storeIgnoredPdfSize(this);
+			settings.storeIgnoredPdfSize(this);
 		} else {
-			storageProvider.removeIgnoredPdfSize(this);
+			settings.removeIgnoredPdfSize(this);
 		}
 	}
 
