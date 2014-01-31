@@ -3,15 +3,14 @@ package model;
 import java.io.File;
 
 public class PDF extends Directory {
+	private static final long serialVersionUID = -2841996600829969452L;
 	private final int size;
-	private final Settings settings;
 	private File fileOnLocalDisk = null;
 	private boolean localNotThere = true;
 
 	public PDF(String name, String url, Directory parentDirectory, int size) {
 		super(name, url, parentDirectory);
 		this.size = size;
-		settings = Settings.getInstance();
 	}
 
 	public int getSize() {
@@ -19,14 +18,14 @@ public class PDF extends Directory {
 	}
 
 	public boolean isIgnored() {
-		return settings.isIgnored(createStoreKey()) != -1;
+		return Settings.getInstance().isIgnored(createStoreKey()) != -1;
 	}
 
 	public void setIgnored(boolean b) {
 		if (b) {
-			settings.storeIgnoredPdfSize(createStoreKey(), getSize());
+			Settings.getInstance().storeIgnoredPdfSize(createStoreKey(), getSize());
 		} else {
-			settings.removeIgnoredPdfSize(createStoreKey());
+			Settings.getInstance().removeIgnoredPdfSize(createStoreKey());
 		}
 	}
 

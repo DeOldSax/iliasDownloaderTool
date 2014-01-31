@@ -1,9 +1,11 @@
 package model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Directory {
+public class Directory implements Serializable {
+	private static final long serialVersionUID = -5666402232004312659L;
 	private final String url;
 	private final String name;
 	private String nameChangedByUser;

@@ -3,7 +3,7 @@ package control;
 import java.util.List;
 
 import model.Directory;
-import model.FileStorageProvider;
+import model.FileStorage;
 import model.PDF;
 
 public class FileSystem {
@@ -12,7 +12,7 @@ public class FileSystem {
 
 	public static List<PDF> getAllPdfFiles() {
 		if (allPdfFiles == null) {
-			allPdfFiles = new FileStorageProvider().loadAllPdfFiles();
+			allPdfFiles = FileStorage.loadAllPdfFiles();
 		}
 		return allPdfFiles;
 	}
@@ -23,13 +23,13 @@ public class FileSystem {
 
 	public static List<Directory> getAllFiles() {
 		if (allFiles == null) {
-			allFiles = new FileStorageProvider().loadAllFiles();
+			allFiles = FileStorage.loadAllFiles();
 		}
 		return allFiles;
 	}
 
 	public static void setAllFiles(List<Directory> allFiles) {
-		new FileStorageProvider().storeAllFiles(allFiles);
+		FileStorage.storeAllFiles(allFiles);
 		FileSystem.allFiles = allFiles;
 	}
 }

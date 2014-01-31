@@ -1,9 +1,11 @@
 package model;
 
+import java.io.Serializable;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
-public class Settings {
+public class Settings implements Serializable {
+
 	private static Settings settings = null;
 
 	private static final String ILIAS_FOLDER = "ILIAS_FOLDER";

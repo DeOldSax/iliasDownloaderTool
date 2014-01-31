@@ -1,6 +1,7 @@
 package model;
 
 public class Folder extends Directory {
+	private static final long serialVersionUID = 6134132849917192741L;
 	private boolean containsPdfsLocalNotThere;
 
 	public Folder(String name, String url, Directory parentDirectory) {

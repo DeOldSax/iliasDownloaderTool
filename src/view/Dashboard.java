@@ -31,7 +31,7 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 import model.Directory;
-import model.FileStorageProvider;
+import model.FileStorage;
 import model.PDF;
 import model.Settings;
 import control.IgnoredPdfFilter;
@@ -65,7 +65,6 @@ public class Dashboard extends Application {
 	private static boolean loaderRunning;
 	private static ParallelTransition tp;
 	private static Settings storageProvider;
-	private static FileStorageProvider fileStorageProvider;
 
 	public static void main(String[] args) {
 		// boolean newVersionCalled = new VersionValidator().validate();
@@ -73,7 +72,6 @@ public class Dashboard extends Application {
 		// System.exit(0);
 		// }
 		storageProvider = Settings.getInstance();
-		fileStorageProvider = new FileStorageProvider();
 
 		storageProvider.setOpen(true);
 		launch();
@@ -139,7 +137,7 @@ public class Dashboard extends Application {
 		updatePane = new GridPane();
 		updatePane.setHgap(10);
 		updatePane.setVgap(5);
-		lastUpdateTime = new Label(fileStorageProvider.getActualisationDate());
+		lastUpdateTime = new Label(FileStorage.getActualisationDate());
 		lastUpdateTime.setId("lastUpdateTimeLbl");
 		updatePane.add(new Label(), 0, 0);
 		updatePane.add(new Label(), 0, 1);
@@ -315,8 +313,8 @@ public class Dashboard extends Application {
 	}
 
 	public static void updateUpdateTime() {
-		fileStorageProvider.setActualisationDate();
-		lastUpdateTime.setText(fileStorageProvider.getActualisationDate());
+		FileStorage.setActualisationDate();
+		lastUpdateTime.setText(FileStorage.getActualisationDate());
 	}
 
 	public static void fadeInLogin() {
