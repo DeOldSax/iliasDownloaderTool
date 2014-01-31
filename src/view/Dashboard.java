@@ -53,7 +53,7 @@ public class Dashboard extends Application {
 	private static WebView webView;
 	private static Label lastUpdateTime;
 	private static ResultList resultList;
-	private static Button settings;
+	private static Button settingsBtn;
 	private static Button loader;
 	private static Label statusFooterText;
 	private static CoursesTreeView courses;
@@ -64,16 +64,15 @@ public class Dashboard extends Application {
 	private static ImageView loaderGif;
 	private static boolean loaderRunning;
 	private static ParallelTransition tp;
-	private static Settings storageProvider;
+	private static Settings settings;
 
 	public static void main(String[] args) {
 		// boolean newVersionCalled = new VersionValidator().validate();
 		// if (newVersionCalled) {
 		// System.exit(0);
 		// }
-		storageProvider = Settings.getInstance();
+		settings = Settings.getInstance();
 
-		storageProvider.setOpen(true);
 		launch();
 	}
 
@@ -83,9 +82,8 @@ public class Dashboard extends Application {
 		stage.addEventHandler(WindowEvent.WINDOW_CLOSE_REQUEST, new EventHandler<WindowEvent>() {
 			@Override
 			public void handle(WindowEvent event) {
-				storageProvider.setLogIn(false);
-				storageProvider.setUpdateCanceled(false);
-				storageProvider.setOpen(false);
+				settings.setLogIn(false);
+				settings.setUpdateCanceled(false);
 				System.exit(0);
 			};
 		});
@@ -110,9 +108,9 @@ public class Dashboard extends Application {
 		TextField username = new TextField();
 		username.setId("userField");
 		username.setPromptText("Benutzererkennung");
-		username.setText(storageProvider.getUsername());
+		username.setText(settings.getUsername());
 		PasswordField password = new PasswordField();
-		password.setText(storageProvider.getPassword());
+		password.setText(settings.getPassword());
 		password.setId("userField");
 		password.setPromptText("Passwort");
 		RadioButton savePwd = new RadioButton("Speichern");
@@ -171,11 +169,11 @@ public class Dashboard extends Application {
 			@Override
 			public void handle(ActionEvent event) {
 				if (loaderRunning) {
-					storageProvider.setUpdateCanceled(true);
+					settings.setUpdateCanceled(true);
 					showLoader(false);
 				} else {
 					showLoader(true);
-					if (storageProvider.userIsLoggedIn()) {
+					if (settings.userIsLoggedIn()) {
 						new Thread(new Runnable() {
 							@Override
 							public void run() {
@@ -198,10 +196,10 @@ public class Dashboard extends Application {
 		showIgnored.setMaxWidth(Double.MAX_VALUE);
 		TextField searchField = new SearchTextField();
 		searchField.prefWidthProperty().bind(menu.prefWidthProperty());
-		settings = new Button();
-		settings.setGraphic(new ImageView("img/settings.png"));
-		settings.setId("settingsBtn");
-		settings.setOnAction(new SettingsMenu());
+		settingsBtn = new Button();
+		settingsBtn.setGraphic(new ImageView("img/settings.png"));
+		settingsBtn.setId("settingsBtn");
+		settingsBtn.setOnAction(new SettingsMenu());
 
 		ColumnConstraints col1 = new ColumnConstraints();
 		col1.setPercentWidth(5);
@@ -225,7 +223,7 @@ public class Dashboard extends Application {
 		menu.add(showLocalNotThere, 3, 0);
 		menu.add(showIgnored, 4, 0);
 		menu.add(searchField, 5, 0);
-		menu.add(settings, 6, 0);
+		menu.add(settingsBtn, 6, 0);
 
 		background.setTop(stackPane);
 
@@ -267,7 +265,7 @@ public class Dashboard extends Application {
 		update(false);
 		stage.show();
 
-		if (storageProvider.autoLogin()) {
+		if (settings.autoLogin()) {
 			signIn.setMouseTransparent(true);
 			Dashboard.setStatusText("", false);
 			Dashboard.showLoader(true);
@@ -275,9 +273,9 @@ public class Dashboard extends Application {
 			new Thread(new Runnable() {
 				@Override
 				public void run() {
-					final IliasStarter iliasStarter = new IliasStarter(storageProvider.getUsername(), storageProvider.getPassword());
+					final IliasStarter iliasStarter = new IliasStarter(settings.getUsername(), settings.getPassword());
 					final boolean loginSuccessfull = iliasStarter.login();
-					if (loginSuccessfull && storageProvider.autoUpdate()) {
+					if (loginSuccessfull && settings.autoUpdate()) {
 						Platform.runLater(new Runnable() {
 							@Override
 							public void run() {

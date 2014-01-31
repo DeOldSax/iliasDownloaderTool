@@ -1,30 +1,31 @@
 package model;
 
-import java.io.Serializable;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
-public class Settings implements Serializable {
+public class Settings {
 
-	private static Settings settings = null;
-
-	private static final String ILIAS_FOLDER = "ILIAS_FOLDER";
-	private static final String USERNAME = "USERNAME";
-	private static final String PASSWORD = "PASSWORD";
+	private static final String ILIAS_FOLDER = "1";
+	private static final String USERNAME = "username";
+	private static final String PASSWORD = "password";
+	private static final String UPDATE_CANCELED = "UpdateCanceled!?";
+	private static final String LOCAL_ILIAS_PATH_IS_SET = "localIliasPathIsAlreadySet";
+	private static final String USER_IS_LOGGED_IN = "#LOGIN#";
 	private static final String LNT = "LNT_*";
 	private static Preferences prefsRoot;
 	private static Preferences myPrefs;
+	private static Settings instance = null;
 
-	public Settings() {
+	private Settings() {
 		prefsRoot = Preferences.userRoot();
 		myPrefs = prefsRoot.node("DownloaderTool.preferences");
 	}
 
 	public static Settings getInstance() {
-		if (settings == null) {
-			settings = new Settings();
+		if (instance == null) {
+			instance = new Settings();
 		}
-		return settings;
+		return instance;
 	}
 
 	public void storeLocalIliasFolderPath(String path) {
@@ -64,11 +65,11 @@ public class Settings implements Serializable {
 	}
 
 	public boolean localIliasPathIsAlreadySet() {
-		return myPrefs.getBoolean("localIliasPathIsAlreadySet", false);
+		return myPrefs.getBoolean(LOCAL_ILIAS_PATH_IS_SET, false);
 	}
 
-	public void setLocalIliasPathTrue() {
-		myPrefs.putBoolean("localIliasPathIsAlreadySet", true);
+	public void setLocalIliasPathStored(boolean value) {
+		myPrefs.putBoolean(LOCAL_ILIAS_PATH_IS_SET, value);
 	}
 
 	public void removeNode() {
@@ -79,24 +80,20 @@ public class Settings implements Serializable {
 		}
 	}
 
-	// public static void main(String[] args) {
-	// getInstance().removeNode();
-	// }
-
 	public void setLogIn(boolean b) {
-		myPrefs.putBoolean("#LOGIN#", b);
+		myPrefs.putBoolean(USER_IS_LOGGED_IN, b);
 	}
 
 	public boolean userIsLoggedIn() {
-		return myPrefs.getBoolean("#LOGIN#", false);
+		return myPrefs.getBoolean(USER_IS_LOGGED_IN, false);
 	}
 
 	public boolean updateCanceled() {
-		return myPrefs.getBoolean("UpdateCanceled!?", false);
+		return myPrefs.getBoolean(UPDATE_CANCELED, false);
 	}
 
 	public void setUpdateCanceled(boolean b) {
-		myPrefs.putBoolean("UpdateCanceled!?", b);
+		myPrefs.putBoolean(UPDATE_CANCELED, b);
 	}
 
 	public void setAutoUpdate(boolean b) {
@@ -113,14 +110,6 @@ public class Settings implements Serializable {
 
 	public boolean autoLogin() {
 		return myPrefs.getBoolean("AUTO_LOGIN", false);
-	}
-
-	public boolean oneInstanceIsAlreadyOpen() {
-		return myPrefs.getBoolean("INSTANCE_ALREADY_OPEN", false);
-	}
-
-	public void setOpen(boolean open) {
-		myPrefs.putBoolean("INSTANCE_ALREADY_OPEN", open);
 	}
 
 	public void storeLocalNotThere(String key, boolean value) {

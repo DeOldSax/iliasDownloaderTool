@@ -7,13 +7,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
 public class FileStorage {
-	private static final String TIME_STORE_PATH = System.getProperty("user.home") + "/" + ".ilias" + "/" + "time.ser";
 	private static final String ILIAS_STORE_FOLDER = System.getProperty("user.home") + "/" + ".ilias";
-	private static final String COURSES_STORE_PATH = System.getProperty("user.home") + "/" + ".ilias" + "/" + "dirs.ser";
+	private static final String TIME_STORE_PATH = ILIAS_STORE_FOLDER + "/" + "time.ser";
+	private static final String COURSES_STORE_PATH = ILIAS_STORE_FOLDER + "/" + "dirs.ser";
 
 	public static List<PDF> loadAllPdfFiles() {
 		final List<Directory> allFiles = loadAllFiles();
@@ -96,6 +97,13 @@ public class FileStorage {
 		File file = new File(ILIAS_STORE_FOLDER);
 		if (!file.exists()) {
 			file.mkdir();
+		}
+		if (System.getProperty("os.name").toLowerCase().contains("windows")) {
+			try {
+				Files.setAttribute(file.toPath(), "dos:hidden", true);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 

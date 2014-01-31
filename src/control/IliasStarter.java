@@ -38,14 +38,16 @@ public class IliasStarter {
 			Dashboard.setStatusText("Falsches Passwort!", true);
 			return false;
 		}
-		Dashboard.setTitle("Ilias - Angemeldet als: " + username);
+		Dashboard.setTitle("Ilias - Angemeldet als " + username);
 		Dashboard.setStatusText("Angemeldet als: " + username, false);
 		studierendenportal = new Studierendenportal(username, password);
 		new Thread(studierendenportal).start();
 		Settings.getInstance().setLogIn(true);
 		Dashboard.showLoader(false);
 		Dashboard.setSignInColor();
-		Dashboard.setStatusText("Aktualisiere über den Button in der Menüleiste die Kurse auf deinem Schreibtisch!", false);
+		if (!Settings.getInstance().autoUpdate()) {
+			Dashboard.setStatusText("Aktualisiere über den Button in der Menüleiste die Kurse auf deinem Schreibtisch!", false);
+		}
 		Dashboard.setSigInTransparent(true);
 		return true;
 	}
