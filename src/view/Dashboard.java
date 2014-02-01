@@ -38,6 +38,7 @@ import control.IgnoredPdfFilter;
 import control.IliasStarter;
 import control.LocalDataMatcher;
 import control.LoginProvider;
+import control.VersionValidator;
 
 public class Dashboard extends Application {
 
@@ -67,10 +68,10 @@ public class Dashboard extends Application {
 	private static Settings settings;
 
 	public static void main(String[] args) {
-		// boolean newVersionCalled = new VersionValidator().validate();
-		// if (newVersionCalled) {
-		// System.exit(0);
-		// }
+		boolean newVersionCalled = new VersionValidator().validate();
+		if (newVersionCalled) {
+			System.exit(0);
+		}
 		settings = Settings.getInstance();
 
 		launch();

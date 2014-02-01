@@ -18,7 +18,7 @@ import org.jsoup.select.Elements;
 
 public class VersionValidator {
 	private final int YES = 0;
-	private final String VERSION = "v1.0.0";
+	private final String VERSION = "v0.2.0";
 	private String LATEST_VERSION;
 
 	public boolean validate() {
