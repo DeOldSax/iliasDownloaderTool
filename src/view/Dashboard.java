@@ -1,5 +1,6 @@
 package view;
 
+import iliasControl.IliasStarter;
 import javafx.animation.Interpolator;
 import javafx.animation.ParallelTransition;
 import javafx.animation.TranslateTransition;
@@ -30,13 +31,12 @@ import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Duration;
-import model.Directory;
-import model.FileStorage;
-import model.PDF;
+import model.IliasPdf;
+import model.IliasTreeNode;
+import model.IliasTreeStorage;
 import model.Settings;
-import control.IgnoredPdfFilter;
-import control.IliasStarter;
 import control.LocalDataMatcher;
+import control.LocalPdfStorage;
 import control.LoginProvider;
 import control.VersionValidator;
 
@@ -53,7 +53,7 @@ public class Dashboard extends Application {
 	private static BorderPane background;
 	private static WebView webView;
 	private static Label lastUpdateTime;
-	private static ResultList resultList;
+	public static ResultList resultList;
 	private static Button settingsBtn;
 	private static Button loader;
 	private static Label statusFooterText;
@@ -136,7 +136,7 @@ public class Dashboard extends Application {
 		updatePane = new GridPane();
 		updatePane.setHgap(10);
 		updatePane.setVgap(5);
-		lastUpdateTime = new Label(FileStorage.getActualisationDate());
+		lastUpdateTime = new Label(IliasTreeStorage.getActualisationDate());
 		lastUpdateTime.setId("lastUpdateTimeLbl");
 		updatePane.add(new Label(), 0, 0);
 		updatePane.add(new Label(), 0, 1);
@@ -178,9 +178,10 @@ public class Dashboard extends Application {
 						new Thread(new Runnable() {
 							@Override
 							public void run() {
-								new IliasStarter().watchForFolders();
+								new IliasStarter().loadIliasTree();
 							}
 						}).start();
+						LocalPdfStorage.getInstance().refresh();
 					}
 				}
 			}
@@ -192,7 +193,12 @@ public class Dashboard extends Application {
 		showLocalNotThere.prefWidthProperty().bind(menu.prefWidthProperty());
 		showLocalNotThere.setOnAction(new LocalDataMatcher());
 		Button showIgnored = new Button("Ignorierte Dateien");
-		showIgnored.setOnAction(new IgnoredPdfFilter());
+		showIgnored.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				resultList.showIgnoredFiles();
+			}
+		});
 		showIgnored.prefWidthProperty().bind(menu.prefWidthProperty());
 		showIgnored.setMaxWidth(Double.MAX_VALUE);
 		TextField searchField = new SearchTextField();
@@ -263,7 +269,8 @@ public class Dashboard extends Application {
 		scene.getStylesheets().add("skin/DashboardStyle.css");
 		setScene();
 		stage.setTitle("Ilias");
-		update(false);
+		LocalPdfStorage.getInstance().refresh();
+		iliasTreeReloaded(false);
 		stage.show();
 
 		if (settings.autoLogin()) {
@@ -284,7 +291,7 @@ public class Dashboard extends Application {
 								loaderRunning = true;
 							}
 						});
-						iliasStarter.watchForFolders();
+						iliasStarter.loadIliasTree();
 					}
 				}
 			}).start();
@@ -303,7 +310,7 @@ public class Dashboard extends Application {
 		stage.sizeToScene();
 	}
 
-	public static void update(boolean showFinishText) {
+	public static void iliasTreeReloaded(boolean showFinishText) {
 		courses.update();
 		if (showFinishText) {
 			setStatusText("Aktualisierung beendet.", true);
@@ -312,8 +319,8 @@ public class Dashboard extends Application {
 	}
 
 	public static void updateUpdateTime() {
-		FileStorage.setActualisationDate();
-		lastUpdateTime.setText(FileStorage.getActualisationDate());
+		IliasTreeStorage.setActualisationDate();
+		lastUpdateTime.setText(IliasTreeStorage.getActualisationDate());
 	}
 
 	public static void fadeInLogin() {
@@ -329,7 +336,7 @@ public class Dashboard extends Application {
 		resultList.clear();
 	}
 
-	public static void addToResultList(final PDF pdf) {
+	public static void addToResultList(final IliasPdf pdf) {
 		resultList.add(pdf);
 	}
 
@@ -396,7 +403,7 @@ public class Dashboard extends Application {
 		});
 	}
 
-	public static Directory getSelectedDirectory() {
+	public static IliasTreeNode getSelectedDirectory() {
 		if (courses.isFocused()) {
 			return courses.getSelectionModel().getSelectedItem().getValue();
 		}
@@ -435,8 +442,17 @@ public class Dashboard extends Application {
 		tp.play();
 	}
 
-	public static void updateGraphicInTree(PDF pdf) {
-		courses.updateGraphic(pdf);
+	public static void updateGraphicInTree(IliasPdf pdf) {
+		courses.pdfStatusChanged(pdf);
+	}
+
+	public static void showPdfIgnoredState(IliasPdf pdf) {
+		if (pdf.isIgnored()) {
+			Dashboard.setStatusText(pdf.getName() + " wurde auf ignorieren gesetzt.", false);
+		} else {
+			Dashboard.setStatusText(pdf.getName() + " wird nicht mehr ignoriert.", false);
+		}
+		Dashboard.updateGraphicInTree(pdf);
 	}
 
 	public static void browse(String url) {

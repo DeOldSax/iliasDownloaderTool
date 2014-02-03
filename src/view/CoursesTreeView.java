@@ -16,23 +16,22 @@ import javafx.scene.control.TreeView;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import model.Directory;
-import model.Forum;
-import model.PDF;
+import model.IliasFolder;
+import model.IliasForum;
+import model.IliasPdf;
+import model.IliasTreeNode;
 import model.Settings;
 import control.Downloader;
-import control.FileSystem;
-import control.LocalDataReader;
-import control.TreeViewContentFiller;
+import control.IliasTreeProvider;
+import control.LocalPdfStorage;
 
-public class CoursesTreeView extends TreeView<Directory> {
-	private final TreeItem<Directory> rootItem;
-	private TreeItem<Directory> tempItemDummy;
+public class CoursesTreeView extends TreeView<IliasTreeNode> {
+	private final TreeItem<IliasTreeNode> rootItem;
 	private ContextMenu menu;
 
 	public CoursesTreeView() {
 		super();
-		rootItem = new TreeItem<Directory>(new Directory("Übersicht", null, null));
+		rootItem = new TreeItem<IliasTreeNode>(new IliasFolder("Übersicht", null, null));
 		rootItem.setExpanded(true);
 		setRoot(rootItem);
 		setShowRoot(false);
@@ -43,15 +42,15 @@ public class CoursesTreeView extends TreeView<Directory> {
 			@Override
 			public void handle(MouseEvent event) {
 				menu.hide();
-				final TreeItem<Directory> selectedItem = getSelectionModel().getSelectedItem();
+				final TreeItem<IliasTreeNode> selectedItem = getSelectionModel().getSelectedItem();
 				if (selectedItem == null) {
 					return;
 				}
 				if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2) {
-					if (selectedItem.getValue() instanceof Forum) {
+					if (selectedItem.getValue() instanceof IliasForum) {
 						openForum();
 						return;
-					} else if (selectedItem.getValue() instanceof PDF) {
+					} else if (selectedItem.getValue() instanceof IliasPdf) {
 						if (Settings.getInstance().userIsLoggedIn()) {
 							new Downloader().download(((CoursesTreeView) event.getSource()).getSelectionModel().getSelectedItem()
 									.getValue());
@@ -59,7 +58,7 @@ public class CoursesTreeView extends TreeView<Directory> {
 					}
 				}
 				if (event.getButton() == MouseButton.SECONDARY) {
-					if (!(selectedItem.getValue() instanceof PDF || selectedItem.getValue() instanceof Forum)) {
+					if (!(selectedItem.getValue() instanceof IliasPdf || selectedItem.getValue() instanceof IliasForum)) {
 						return;
 					}
 					showContextMenu(selectedItem, event);
@@ -69,7 +68,7 @@ public class CoursesTreeView extends TreeView<Directory> {
 	}
 
 	private void openForum() {
-		final Forum forum = (Forum) Dashboard.getSelectedDirectory();
+		final IliasForum forum = (IliasForum) this.getSelectionModel().getSelectedItem().getValue();
 		if (Desktop.isDesktopSupported()) {
 			try {
 				Desktop.getDesktop().browse(new URI(forum.getUrl()));
@@ -81,7 +80,7 @@ public class CoursesTreeView extends TreeView<Directory> {
 		}
 	}
 
-	private void showContextMenu(TreeItem<Directory> item, MouseEvent event) {
+	private void showContextMenu(TreeItem<IliasTreeNode> item, MouseEvent event) {
 		menu.getItems().clear();
 		menu = new FileContextMenu().createMenu(item.getValue(), event);
 		menu.show(this, event.getScreenX(), event.getScreenY());
@@ -89,70 +88,103 @@ public class CoursesTreeView extends TreeView<Directory> {
 
 	public void update() {
 		rootItem.getChildren().clear();
-		final TreeViewContentFiller treeViewContentFiller = new TreeViewContentFiller();
-		treeViewContentFiller.addKurseToTree(rootItem, FileSystem.getAllFiles());
-		treeViewContentFiller.markCourses(rootItem);
+		setCourses(rootItem, IliasTreeProvider.getTree());
+	}
+
+	private void setCourses(TreeItem<IliasTreeNode> rootItem, List<? extends IliasTreeNode> kurse) {
+		for (IliasTreeNode node : kurse) {
+			TreeItem<IliasTreeNode> item = new TreeItem<IliasTreeNode>(node);
+			rootItem.getChildren().add(item);
+
+			if (node instanceof IliasFolder) {
+				IliasFolder folder = (IliasFolder) node;
+				setCourses(item, folder.getChildNodes());
+				if (LocalPdfStorage.getInstance().isFolderSynchronized(folder)) {
+					item.setGraphic(new ImageView("img/folder.png"));
+				} else {
+					item.setGraphic(new ImageView("img/folder_pdf_not_there.png"));
+				}
+			} else if (node instanceof IliasPdf) {
+				IliasPdf pdf = (IliasPdf) node;
+				if (pdf.isIgnored()) {
+					item.setGraphic(new ImageView("img/pdf_ignored.png"));
+				} else if (!(LocalPdfStorage.getInstance().contains(pdf))) {
+					item.setGraphic(new ImageView("img/pdf_local_not_there.png"));
+				} else {
+					item.setGraphic(new ImageView("img/pdf.png"));
+				}
+			} else if (node instanceof IliasForum) {
+				item.setGraphic(new ImageView("img/forum.png"));
+			}
+		}
 	}
 
 	public void collapse() {
 		collapse(rootItem.getChildren());
 	}
 
-	private void collapse(ObservableList<TreeItem<Directory>> items) {
-		for (TreeItem<Directory> item : items) {
+	private void collapse(ObservableList<TreeItem<IliasTreeNode>> items) {
+		for (TreeItem<IliasTreeNode> item : items) {
 			item.setExpanded(false);
 			collapse(item.getChildren());
 		}
 		Dashboard.setStatusText("");
 	}
 
-	public void expandTreeItem(Directory selectedDirectory) {
+	public void selectPdf(IliasPdf selectedDirectory) {
 		collapse();
-		final TreeItem<Directory> linkedTreeItem = getLinkedTreeItem((PDF) selectedDirectory);
+		final TreeItem<IliasTreeNode> linkedTreeItem = getItem(selectedDirectory);
 		linkedTreeItem.setExpanded(true);
 		getSelectionModel().clearSelection();
 		getSelectionModel().select(linkedTreeItem);
-		final int selectedIndex = getSelectionModel().getSelectedIndex();
-		scrollTo(selectedIndex);
+		scrollTo(getSelectionModel().getSelectedIndex());
 	}
 
-	public TreeItem<Directory> getLinkedTreeItem(final PDF pdf) {
-		tempItemDummy = null;
-		return search(rootItem.getChildren(), pdf);
+	public TreeItem<IliasTreeNode> getItem(final IliasPdf pdf) {
+		return search(rootItem, pdf);
 	}
 
-	private TreeItem<Directory> search(final ObservableList<TreeItem<Directory>> children, final PDF pdf) {
-		for (TreeItem<Directory> treeItem : children) {
-			if (treeItem.getValue().getUrl().equals(pdf.getUrl())) {
-				this.tempItemDummy = treeItem;
+	private TreeItem<IliasTreeNode> search(TreeItem<IliasTreeNode> item, final IliasPdf pdf) {
+		for (TreeItem<IliasTreeNode> treeItem : item.getChildren()) {
+			if (treeItem.getValue().equals(pdf)) {
+				return treeItem;
 			}
-			search(treeItem.getChildren(), pdf);
+			final TreeItem<IliasTreeNode> searchResult = search(treeItem, pdf);
+			if (searchResult != null) {
+				return searchResult;
+			}
 		}
-		return tempItemDummy;
+		return null;
 	}
 
-	public void updateGraphic(PDF pdf) {
-		final List<Integer> allLocalPDFSizes = new LocalDataReader().getAllLocalPDFSizes();
-		TreeItem<Directory> treeItem = getLinkedTreeItem(pdf);
-		ImageView image;
-		if (allLocalPDFSizes.contains(pdf.getSize())) {
-			image = new ImageView("img/pdf.png");
-		} else {
-			image = new ImageView("img/pdf_local_not_there.png");
-		}
+	public void pdfStatusChanged(IliasPdf pdf) {
+		final LocalPdfStorage localPdfStorage = LocalPdfStorage.getInstance();
+		TreeItem<IliasTreeNode> treeItem = getItem(pdf);
 		if (pdf.isIgnored()) {
-			image = new ImageView("img/pdf_ignored.png");
+			setGraphic(treeItem, new ImageView("img/pdf_ignored.png"));
+		} else if (localPdfStorage.contains(pdf)) {
+			setGraphic(treeItem, new ImageView("img/pdf.png"));
+		} else {
+			setGraphic(treeItem, new ImageView("img/pdf_local_not_there.png"));
 		}
-		setGraphic(image, treeItem);
+		while (treeItem.getParent() != null) {
+			treeItem = treeItem.getParent();
+			IliasFolder folder = (IliasFolder) treeItem.getValue();
+			if (LocalPdfStorage.getInstance().isFolderSynchronized(folder)) {
+				setGraphic(treeItem, new ImageView("img/folder.png"));
+			} else {
+				setGraphic(treeItem, new ImageView("img/folder_pdf_not_there.png"));
+			}
+		}
 	}
 
-	private void setGraphic(final ImageView image, final TreeItem<Directory> treeItem) {
+	private void setGraphic(final TreeItem<IliasTreeNode> treeItem, final ImageView image) {
 		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {
-				treeItem.setExpanded(false);
+				treeItem.setExpanded(!treeItem.isExpanded());
 				treeItem.setGraphic(image);
-				treeItem.setExpanded(true);
+				treeItem.setExpanded(!treeItem.isExpanded());
 			}
 		});
 	}

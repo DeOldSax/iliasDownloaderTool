@@ -3,18 +3,18 @@ package control;
 import java.util.List;
 
 import javafx.application.Platform;
-import model.Directory;
-import model.PDF;
+import model.IliasTreeNode;
+import model.IliasPdf;
 
 public class Downloader {
-	public void download(final Directory directory) {
+	public void download(final IliasTreeNode directory) {
 		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {
-				final List<PDF> allPdfFiles = FileSystem.getAllPdfFiles();
+				final List<IliasPdf> allPdfFiles = IliasTreeProvider.getAllPdfFiles();
 
-				for (PDF pdf : allPdfFiles) {
-					if (directory instanceof PDF) {
+				for (IliasPdf pdf : allPdfFiles) {
+					if (directory instanceof IliasPdf) {
 						if (pdf.getUrl().equals(directory.getUrl())) {
 							Platform.runLater(new FileDownloader(pdf, ".pdf"));
 						}

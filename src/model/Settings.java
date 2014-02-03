@@ -64,6 +64,14 @@ public class Settings {
 		myPrefs.remove(key);
 	}
 
+	public void togglePdfIgnored(IliasPdf pdf) {
+		if (pdf.isIgnored()) {
+			pdf.setIgnored(false);
+		} else {
+			pdf.setIgnored(true);
+		}
+	}
+
 	public boolean localIliasPathIsAlreadySet() {
 		return myPrefs.getBoolean(LOCAL_ILIAS_PATH_IS_SET, false);
 	}

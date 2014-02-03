@@ -1,9 +1,9 @@
 package model;
 
-public class Forum extends Directory {
+public class IliasForum extends IliasTreeNode {
 	private static final long serialVersionUID = 5332458530562614267L;
 
-	public Forum(String name, String url, Directory parentDirectory) {
+	public IliasForum(String name, String url, IliasFolder parentDirectory) {
 		super(name, url, parentDirectory);
 	}
 }

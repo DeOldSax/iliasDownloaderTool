@@ -1,6 +1,7 @@
 package view;
 
 import java.awt.Desktop;
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -11,13 +12,12 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import model.Directory;
-import model.Forum;
-import model.PDF;
+import model.IliasForum;
+import model.IliasPdf;
+import model.IliasTreeNode;
 import model.Settings;
 import control.Downloader;
-import control.Ignorer;
-import control.LocalDataReader;
+import control.LocalPdfStorage;
 
 public class FileContextMenu {
 
@@ -29,9 +29,10 @@ public class FileContextMenu {
 	private final MenuItem openParentFolderItem;
 	private final MenuItem openFileItem;
 	private final MenuItem openForumItem;
-	private Directory directory;
+	private IliasTreeNode directory;
 
 	public FileContextMenu() {
+		// FIXME add param Dashboard
 		menu = new ContextMenu();
 		downloadItem = new MenuItem("Herunterladen");
 		downloadItem.setGraphic(new ImageView("img/downloadArrow.png"));
@@ -45,8 +46,19 @@ public class FileContextMenu {
 		ignoreItem.setGraphic(new ImageView("img/ignore.png"));
 		ignoreItemCancel = new MenuItem("Ignorieren aufheben");
 		ignoreItemCancel.setGraphic(new ImageView("img/check.png"));
-		ignoreItem.setOnAction(new Ignorer());
-		ignoreItemCancel.setOnAction(new Ignorer());
+
+		final EventHandler<ActionEvent> pdfIgnorer = new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				final IliasPdf pdf = (IliasPdf) directory;
+				Settings.getInstance().togglePdfIgnored(pdf);
+				Dashboard.showPdfIgnoredState(pdf);
+				Dashboard.resultList.pdfIgnoredStateChanged(pdf);
+			}
+		};
+
+		ignoreItem.setOnAction(pdfIgnorer);
+		ignoreItemCancel.setOnAction(pdfIgnorer);
 		printItem = new MenuItem("Drucken");
 		printItem.setGraphic(new ImageView("img/printer.png"));
 		printItem.setOnAction(new EventHandler<ActionEvent>() {
@@ -82,20 +94,21 @@ public class FileContextMenu {
 		new Downloader().download(directory);
 	}
 
-	public ContextMenu createMenu(final Directory directory, final MouseEvent event) {
-		this.directory = directory;
+	public ContextMenu createMenu(final IliasTreeNode node, final MouseEvent event) {
+		this.directory = node;
 		menu.getItems().clear();
 
-		if (directory instanceof Forum) {
+		if (node instanceof IliasForum) {
 			menu.getItems().add(openForumItem);
 			return menu;
-		} else if (directory instanceof PDF) {
-			if (((PDF) directory).isIgnored()) {
+		} else if (node instanceof IliasPdf) {
+			IliasPdf pdf = (IliasPdf) node;
+			if (pdf.isIgnored()) {
 				menu.getItems().add(ignoreItemCancel);
 			} else {
 				menu.getItems().add(ignoreItem);
 			}
-			if (!((PDF) directory).isLocalNotThere()) {
+			if (LocalPdfStorage.getInstance().contains(pdf)) {
 				menu.getItems().add(printItem);
 				menu.getItems().add(openParentFolderItem);
 				menu.getItems().add(openFileItem);
@@ -108,12 +121,12 @@ public class FileContextMenu {
 	}
 
 	private void openFile() {
-		final PDF pdf = (PDF) Dashboard.getSelectedDirectory();
-		new LocalDataReader().findFileOnLocalDisk(pdf);
-		if (pdf.getFileOnLocalDisk() != null && pdf.getFileOnLocalDisk().exists()) {
+		final IliasPdf pdf = (IliasPdf) this.directory;
+		final File file = LocalPdfStorage.getInstance().getFile(pdf);
+		if (file != null && file.exists()) {
 			if (Desktop.isDesktopSupported()) {
 				try {
-					Desktop.getDesktop().open(pdf.getFileOnLocalDisk());
+					Desktop.getDesktop().open(file);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -124,7 +137,7 @@ public class FileContextMenu {
 	}
 
 	private void openForum() {
-		final Forum forum = (Forum) Dashboard.getSelectedDirectory();
+		final IliasForum forum = (IliasForum) this.directory;
 		if (Desktop.isDesktopSupported()) {
 			try {
 				Desktop.getDesktop().browse(new URI(forum.getUrl()));
@@ -137,12 +150,12 @@ public class FileContextMenu {
 	}
 
 	private void openLocalFolder() {
-		PDF pdf = (PDF) Dashboard.getSelectedDirectory();
-		new LocalDataReader().findFileOnLocalDisk(pdf);
-		if (pdf.getFileOnLocalDisk() != null && pdf.getFileOnLocalDisk().exists()) {
+		IliasPdf pdf = (IliasPdf) this.directory;
+		final File file = LocalPdfStorage.getInstance().getFile(pdf);
+		if (file != null && file.exists()) {
 			if (Desktop.isDesktopSupported()) {
 				try {
-					Desktop.getDesktop().open(pdf.getParentFolderOnLocalDisk());
+					Desktop.getDesktop().open(file.getParentFile());
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -153,11 +166,11 @@ public class FileContextMenu {
 	}
 
 	private void print() {
-		PDF pdf = (PDF) Dashboard.getSelectedDirectory();
-		new LocalDataReader().findFileOnLocalDisk(pdf);
-		if (pdf.getFileOnLocalDisk() != null && pdf.getFileOnLocalDisk().exists()) {
+		IliasPdf pdf = (IliasPdf) this.directory;
+		final File file = LocalPdfStorage.getInstance().getFile(pdf);
+		if (file != null && file.exists()) {
 			try {
-				Desktop.getDesktop().print(pdf.getFileOnLocalDisk());
+				Desktop.getDesktop().print(file);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

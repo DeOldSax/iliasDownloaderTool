@@ -157,7 +157,7 @@ public class SettingsMenu implements EventHandler<ActionEvent> {
 
 	private static void updateLocalIliasFolderPath() {
 		if (promptUpdater) {
-			Dashboard.update(true);
+			Dashboard.iliasTreeReloaded(true);
 			promptUpdater = false;
 		}
 	}

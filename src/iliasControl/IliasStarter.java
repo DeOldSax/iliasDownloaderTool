@@ -1,18 +1,11 @@
-package control;
-
-import iliasControl.Ilias;
-import iliasControl.IliasCourseFinder;
-import iliasControl.IliasPdfFinder;
-
-import java.util.List;
+package iliasControl;
 
 import javafx.application.Platform;
-import model.Directory;
-import model.PDF;
 import model.Settings;
 import studportControl.Studierendenportal;
 import view.Dashboard;
 import view.SettingsMenu;
+import control.IliasTreeProvider;
 
 public class IliasStarter {
 	private static String htmlContent;
@@ -58,15 +51,10 @@ public class IliasStarter {
 		return htmlContent.equals("0");
 	}
 
-	public void watchForFolders() {
-		List<Directory> kurse;
-		List<PDF> allPdfs;
-		final IliasPdfFinder iliasPdfFinder = new IliasPdfFinder();
-		final IliasCourseFinder iliasCourseFinder = new IliasCourseFinder();
-		kurse = iliasCourseFinder.getSubjects(htmlContent);
-		iliasPdfFinder.findAllPdfs(kurse);
-		allPdfs = iliasPdfFinder.getAllPdfs();
-		while (iliasPdfFinder.threadCount.get() > 0) {
+	public void loadIliasTree() {
+		final IliasScraper Scraper = new IliasScraper();
+		Scraper.run(htmlContent);
+		while (Scraper.threadCount.get() > 0) {
 			try {
 				Thread.sleep(100);
 			} catch (InterruptedException e) {
@@ -74,12 +62,11 @@ public class IliasStarter {
 			}
 		}
 		if (!(Settings.getInstance().updateCanceled())) {
-			FileSystem.setAllPdfFiles(allPdfs);
-			FileSystem.setAllFiles(iliasPdfFinder.getKurse());
+			IliasTreeProvider.setTree(Scraper.getIliasTree());
 			Settings.getInstance().setUpdateCanceled(false);
 		} else {
 			Settings.getInstance().setUpdateCanceled(false);
-			Dashboard.setStatusText("");
+			Dashboard.setStatusText("Aktualisierung abgebrochen.", false);
 			return;
 		}
 
@@ -87,7 +74,7 @@ public class IliasStarter {
 			Platform.runLater(new Runnable() {
 				@Override
 				public void run() {
-					Dashboard.update(true);
+					Dashboard.iliasTreeReloaded(true);
 					Dashboard.showLoader(false);
 				}
 			});

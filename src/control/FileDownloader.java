@@ -11,7 +11,7 @@ import java.io.IOException;
 import javafx.application.Platform;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import model.PDF;
+import model.IliasPdf;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -25,14 +25,14 @@ public class FileDownloader implements Runnable {
 	private HttpResponse response;
 	private BasicHttpContext context;
 	private HttpEntity entity;
-	private final PDF pdf;
+	private final IliasPdf pdf;
 	private String targetPath;
 	private final String type;
 	private String name;
 
-	public FileDownloader(PDF pdf, String type) {
+	public FileDownloader(IliasPdf pdf, String type) {
 		this.pdf = pdf;
-		this.targetPath = new LocalDataReader().findLocalDownloadPath(pdf);
+		this.targetPath = LocalPdfStorage.getInstance().suggestDownloadPath(pdf);
 		this.type = type;
 	}
 
@@ -89,8 +89,7 @@ public class FileDownloader implements Runnable {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		pdf.setFileOnLocalDisk(new File(targetPath));
-		pdf.setLocalNotThere(false);
+		LocalPdfStorage.getInstance().addPdf(pdf, targetPath);
 		Dashboard.setStatusText("Download abgeschlossen", false);
 		Dashboard.updateGraphicInTree(pdf);
 	}

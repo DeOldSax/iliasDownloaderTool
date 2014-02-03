@@ -8,41 +8,24 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.nio.file.Files;
-import java.util.ArrayList;
 import java.util.List;
 
-public class FileStorage {
+public class IliasTreeStorage {
 	private static final String ILIAS_STORE_FOLDER = System.getProperty("user.home") + "/" + ".ilias";
 	private static final String TIME_STORE_PATH = ILIAS_STORE_FOLDER + "/" + "time.ser";
 	private static final String COURSES_STORE_PATH = ILIAS_STORE_FOLDER + "/" + "dirs.ser";
+	private static List<IliasFolder> allFiles;
 
-	public static List<PDF> loadAllPdfFiles() {
-		final List<Directory> allFiles = loadAllFiles();
-		final ArrayList<PDF> allPdfFiles = new ArrayList<PDF>();
-		pdfFilter(allFiles, allPdfFiles);
-		return allPdfFiles;
-	}
-
-	private static void pdfFilter(final List<Directory> allFiles, final ArrayList<PDF> allPdfFiles) {
-		for (Directory directory : allFiles) {
-			if (directory instanceof PDF) {
-				allPdfFiles.add((PDF) directory);
-			}
-			pdfFilter(directory.getChildFolders(), allPdfFiles);
-		}
-	}
-
-	public static void storeAllFiles(List<Directory> allFiles) {
+	public static void storeAllFiles(List<IliasFolder> allFiles) {
 		serialize(allFiles, COURSES_STORE_PATH);
 	}
 
 	@SuppressWarnings("unchecked")
-	public static List<Directory> loadAllFiles() {
-		final Object object = deserialize(COURSES_STORE_PATH);
-		if (object == null) {
-			return new ArrayList<Directory>();
+	public static List<IliasFolder> getTree() {
+		if (allFiles == null) {
+			allFiles = (List<IliasFolder>) deserialize(COURSES_STORE_PATH);
 		}
-		return (List<Directory>) object;
+		return allFiles;
 	}
 
 	public static String getActualisationDate() {
@@ -59,9 +42,6 @@ public class FileStorage {
 	}
 
 	private static Object deserialize(String path) {
-		if (!fileExists(path)) {
-			return null;
-		}
 		Object object = null;
 		try {
 			final FileInputStream fileInputStream = new FileInputStream(new File(path));
@@ -69,11 +49,12 @@ public class FileStorage {
 			object = o.readObject();
 			o.close();
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			return null;
 		} catch (IOException e) {
 			e.printStackTrace();
+			return null;
 		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
+			return null;
 		}
 		return object;
 	}
@@ -105,9 +86,5 @@ public class FileStorage {
 				e.printStackTrace();
 			}
 		}
-	}
-
-	private static boolean fileExists(String path) {
-		return new File(path).exists();
 	}
 }

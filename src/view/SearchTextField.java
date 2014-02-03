@@ -6,8 +6,8 @@ import java.util.List;
 import javafx.event.EventHandler;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
-import model.PDF;
-import control.FileSystem;
+import model.IliasPdf;
+import control.IliasTreeProvider;
 
 public class SearchTextField extends TextField {
 
@@ -24,6 +24,7 @@ public class SearchTextField extends TextField {
 	}
 
 	private void searchPdf(String inputString) {
+		ResultList.listMode = ResultList.SEARCH_MODE;
 		Dashboard.clearResultList();
 
 		if (inputString.length() == 0 || inputString.equals(" ")) {
@@ -32,7 +33,7 @@ public class SearchTextField extends TextField {
 			return;
 		}
 
-		final List<PDF> allPdfFiles = FileSystem.getAllPdfFiles();
+		final List<IliasPdf> allPdfFiles = IliasTreeProvider.getAllPdfFiles();
 
 		if (allPdfFiles.isEmpty()) {
 			Dashboard.clearResultList();
@@ -41,9 +42,9 @@ public class SearchTextField extends TextField {
 		}
 		Dashboard.setStatusText("");
 
-		List<PDF> alreadyAddedPDF = new ArrayList<PDF>();
+		List<IliasPdf> alreadyAddedPDF = new ArrayList<IliasPdf>();
 
-		for (PDF pdf : allPdfFiles) {
+		for (IliasPdf pdf : allPdfFiles) {
 			if (pdf.isIgnored()) {
 				continue;
 			}
@@ -65,16 +66,16 @@ public class SearchTextField extends TextField {
 					alreadyAddedPDF.add(pdf);
 					continue;
 				}
-				if (pdf.getParentDirectory() != null) {
-					if (inputString.length() > 3 && pdf.getParentDirectory().getName().toLowerCase().contains(inputString.toLowerCase())
+				if (pdf.getParentFolder() != null) {
+					if (inputString.length() > 3 && pdf.getParentFolder().getName().toLowerCase().contains(inputString.toLowerCase())
 							&& !alreadyAddedPDF.contains(pdf)) {
 						alreadyAddedPDF.add(pdf);
 					}
 					continue;
 				}
-				if (pdf.getParentDirectory().getParentDirectory() != null) {
+				if (pdf.getParentFolder().getParentFolder() != null) {
 					if (inputString.length() > 3
-							&& pdf.getParentDirectory().getParentDirectory().getName().toLowerCase().contains(inputString.toLowerCase())
+							&& pdf.getParentFolder().getParentFolder().getName().toLowerCase().contains(inputString.toLowerCase())
 							&& !alreadyAddedPDF.contains(pdf)) {
 						alreadyAddedPDF.add(pdf);
 					}
@@ -86,7 +87,7 @@ public class SearchTextField extends TextField {
 		if (alreadyAddedPDF.isEmpty()) {
 			Dashboard.setStatusText("Keine Datei gefunden.");
 		} else {
-			for (PDF pdf : alreadyAddedPDF) {
+			for (IliasPdf pdf : alreadyAddedPDF) {
 				Dashboard.addToResultList(pdf);
 			}
 		}
