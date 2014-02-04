@@ -20,17 +20,19 @@ import model.IliasFolder;
 import model.IliasForum;
 import model.IliasPdf;
 import model.IliasTreeNode;
+import model.IliasTreeProvider;
 import model.Settings;
 import control.Downloader;
-import control.IliasTreeProvider;
 import control.LocalPdfStorage;
 
 public class CoursesTreeView extends TreeView<IliasTreeNode> {
 	private final TreeItem<IliasTreeNode> rootItem;
 	private ContextMenu menu;
+	private final Dashboard dashboard;
 
-	public CoursesTreeView() {
+	public CoursesTreeView(Dashboard dashboard) {
 		super();
+		this.dashboard = dashboard;
 		rootItem = new TreeItem<IliasTreeNode>(new IliasFolder("Übersicht", null, null));
 		rootItem.setExpanded(true);
 		setRoot(rootItem);
@@ -76,13 +78,13 @@ public class CoursesTreeView extends TreeView<IliasTreeNode> {
 				e.printStackTrace();
 			}
 		} else {
-			Dashboard.browse(forum.getUrl());
+			dashboard.browse(forum.getUrl());
 		}
 	}
 
 	private void showContextMenu(TreeItem<IliasTreeNode> item, MouseEvent event) {
 		menu.getItems().clear();
-		menu = new FileContextMenu().createMenu(item.getValue(), event);
+		menu = new FileContextMenu(dashboard).createMenu(item.getValue(), event);
 		menu.show(this, event.getScreenX(), event.getScreenY());
 	}
 
@@ -128,7 +130,7 @@ public class CoursesTreeView extends TreeView<IliasTreeNode> {
 			item.setExpanded(false);
 			collapse(item.getChildren());
 		}
-		Dashboard.setStatusText("");
+		dashboard.setStatusText("");
 	}
 
 	public void selectPdf(IliasPdf selectedDirectory) {

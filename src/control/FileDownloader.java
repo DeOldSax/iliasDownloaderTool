@@ -1,7 +1,5 @@
 package control;
 
-import iliasControl.Ilias;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -50,7 +48,6 @@ public class FileDownloader implements Runnable {
 			@Override
 			public void run() {
 				final File selectedFile = fileChooser.showSaveDialog(new Stage());
-				// Dashboard.startDownloadAnimation();
 				if (selectedFile != null) {
 					targetPath = selectedFile.getAbsolutePath();
 					if (!targetPath.endsWith(".pdf")) {

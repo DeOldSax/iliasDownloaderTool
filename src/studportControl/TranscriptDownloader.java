@@ -1,7 +1,5 @@
 package studportControl;
 
-import iliasControl.ClientCloner;
-
 import java.awt.Desktop;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -16,6 +14,8 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.HttpContext;
+
+import control.IliasClientCloner;
 
 public class TranscriptDownloader implements Runnable {
 	private final DefaultHttpClient client;
@@ -38,7 +38,7 @@ public class TranscriptDownloader implements Runnable {
 			return;
 		}
 
-		final DefaultHttpClient clonedClient = ClientCloner.cloneClient(client);
+		final DefaultHttpClient clonedClient = IliasClientCloner.cloneClient(client);
 
 		try {
 			final HttpGet httpGet = new HttpGet(downloadPdfUrl);

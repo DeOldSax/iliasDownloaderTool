@@ -12,13 +12,13 @@ public class LoginFader implements EventHandler<ActionEvent> {
 
 	private final double c;
 	private final GridPane login;
-	private final GridPane menu;
 	private final ParallelTransition p;
+	private final Dashboard dashboard;
 
-	public LoginFader(double c, GridPane login, GridPane menu) {
+	public LoginFader(Dashboard dashboard, double c, GridPane login) {
+		this.dashboard = dashboard;
 		this.c = c;
 		this.login = login;
-		this.menu = menu;
 		p = new ParallelTransition();
 	}
 
@@ -35,8 +35,8 @@ public class LoginFader implements EventHandler<ActionEvent> {
 		}
 	}
 
-	private void fade(double c, GridPane login, GridPane menu) {
-		TranslateTransition t1 = new TranslateTransition(Duration.millis(500), menu);
+	private void fade(double c, GridPane login) {
+		TranslateTransition t1 = new TranslateTransition(Duration.millis(500), dashboard.getActionBar());
 		t1.setByX(c);
 
 		TranslateTransition t2 = new TranslateTransition(Duration.millis(500), login);
@@ -60,12 +60,12 @@ public class LoginFader implements EventHandler<ActionEvent> {
 	}
 
 	public void fadeIn() {
-		Dashboard.setMenuTransparent(true);
-		fade(500, login, menu);
+		dashboard.setMenuTransparent(true);
+		fade(500, login);
 	}
 
 	public void fadeOut() {
-		Dashboard.setMenuTransparent(false);
-		fade(-500, login, menu);
+		dashboard.setMenuTransparent(false);
+		fade(-500, login);
 	}
 }

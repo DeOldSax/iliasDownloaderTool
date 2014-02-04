@@ -1,12 +1,7 @@
-package control;
+package model;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import model.IliasFolder;
-import model.IliasPdf;
-import model.IliasTreeNode;
-import model.IliasTreeStorage;
 
 public class IliasTreeProvider {
 	private static List<IliasFolder> allFiles = null;

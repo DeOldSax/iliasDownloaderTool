@@ -1,8 +1,6 @@
 package view;
 
-import iliasControl.IliasStarter;
 import javafx.animation.Interpolator;
-import javafx.animation.ParallelTransition;
 import javafx.animation.TranslateTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -21,70 +19,67 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
-import javafx.scene.text.TextAlignment;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 import model.IliasPdf;
-import model.IliasTreeNode;
 import model.IliasTreeStorage;
 import model.Settings;
-import control.LocalDataMatcher;
+import control.IliasStarter;
 import control.LocalPdfStorage;
 import control.LoginProvider;
 import control.VersionValidator;
 
 public class Dashboard extends Application {
 
+	private Dashboard dashboard;
 	private static Stage stage;
 	private static Scene scene;
 	private LoginFader loginFader;
-	private static GridPane help;
-	private static Label listHeader;
-	private static SplitPane splitPane;
-	private static StackPane stackPane;
-	private static GridPane updatePane;
-	private static BorderPane background;
-	private static WebView webView;
+	private SplitPane splitPane;
+	private StackPane stackPane;
+	private GridPane actualisationTimePane;
+	private BorderPane background;
+	private WebView webView;
 	private static Label lastUpdateTime;
-	public static ResultList resultList;
-	private static Button settingsBtn;
-	private static Button loader;
+	private static ResultList resultList;
+	private Button settingsBtn;
+	private Button loader;
 	private static Label statusFooterText;
 	private static CoursesTreeView courses;
-	private static Button signIn;
-	private static GridPane menu;
-	private static LoginFader loginFader2;
-	private static ImageView loaderIcon;
-	private static ImageView loaderGif;
-	private static boolean loaderRunning;
-	private static ParallelTransition tp;
-	private static Settings settings;
+	private Button signIn;
+	private GridPane actionBar;
+	private LoginFader loginFader2;
+	private ImageView loaderIcon;
+	private ImageView loaderGif;
+	private boolean loaderRunning;
+	private TextField searchField;
 
 	public static void main(String[] args) {
 		boolean newVersionCalled = new VersionValidator().validate();
 		if (newVersionCalled) {
 			System.exit(0);
 		}
-		settings = Settings.getInstance();
 
 		launch();
 	}
 
 	@Override
 	public void start(Stage stage) throws Exception {
+		dashboard = this;
 		stage.getIcons().add(new Image("img/folder.png"));
 		stage.addEventHandler(WindowEvent.WINDOW_CLOSE_REQUEST, new EventHandler<WindowEvent>() {
 			@Override
 			public void handle(WindowEvent event) {
-				settings.setLogIn(false);
-				settings.setUpdateCanceled(false);
+				Settings.getInstance().setLogIn(false);
+				Settings.getInstance().setUpdateCanceled(false);
 				System.exit(0);
 			};
 		});
@@ -94,8 +89,8 @@ public class Dashboard extends Application {
 		background = new BorderPane();
 		background.setPadding(new Insets(20, 50, 50, 50));
 
-		menu = new GridPane();
-		menu.setPadding(new Insets(0, 0, 30, 0));
+		actionBar = new GridPane();
+		actionBar.setPadding(new Insets(0, 0, 30, 0));
 
 		final GridPane login = new GridPane();
 		login.setId("loginBackground");
@@ -104,22 +99,22 @@ public class Dashboard extends Application {
 
 		Button goBack = new Button("X");
 		goBack.setId("loginButtonCancel");
-		loginFader2 = new LoginFader(-500, login, menu);
+		loginFader2 = new LoginFader(this, -500, login);
 		goBack.setOnAction(loginFader2);
 		TextField username = new TextField();
 		username.setId("userField");
 		username.setPromptText("Benutzererkennung");
-		username.setText(settings.getUsername());
+		username.setText(Settings.getInstance().getUsername());
 		PasswordField password = new PasswordField();
-		password.setText(settings.getPassword());
+		password.setText(Settings.getInstance().getPassword());
 		password.setId("userField");
 		password.setPromptText("Passwort");
 		RadioButton savePwd = new RadioButton("Speichern");
 		savePwd.setSelected(true);
 		Button loginBtn = new Button("Login");
-		loginFader = new LoginFader(-500, login, menu);
+		loginFader = new LoginFader(this, -500, login);
 		loginBtn.setId("loginButton");
-		loginFader.getT().setOnFinished(new LoginProvider(username, password, savePwd));
+		loginFader.getT().setOnFinished(new LoginProvider(this, username, password, savePwd));
 		loginBtn.setOnAction(loginFader);
 		username.setOnAction(loginFader);
 		password.setOnAction(loginFader);
@@ -133,22 +128,22 @@ public class Dashboard extends Application {
 		login.add(separator, 4, 0);
 		login.setOpacity(0);
 
-		updatePane = new GridPane();
-		updatePane.setHgap(10);
-		updatePane.setVgap(5);
+		actualisationTimePane = new GridPane();
+		actualisationTimePane.setHgap(10);
+		actualisationTimePane.setVgap(5);
 		lastUpdateTime = new Label(IliasTreeStorage.getActualisationDate());
 		lastUpdateTime.setId("lastUpdateTimeLbl");
-		updatePane.add(new Label(), 0, 0);
-		updatePane.add(new Label(), 0, 1);
-		updatePane.add(lastUpdateTime, 0, 2);
+		actualisationTimePane.add(new Label(), 0, 0);
+		actualisationTimePane.add(new Label(), 0, 1);
+		actualisationTimePane.add(lastUpdateTime, 0, 2);
 
 		stackPane = new StackPane();
-		stackPane.getChildren().add(updatePane);
+		stackPane.getChildren().add(actualisationTimePane);
 		stackPane.getChildren().add(login);
-		stackPane.getChildren().add(menu);
+		stackPane.getChildren().add(actionBar);
 
-		menu.prefWidthProperty().bind(background.widthProperty());
-		menu.setHgap(10);
+		actionBar.prefWidthProperty().bind(background.widthProperty());
+		actionBar.setHgap(10);
 
 		Button collapseTree = new Button();
 		collapseTree.setOnAction(new EventHandler<ActionEvent>() {
@@ -159,7 +154,7 @@ public class Dashboard extends Application {
 		});
 		collapseTree.setTooltip(new Tooltip("Alle Ordner schlieﬂen"));
 		collapseTree.setGraphic(new ImageView("img/collapse.png"));
-		collapseTree.prefWidthProperty().bind(menu.prefWidthProperty());
+		collapseTree.prefWidthProperty().bind(actionBar.prefWidthProperty());
 		loader = new Button();
 		final Tooltip tooltip = new Tooltip("Aktualisieren");
 		loader.setTooltip(tooltip);
@@ -170,15 +165,15 @@ public class Dashboard extends Application {
 			@Override
 			public void handle(ActionEvent event) {
 				if (loaderRunning) {
-					settings.setUpdateCanceled(true);
+					Settings.getInstance().setUpdateCanceled(true);
 					showLoader(false);
 				} else {
 					showLoader(true);
-					if (settings.userIsLoggedIn()) {
+					if (Settings.getInstance().userIsLoggedIn()) {
 						new Thread(new Runnable() {
 							@Override
 							public void run() {
-								new IliasStarter().loadIliasTree();
+								new IliasStarter(dashboard).loadIliasTree();
 							}
 						}).start();
 						LocalPdfStorage.getInstance().refresh();
@@ -187,11 +182,16 @@ public class Dashboard extends Application {
 			}
 		});
 		signIn = new Button("Anmelden");
-		signIn.setOnAction(new LoginFader(500, login, menu));
-		signIn.prefWidthProperty().bind(menu.prefWidthProperty());
+		signIn.setOnAction(new LoginFader(this, 500, login));
+		signIn.prefWidthProperty().bind(actionBar.prefWidthProperty());
 		Button showLocalNotThere = new Button("Lokal nicht vorhandene Dateien");
-		showLocalNotThere.prefWidthProperty().bind(menu.prefWidthProperty());
-		showLocalNotThere.setOnAction(new LocalDataMatcher());
+		showLocalNotThere.prefWidthProperty().bind(actionBar.prefWidthProperty());
+		showLocalNotThere.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				resultList.showUnsynchronizedPdfs();
+			}
+		});
 		Button showIgnored = new Button("Ignorierte Dateien");
 		showIgnored.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
@@ -199,10 +199,18 @@ public class Dashboard extends Application {
 				resultList.showIgnoredFiles();
 			}
 		});
-		showIgnored.prefWidthProperty().bind(menu.prefWidthProperty());
+		showIgnored.prefWidthProperty().bind(actionBar.prefWidthProperty());
 		showIgnored.setMaxWidth(Double.MAX_VALUE);
-		TextField searchField = new SearchTextField();
-		searchField.prefWidthProperty().bind(menu.prefWidthProperty());
+		searchField = new TextField();
+		searchField.setId("searchTextField");
+		searchField.setPromptText("Datei suchen");
+		searchField.setOnKeyReleased(new EventHandler<KeyEvent>() {
+			@Override
+			public void handle(KeyEvent event) {
+				resultList.showPdfMatches(searchField.getText());
+			};
+		});
+		searchField.prefWidthProperty().bind(actionBar.prefWidthProperty());
 		settingsBtn = new Button();
 		settingsBtn.setGraphic(new ImageView("img/settings.png"));
 		settingsBtn.setId("settingsBtn");
@@ -222,39 +230,27 @@ public class Dashboard extends Application {
 		col5.setPercentWidth(20);
 		ColumnConstraints col6 = new ColumnConstraints();
 		col6.setPercentWidth(5);
-		menu.getColumnConstraints().addAll(col1, col15, col2, col3, col4, col5, col6);
+		actionBar.getColumnConstraints().addAll(col1, col15, col2, col3, col4, col5, col6);
 
-		menu.add(collapseTree, 0, 0);
-		menu.add(loader, 1, 0);
-		menu.add(signIn, 2, 0);
-		menu.add(showLocalNotThere, 3, 0);
-		menu.add(showIgnored, 4, 0);
-		menu.add(searchField, 5, 0);
-		menu.add(settingsBtn, 6, 0);
+		actionBar.add(collapseTree, 0, 0);
+		actionBar.add(loader, 1, 0);
+		actionBar.add(signIn, 2, 0);
+		actionBar.add(showLocalNotThere, 3, 0);
+		actionBar.add(showIgnored, 4, 0);
+		actionBar.add(searchField, 5, 0);
+		actionBar.add(settingsBtn, 6, 0);
 
 		background.setTop(stackPane);
 
 		splitPane = new SplitPane();
 		splitPane.setId("splitPane");
 
-		courses = new CoursesTreeView();
-		resultList = new ResultList(courses);
+		courses = new CoursesTreeView(this);
+		resultList = new ResultList(this);
 
 		splitPane.setDividerPositions(0.6f, 0.4f);
 
-		help = new GridPane();
-		BorderPane listPane = new BorderPane();
-
-		help.setId("listHeader");
-		listPane.setCenter(resultList);
-
-		listHeader = new Label();
-		listHeader.setId("listHeaderText");
-		listHeader.setTextAlignment(TextAlignment.CENTER);
-		listPane.setTop(help);
-		help.add(listHeader, 0, 0);
-
-		splitPane.getItems().addAll(courses, listPane);
+		splitPane.getItems().addAll(courses, resultList.getPane());
 
 		background.setCenter(splitPane);
 
@@ -273,17 +269,18 @@ public class Dashboard extends Application {
 		iliasTreeReloaded(false);
 		stage.show();
 
-		if (settings.autoLogin()) {
+		if (Settings.getInstance().autoLogin()) {
 			signIn.setMouseTransparent(true);
-			Dashboard.setStatusText("", false);
-			Dashboard.showLoader(true);
-			Dashboard.setMenuTransparent(false);
+			setStatusText("", false);
+			showLoader(true);
+			setMenuTransparent(false);
 			new Thread(new Runnable() {
 				@Override
 				public void run() {
-					final IliasStarter iliasStarter = new IliasStarter(settings.getUsername(), settings.getPassword());
+					final IliasStarter iliasStarter = new IliasStarter(dashboard, Settings.getInstance().getUsername(), Settings
+							.getInstance().getPassword());
 					final boolean loginSuccessfull = iliasStarter.login();
-					if (loginSuccessfull && settings.autoUpdate()) {
+					if (loginSuccessfull && Settings.getInstance().autoUpdate()) {
 						Platform.runLater(new Runnable() {
 							@Override
 							public void run() {
@@ -312,6 +309,7 @@ public class Dashboard extends Application {
 
 	public static void iliasTreeReloaded(boolean showFinishText) {
 		courses.update();
+		resultList.refresh();
 		if (showFinishText) {
 			setStatusText("Aktualisierung beendet.", true);
 			updateUpdateTime();
@@ -323,7 +321,7 @@ public class Dashboard extends Application {
 		lastUpdateTime.setText(IliasTreeStorage.getActualisationDate());
 	}
 
-	public static void fadeInLogin() {
+	public void fadeInLogin() {
 		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {
@@ -332,23 +330,15 @@ public class Dashboard extends Application {
 		});
 	}
 
-	public static void clearResultList() {
-		resultList.clear();
+	public void setMenuTransparent(boolean b) {
+		actionBar.setMouseTransparent(b);
 	}
 
-	public static void addToResultList(final IliasPdf pdf) {
-		resultList.add(pdf);
-	}
-
-	public static void setMenuTransparent(boolean b) {
-		menu.setMouseTransparent(b);
-	}
-
-	public static void setSigInTransparent(boolean b) {
+	public void setSigInTransparent(boolean b) {
 		signIn.setMouseTransparent(b);
 	}
 
-	public static void showLoader(final boolean show) {
+	public void showLoader(final boolean show) {
 		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {
@@ -366,11 +356,11 @@ public class Dashboard extends Application {
 		});
 	}
 
-	public static void setSignInColor() {
+	public void setSignInColor() {
 		signIn.setStyle("-fx-background-color: linear-gradient(lime, limegreen)");
 	}
 
-	public static void setTitle(String title) {
+	public void setTitle(String title) {
 		stage.setTitle(title);
 	}
 
@@ -393,7 +383,7 @@ public class Dashboard extends Application {
 		t.play();
 	}
 
-	public static void setStatusText(final String text) {
+	public void setStatusText(final String text) {
 		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {
@@ -403,59 +393,20 @@ public class Dashboard extends Application {
 		});
 	}
 
-	public static IliasTreeNode getSelectedDirectory() {
-		if (courses.isFocused()) {
-			return courses.getSelectionModel().getSelectedItem().getValue();
-		}
-		return resultList.getSelectionModel().getSelectedItem();
-	}
-
-	public static void startDownloadAnimation() {
-		final Label downloadIcon = new Label();
-		final Label icon2 = new Label();
-		menu.add(downloadIcon, 6, 0);
-		menu.add(icon2, 6, 0);
-		downloadIcon.setGraphic(new ImageView("img/downloadArrow.png"));
-		icon2.setGraphic(new ImageView("img/downloadArrow.png"));
-
-		tp = new ParallelTransition();
-		final TranslateTransition t = new TranslateTransition(Duration.millis(2000), downloadIcon);
-		t.setInterpolator(new Interpolator() {
-			@Override
-			protected double curve(double x) {
-				return Math.sqrt(x);
-			}
-		});
-		t.setFromX(downloadIcon.getLayoutX() + 50);
-		t.setByY(stage.getHeight() - 80);
-		final TranslateTransition t2 = new TranslateTransition(Duration.millis(2000), icon2);
-		t2.setDelay(Duration.millis(100));
-		t2.setInterpolator(new Interpolator() {
-			@Override
-			protected double curve(double x) {
-				return Math.sqrt(x);
-			}
-		});
-		t2.setFromX(downloadIcon.getLayoutX() + 50);
-		t2.setByY(stage.getHeight() - 80);
-		tp.getChildren().addAll(t, t2);
-		tp.play();
-	}
-
 	public static void updateGraphicInTree(IliasPdf pdf) {
 		courses.pdfStatusChanged(pdf);
 	}
 
-	public static void showPdfIgnoredState(IliasPdf pdf) {
+	public void pdfIgnoredStateChanged(IliasPdf pdf) {
 		if (pdf.isIgnored()) {
-			Dashboard.setStatusText(pdf.getName() + " wurde auf ignorieren gesetzt.", false);
+			setStatusText(pdf.getName() + " wurde auf ignorieren gesetzt.", false);
 		} else {
-			Dashboard.setStatusText(pdf.getName() + " wird nicht mehr ignoriert.", false);
+			setStatusText(pdf.getName() + " wird nicht mehr ignoriert.", false);
 		}
-		Dashboard.updateGraphicInTree(pdf);
+		courses.pdfStatusChanged(pdf);
 	}
 
-	public static void browse(String url) {
+	public void browse(String url) {
 		webView = new WebView();
 		background.setCenter(webView);
 		final GridPane webControllerPane = new GridPane();
@@ -479,19 +430,19 @@ public class Dashboard extends Application {
 		engine.load(url);
 	}
 
-	public static void setListHeader(String text, String color) {
-		String textColor = "-fx-text-fill: #3d3d3d";
-		listHeader.setText(text);
-		if (color.equals("red")) {
-			color = "-fx-background-color: linear-gradient(red, darkred)";
-			textColor = "-fx-text-fill: white";
-		} else if (color.equals("green")) {
-			color = "-fx-background-color: linear-gradient(lime, limegreen)";
-			textColor = "-fx-text-fill: white";
-		} else {
-			color = "-fx-background-color: 	#c3c4c4,linear-gradient(#d6d6d6 50%, white 100%),radial-gradient(center 50% -40%, radius 200%, #e6e6e6 45%, rgba(230,230,230,0) 50%);";
-		}
-		help.setStyle(color);
-		listHeader.setStyle(textColor);
+	public ResultList getResultList() {
+		return resultList;
+	}
+
+	public CoursesTreeView getCoursesTreeView() {
+		return courses;
+	}
+
+	public GridPane getActionBar() {
+		return actionBar;
+	}
+
+	public String getSearchInput() {
+		return searchField.getText();
 	}
 }

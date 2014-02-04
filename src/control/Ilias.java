@@ -1,4 +1,4 @@
-package iliasControl;
+package control;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -199,7 +199,7 @@ public class Ilias {
 	}
 
 	public static DefaultHttpClient getClient() {
-		DefaultHttpClient clientCloned = ClientCloner.cloneClient(client);
+		DefaultHttpClient clientCloned = IliasClientCloner.cloneClient(client);
 		return clientCloned;
 	}
 }

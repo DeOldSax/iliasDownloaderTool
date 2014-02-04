@@ -1,4 +1,4 @@
-package iliasControl;
+package control;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,8 +20,10 @@ public class IliasScraper {
 	public AtomicInteger threadCount;
 	public AtomicInteger pdfCounter;
 	private List<IliasFolder> iliasTree;
+	private final Dashboard dashboard;
 
-	public IliasScraper() {
+	public IliasScraper(Dashboard dashboard) {
+		this.dashboard = dashboard;
 		threadCount = new AtomicInteger(0);
 		pdfCounter = new AtomicInteger(0);
 	}
@@ -43,7 +45,7 @@ public class IliasScraper {
 		return iliasTree;
 	}
 
-	public List<IliasFolder> getCourses(String dashboardHtml) {
+	private List<IliasFolder> getCourses(String dashboardHtml) {
 		List<IliasFolder> courses = new ArrayList<IliasFolder>();
 		String s = null;
 		Document doc = Jsoup.parse(dashboardHtml);
@@ -99,7 +101,7 @@ public class IliasScraper {
 						final int size = new IliasConnector().requestHead(dir.attr("abs:href"));
 						IliasPdf newPdfFile = createPDF(parent, dir, size);
 
-						Dashboard.setStatusText(pdfCounter.toString() + " Dateien wurden bereits überprüft.");
+						dashboard.setStatusText(pdfCounter.toString() + " Dateien wurden bereits überprüft.");
 
 						List<Element> elemse = dir.parent().parent().siblingElements().select("div").select("span");
 						for (Element el : elemse) {

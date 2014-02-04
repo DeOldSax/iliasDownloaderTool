@@ -5,6 +5,7 @@ import java.util.List;
 import javafx.application.Platform;
 import model.IliasTreeNode;
 import model.IliasPdf;
+import model.IliasTreeProvider;
 
 public class Downloader {
 	public void download(final IliasTreeNode directory) {

@@ -30,8 +30,10 @@ public class FileContextMenu {
 	private final MenuItem openFileItem;
 	private final MenuItem openForumItem;
 	private IliasTreeNode directory;
+	private final Dashboard dashboard;
 
-	public FileContextMenu() {
+	public FileContextMenu(final Dashboard dashboard) {
+		this.dashboard = dashboard;
 		// FIXME add param Dashboard
 		menu = new ContextMenu();
 		downloadItem = new MenuItem("Herunterladen");
@@ -52,8 +54,8 @@ public class FileContextMenu {
 			public void handle(ActionEvent event) {
 				final IliasPdf pdf = (IliasPdf) directory;
 				Settings.getInstance().togglePdfIgnored(pdf);
-				Dashboard.showPdfIgnoredState(pdf);
-				Dashboard.resultList.pdfIgnoredStateChanged(pdf);
+				dashboard.pdfIgnoredStateChanged(pdf);
+				dashboard.getResultList().pdfIgnoredStateChanged(pdf);
 			}
 		};
 
@@ -145,7 +147,7 @@ public class FileContextMenu {
 				e.printStackTrace();
 			}
 		} else {
-			Dashboard.browse(forum.getUrl());
+			dashboard.browse(forum.getUrl());
 		}
 	}
 

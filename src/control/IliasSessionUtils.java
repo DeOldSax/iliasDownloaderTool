@@ -1,4 +1,4 @@
-package iliasControl;
+package control;
 
 import java.io.IOException;
 import java.util.List;

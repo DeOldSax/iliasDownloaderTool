@@ -1,23 +1,25 @@
-package iliasControl;
+package control;
 
 import javafx.application.Platform;
+import model.IliasTreeProvider;
 import model.Settings;
 import studportControl.Studierendenportal;
 import view.Dashboard;
 import view.SettingsMenu;
-import control.IliasTreeProvider;
 
 public class IliasStarter {
 	private static String htmlContent;
 	private String username = null;
 	private String password = null;
 	private static Studierendenportal studierendenportal;
+	private final Dashboard dashboard;
 
-	public IliasStarter() {
-
+	public IliasStarter(Dashboard dashboard) {
+		this.dashboard = dashboard;
 	}
 
-	public IliasStarter(String username, String password) {
+	public IliasStarter(Dashboard dashboard, String username, String password) {
+		this.dashboard = dashboard;
 		this.username = username;
 		this.password = password;
 	}
@@ -25,23 +27,23 @@ public class IliasStarter {
 	public boolean login() {
 		final boolean usernameOrPasswordWrong = doLogin(username, password);
 		if (usernameOrPasswordWrong) {
-			Dashboard.showLoader(false);
-			Dashboard.setSigInTransparent(true);
-			Dashboard.fadeInLogin();
-			Dashboard.setStatusText("Falsches Passwort!", true);
+			dashboard.showLoader(false);
+			dashboard.setSigInTransparent(true);
+			dashboard.fadeInLogin();
+			dashboard.setStatusText("Falsches Passwort!", true);
 			return false;
 		}
-		Dashboard.setTitle("Ilias - Angemeldet als " + username);
-		Dashboard.setStatusText("Angemeldet als: " + username, false);
+		dashboard.setTitle("Ilias - Angemeldet als " + username);
+		dashboard.setStatusText("Angemeldet als: " + username, false);
 		studierendenportal = new Studierendenportal(username, password);
 		new Thread(studierendenportal).start();
 		Settings.getInstance().setLogIn(true);
-		Dashboard.showLoader(false);
-		Dashboard.setSignInColor();
+		dashboard.showLoader(false);
+		dashboard.setSignInColor();
 		if (!Settings.getInstance().autoUpdate()) {
-			Dashboard.setStatusText("Aktualisiere über den Button in der Menüleiste die Kurse auf deinem Schreibtisch!", false);
+			dashboard.setStatusText("Aktualisiere über den Button in der Menüleiste die Kurse auf deinem Schreibtisch!", false);
 		}
-		Dashboard.setSigInTransparent(true);
+		dashboard.setSigInTransparent(true);
 		return true;
 	}
 
@@ -52,7 +54,7 @@ public class IliasStarter {
 	}
 
 	public void loadIliasTree() {
-		final IliasScraper Scraper = new IliasScraper();
+		final IliasScraper Scraper = new IliasScraper(dashboard);
 		Scraper.run(htmlContent);
 		while (Scraper.threadCount.get() > 0) {
 			try {
@@ -74,8 +76,8 @@ public class IliasStarter {
 			Platform.runLater(new Runnable() {
 				@Override
 				public void run() {
-					Dashboard.iliasTreeReloaded(true);
-					Dashboard.showLoader(false);
+					dashboard.iliasTreeReloaded(true);
+					dashboard.showLoader(false);
 				}
 			});
 			return;
@@ -95,6 +97,6 @@ public class IliasStarter {
 				e.printStackTrace();
 			}
 		}
-		Dashboard.showLoader(false);
+		dashboard.showLoader(false);
 	}
 }

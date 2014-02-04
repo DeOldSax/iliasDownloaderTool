@@ -2,36 +2,59 @@ package view;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.text.TextAlignment;
 import model.IliasPdf;
 import model.IliasTreeNode;
+import model.IliasTreeProvider;
 import model.Settings;
 import control.Downloader;
-import control.IliasTreeProvider;
+import control.LocalPdfStorage;
 
 public class ResultList extends ListView<IliasTreeNode> {
+	private final Dashboard dashboard;
+	private final GridPane headerPane;
+	private final Label listHeader;
 	private final ObservableList<IliasTreeNode> items;
-	private final CoursesTreeView courses;
+	private final BorderPane listPane;
+	public ResultListMode listMode;
 	private ContextMenu menu;
-	public static int listMode = 0;
-	public static final int IGNORE_MODE = 1;
-	public static final int SEARCH_MODE = 2;
-	public static final int PDF_NOT_SYNCHRONIZED = 3;
 
-	public ResultList(CoursesTreeView courses) {
+	enum ResultListMode {
+		IGNORE_MODE, SEARCH_MODE, PDF_NOT_SYNCHRONIZED;
+	}
+
+	public ResultList(Dashboard dashboard) {
 		super();
+		this.dashboard = dashboard;
+		listHeader = new Label();
+		listHeader.setId("listHeaderText");
+		listHeader.setTextAlignment(TextAlignment.CENTER);
+
+		headerPane = new GridPane();
+		listPane = new BorderPane();
+
+		headerPane.setId("listHeader");
+		listPane.setCenter(this);
+
+		listPane.setTop(headerPane);
+		headerPane.add(listHeader, 0, 0);
+
 		menu = new ContextMenu();
-		this.courses = courses;
 		setId("listView");
 		items = FXCollections.observableArrayList();
 		setItems(items);
@@ -55,15 +78,15 @@ public class ResultList extends ListView<IliasTreeNode> {
 	}
 
 	private void handleKeyEvents(KeyEvent event) {
-		if (event.getCode() == KeyCode.DELETE && listMode == IGNORE_MODE) {
+		if (event.getCode() == KeyCode.DELETE && listMode.equals(ResultListMode.IGNORE_MODE)) {
 			final IliasPdf pdf = (IliasPdf) getSelectionModel().getSelectedItem();
 			Settings.getInstance().togglePdfIgnored(pdf);
-			Dashboard.showPdfIgnoredState(pdf);
+			dashboard.pdfIgnoredStateChanged(pdf);
 			pdfIgnoredStateChanged(pdf);
 			getSelectionModel().selectNext();
 		} else if (event.getCode() == KeyCode.UP || event.getCode() == KeyCode.DOWN) {
 			final IliasTreeNode selectedDirectory = ((ResultList) event.getSource()).getSelectionModel().getSelectedItem();
-			courses.selectPdf((IliasPdf) selectedDirectory);
+			dashboard.getCoursesTreeView().selectPdf((IliasPdf) selectedDirectory);
 		} else if (event.getCode() == KeyCode.ENTER && Settings.getInstance().userIsLoggedIn()) {
 			new Downloader().download((IliasTreeNode) event.getSource());
 		}
@@ -75,24 +98,16 @@ public class ResultList extends ListView<IliasTreeNode> {
 		if (selectedNode == null) {
 			return;
 		}
-		courses.selectPdf((IliasPdf) selectedNode);
+		dashboard.getCoursesTreeView().selectPdf((IliasPdf) selectedNode);
 		if (event.getButton() == MouseButton.SECONDARY) {
 			final IliasPdf pdf = (IliasPdf) selectedNode;
-			menu = new FileContextMenu().createMenu(pdf, event);
+			menu = new FileContextMenu(dashboard).createMenu(pdf, event);
 			menu.show(this, event.getScreenX(), event.getScreenY());
 		}
 	}
 
-	public void clear() {
-		items.clear();
-	}
-
-	public void add(IliasTreeNode dir) {
-		items.add(dir);
-	}
-
 	public void pdfIgnoredStateChanged(IliasPdf pdf) {
-		if (listMode != IGNORE_MODE) {
+		if (listMode != ResultListMode.IGNORE_MODE) {
 			return;
 		}
 		if (pdf.isIgnored()) {
@@ -104,8 +119,18 @@ public class ResultList extends ListView<IliasTreeNode> {
 		}
 	}
 
+	public void refresh() {
+		if (listMode == ResultListMode.IGNORE_MODE) {
+			showIgnoredFiles();
+		} else if (listMode == ResultListMode.PDF_NOT_SYNCHRONIZED) {
+			showUnsynchronizedPdfs();
+		} else if (listMode == ResultListMode.SEARCH_MODE) {
+			showPdfMatches(dashboard.getSearchInput());
+		}
+	}
+
 	public void showIgnoredFiles() {
-		listMode = IGNORE_MODE;
+		listMode = ResultListMode.IGNORE_MODE;
 		final List<IliasPdf> allPdfFiles = IliasTreeProvider.getAllPdfFiles();
 		ArrayList<IliasPdf> ignoredPdf = new ArrayList<IliasPdf>();
 		for (IliasPdf pdf : allPdfFiles) {
@@ -114,10 +139,122 @@ public class ResultList extends ListView<IliasTreeNode> {
 			}
 		}
 		items.clear();
-		Dashboard.setListHeader(" Ignorierte Dateien " + "(" + String.valueOf(ignoredPdf.size()) + ")", "red");
+		setListHeader(" Ignorierte Dateien " + "(" + String.valueOf(ignoredPdf.size()) + ")", "red");
 		for (IliasPdf pdf : ignoredPdf) {
 			items.add(pdf);
 		}
-		Dashboard.setStatusText(ignoredPdf.size() + " ignorierte Dateien in Ignorieren-Liste.", false);
+		dashboard.setStatusText(ignoredPdf.size() + " ignorierte Dateien in Ignorieren-Liste.", false);
+	}
+
+	public void showUnsynchronizedPdfs() {
+		listMode = ResultListMode.PDF_NOT_SYNCHRONIZED;
+		final List<IliasPdf> unsynchronizedPdfs = new ArrayList<IliasPdf>();
+		final List<IliasPdf> allPdfFiles = IliasTreeProvider.getAllPdfFiles();
+
+		final Set<Integer> allLocalPdfSizes = LocalPdfStorage.getInstance().getAllLocalPDFSizes();
+		for (IliasPdf pdf : allPdfFiles) {
+			if (pdf.isIgnored()) {
+				continue;
+			}
+			if (!allLocalPdfSizes.contains(pdf.getSize())) {
+				unsynchronizedPdfs.add(pdf);
+			}
+		}
+		dashboard.setStatusText("Gesamt: " + allPdfFiles.size() + ", davon sind " + unsynchronizedPdfs.size()
+				+ " noch nicht im Ilias Ordner.", false);
+		setListHeader(" Lokal nicht vorhandene Dateien " + "(" + String.valueOf(unsynchronizedPdfs.size()) + ")", "");
+		items.clear();
+
+		for (IliasPdf pdf : unsynchronizedPdfs) {
+			items.add(pdf);
+		}
+	}
+
+	public void showPdfMatches(String inputString) {
+		listMode = ResultListMode.SEARCH_MODE;
+		items.clear();
+
+		if (inputString.length() == 0 || inputString.equals(" ")) {
+			setListHeader(" Gefundene Dateien " + "(" + String.valueOf(0) + ")", "green");
+			return;
+		}
+
+		final List<IliasPdf> allPdfFiles = IliasTreeProvider.getAllPdfFiles();
+
+		if (allPdfFiles.isEmpty()) {
+			dashboard.setStatusText("Keine passende Datei gefunden.", false);
+			return;
+		}
+		dashboard.setStatusText("");
+
+		List<IliasPdf> alreadyAddedPDF = new ArrayList<IliasPdf>();
+
+		for (IliasPdf pdf : allPdfFiles) {
+			if (pdf.isIgnored()) {
+				continue;
+			}
+			final String[] splitedStrings = pdf.getName().split(" ");
+			for (int i = 0; i < splitedStrings.length; i++) {
+				splitedStrings[i] = (splitedStrings[i] + " ").toLowerCase();
+			}
+			for (int i = 0; i < splitedStrings.length; i++) {
+				if (splitedStrings[i].startsWith(inputString.toLowerCase()) && !alreadyAddedPDF.contains(pdf)) {
+					alreadyAddedPDF.add(pdf);
+					continue;
+				}
+				if (inputString.contains(" ") && pdf.getName().toLowerCase().contains(inputString.toLowerCase())
+						&& !alreadyAddedPDF.contains(pdf)) {
+					alreadyAddedPDF.add(pdf);
+					continue;
+				}
+				if (splitedStrings[i].toLowerCase().contains(inputString.toLowerCase()) && !alreadyAddedPDF.contains(pdf)) {
+					alreadyAddedPDF.add(pdf);
+					continue;
+				}
+				if (pdf.getParentFolder() != null) {
+					if (inputString.length() > 3 && pdf.getParentFolder().getName().toLowerCase().contains(inputString.toLowerCase())
+							&& !alreadyAddedPDF.contains(pdf)) {
+						alreadyAddedPDF.add(pdf);
+					}
+					continue;
+				}
+				if (pdf.getParentFolder().getParentFolder() != null) {
+					if (inputString.length() > 3
+							&& pdf.getParentFolder().getParentFolder().getName().toLowerCase().contains(inputString.toLowerCase())
+							&& !alreadyAddedPDF.contains(pdf)) {
+						alreadyAddedPDF.add(pdf);
+					}
+					continue;
+				}
+			}
+		}
+		setListHeader(" Gefundene Dateien " + "(" + String.valueOf(alreadyAddedPDF.size()) + ")", "green");
+		if (alreadyAddedPDF.isEmpty()) {
+			dashboard.setStatusText("Keine Datei gefunden.");
+		} else {
+			for (IliasPdf pdf : alreadyAddedPDF) {
+				items.add(pdf);
+			}
+		}
+	}
+
+	private void setListHeader(String text, String color) {
+		String textColor = "-fx-text-fill: #3d3d3d";
+		listHeader.setText(text);
+		if (color.equals("red")) {
+			color = "-fx-background-color: linear-gradient(red, darkred)";
+			textColor = "-fx-text-fill: white";
+		} else if (color.equals("green")) {
+			color = "-fx-background-color: linear-gradient(lime, limegreen)";
+			textColor = "-fx-text-fill: white";
+		} else {
+			color = "-fx-background-color: 	#c3c4c4,linear-gradient(#d6d6d6 50%, white 100%),radial-gradient(center 50% -40%, radius 200%, #e6e6e6 45%, rgba(230,230,230,0) 50%);";
+		}
+		headerPane.setStyle(color);
+		listHeader.setStyle(textColor);
+	}
+
+	public BorderPane getPane() {
+		return listPane;
 	}
 }

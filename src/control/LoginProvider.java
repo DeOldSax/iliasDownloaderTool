@@ -1,6 +1,5 @@
 package control;
 
-import iliasControl.IliasStarter;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.PasswordField;
@@ -15,8 +14,10 @@ public class LoginProvider implements EventHandler<ActionEvent> {
 	private final PasswordField passwordField;
 	private final RadioButton savePwd;
 	private final Settings settings;
+	private final Dashboard dashboard;
 
-	public LoginProvider(TextField usernameField, PasswordField passwordField, RadioButton savePwd) {
+	public LoginProvider(Dashboard dashboard, TextField usernameField, PasswordField passwordField, RadioButton savePwd) {
+		this.dashboard = dashboard;
 		this.usernameField = usernameField;
 		this.passwordField = passwordField;
 		this.savePwd = savePwd;
@@ -25,27 +26,27 @@ public class LoginProvider implements EventHandler<ActionEvent> {
 
 	@Override
 	public void handle(ActionEvent event) {
-		Dashboard.setStatusText("", false);
-		Dashboard.showLoader(true);
-		Dashboard.setMenuTransparent(false);
-		Dashboard.setSigInTransparent(true);
+		dashboard.setStatusText("", false);
+		dashboard.showLoader(true);
+		dashboard.setMenuTransparent(false);
+		dashboard.setSigInTransparent(true);
 		final String username = usernameField.getText();
 		final boolean validUsername = username.length() != 5 || !username.startsWith("u");
 		if (validUsername) {
 			Dashboard.setStatusText("Ungültiger Benutzername", true);
 			usernameField.requestFocus();
 			usernameField.selectAll();
-			Dashboard.fadeInLogin();
-			Dashboard.showLoader(false);
+			dashboard.fadeInLogin();
+			dashboard.showLoader(false);
 			return;
 		} else {
 			final String password = passwordField.getText();
 			if (password.length() < 1) {
-				Dashboard.setStatusText("Ungültiges Passwort", true);
+				dashboard.setStatusText("Ungültiges Passwort", true);
 				passwordField.requestFocus();
 				passwordField.selectAll();
-				Dashboard.fadeInLogin();
-				Dashboard.showLoader(false);
+				dashboard.fadeInLogin();
+				dashboard.showLoader(false);
 				return;
 			}
 			if (savePwd.isSelected()) {
@@ -59,7 +60,7 @@ public class LoginProvider implements EventHandler<ActionEvent> {
 			new Thread(new Runnable() {
 				@Override
 				public void run() {
-					new IliasStarter(username, password).login();
+					new IliasStarter(dashboard, username, password).login();
 				}
 			}).start();
 		}
