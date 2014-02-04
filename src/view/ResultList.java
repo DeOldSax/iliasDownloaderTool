@@ -137,6 +137,8 @@ public class ResultList extends ListView<IliasTreeNode> {
 		} else if (listMode == ResultListMode.SEARCH_MODE) {
 			showPdfMatches(dashboard.getSearchFieldInput());
 		}
+		dashboard.setNumberofIngoredPdfs(getIgnoredIliasPdfs().size());
+		dashboard.setNumberOfUnsynchronizedPdfs(getUnsynchronizedPdfs().size());
 	}
 
 	public void showIgnoredFiles() {
