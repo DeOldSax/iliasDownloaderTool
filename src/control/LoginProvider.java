@@ -33,7 +33,7 @@ public class LoginProvider implements EventHandler<ActionEvent> {
 		final String username = usernameField.getText();
 		final boolean validUsername = username.length() != 5 || !username.startsWith("u");
 		if (validUsername) {
-			Dashboard.setStatusText("Ungültiger Benutzername", true);
+			dashboard.setStatusText("Ungültiger Benutzername", true);
 			usernameField.requestFocus();
 			usernameField.selectAll();
 			dashboard.fadeInLogin();

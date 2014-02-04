@@ -26,11 +26,15 @@ import model.Settings;
 public class SettingsMenu implements EventHandler<ActionEvent> {
 	private static Button localIliasPath;
 	private final GridPane gridPane;
+	private Button autoUpdate;
+	private Button autoLogin;
 	private static Scene scene;
 	private static boolean promptUpdater;
 	private static FadeTransition t;
+	private static Dashboard dashboard;
 
-	public SettingsMenu() {
+	public SettingsMenu(Dashboard dashboard) {
+		SettingsMenu.dashboard = dashboard;
 		gridPane = new GridPane();
 		gridPane.setPadding(new Insets(50, 50, 50, 50));
 		gridPane.setHgap(20);
@@ -47,20 +51,20 @@ public class SettingsMenu implements EventHandler<ActionEvent> {
 
 	public static void show() {
 		changeLocalIliasFolderButton();
-		Dashboard.setScene(scene, 900);
+		dashboard.setScene(scene, 900);
 	}
 
 	private void initDialog() {
 
-		final Button goBackToDashboard = new Button("zurück");
-		goBackToDashboard.setId("goBackButton");
-		goBackToDashboard.setOnAction(new EventHandler<ActionEvent>() {
+		final Button goBackTodashboard = new Button("zurück");
+		goBackTodashboard.setId("goBackButton");
+		goBackTodashboard.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				Dashboard.setScene();
+				dashboard.setScene();
 			}
 		});
-		gridPane.add(goBackToDashboard, 0, 0);
+		gridPane.add(goBackTodashboard, 0, 0);
 
 		Label selectIliasLocalBtn = new Label("Mein Lokaler Ilias Ordner:            ");
 		gridPane.add(selectIliasLocalBtn, 0, 2);
@@ -89,18 +93,26 @@ public class SettingsMenu implements EventHandler<ActionEvent> {
 		gridPane.add(boxX, 1, 2);
 
 		Label startActions = new Label("Bei jedem Start ausführen:          ");
-		final Button doLogin = new Button("Anmelden");
-		doLogin.setOnAction(new Selector());
-		Button doUpdate = new Button("Aktualisieren");
-		doUpdate.setOnAction(new Selector());
+		autoLogin = new Button("Anmelden");
+		final EventHandler<ActionEvent> toggleButton = new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				toggleButtonColor(event);
+			}
+		};
+		autoLogin.setOnAction(toggleButton);
+		autoLogin.setId("autoBtn");
+		autoUpdate = new Button("Aktualisieren");
+		autoUpdate.setId("autoBtn");
+		autoUpdate.setOnAction(toggleButton);
 		HBox box = new HBox();
 		box.setSpacing(20);
-		box.getChildren().addAll(doLogin, doUpdate);
+		box.getChildren().addAll(autoLogin, autoUpdate);
 		if (Settings.getInstance().autoLogin()) {
-			doLogin.setStyle("-fx-background-color: linear-gradient(steelblue,royalblue)");
+			autoLogin.setStyle("-fx-background-color: linear-gradient(steelblue,royalblue)");
 		}
 		if (Settings.getInstance().autoUpdate()) {
-			doUpdate.setStyle("-fx-background-color: linear-gradient(steelblue,royalblue)");
+			autoUpdate.setStyle("-fx-background-color: linear-gradient(steelblue,royalblue)");
 		}
 
 		gridPane.add(startActions, 0, 4);
@@ -157,7 +169,7 @@ public class SettingsMenu implements EventHandler<ActionEvent> {
 
 	private static void updateLocalIliasFolderPath() {
 		if (promptUpdater) {
-			Dashboard.iliasTreeReloaded(true);
+			dashboard.iliasTreeReloaded(true);
 			promptUpdater = false;
 		}
 	}
@@ -206,5 +218,30 @@ public class SettingsMenu implements EventHandler<ActionEvent> {
 			t.setAutoReverse(true);
 		}
 		return t;
+	}
+
+	private void toggleButtonColor(ActionEvent event) {
+		Settings settings = Settings.getInstance();
+		Button button = (Button) event.getSource();
+		if (button.equals(autoLogin)) {
+			if (settings.autoLogin()) {
+				settings.setAutoLogin(false);
+				button.setStyle("-fx-background-color: 	#3d3d3d;");
+			} else {
+				settings.setAutoLogin(true);
+				button.setStyle("-fx-background-color: 	linear-gradient(steelblue,royalblue)");
+			}
+			return;
+		}
+		if (button.equals(autoUpdate)) {
+			if (settings.autoUpdate()) {
+				settings.setAutoUpdate(false);
+				button.setStyle("-fx-background-color: 	#3d3d3d;");
+			} else {
+				settings.setAutoUpdate(true);
+				button.setStyle("-fx-background-color: 	linear-gradient(steelblue,royalblue)");
+			}
+			return;
+		}
 	}
 }

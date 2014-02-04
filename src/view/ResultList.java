@@ -41,6 +41,7 @@ public class ResultList extends ListView<IliasTreeNode> {
 	public ResultList(Dashboard dashboard) {
 		super();
 		this.dashboard = dashboard;
+		setMinWidth(260);
 		listHeader = new Label();
 		listHeader.setId("listHeaderText");
 		listHeader.setTextAlignment(TextAlignment.CENTER);
@@ -88,7 +89,7 @@ public class ResultList extends ListView<IliasTreeNode> {
 			final IliasTreeNode selectedDirectory = ((ResultList) event.getSource()).getSelectionModel().getSelectedItem();
 			dashboard.getCoursesTreeView().selectPdf((IliasPdf) selectedDirectory);
 		} else if (event.getCode() == KeyCode.ENTER && Settings.getInstance().userIsLoggedIn()) {
-			new Downloader().download((IliasTreeNode) event.getSource());
+			new Downloader().download(getSelectionModel().getSelectedItem());
 		}
 	}
 
@@ -107,6 +108,8 @@ public class ResultList extends ListView<IliasTreeNode> {
 	}
 
 	public void pdfIgnoredStateChanged(IliasPdf pdf) {
+		dashboard.setNumberofIngoredPdfs(getIgnoredIliasPdfs().size());
+		dashboard.setNumberOfUnsynchronizedPdfs(getUnsynchronizedPdfs().size());
 		if (listMode != ResultListMode.IGNORE_MODE) {
 			return;
 		}
@@ -119,18 +122,36 @@ public class ResultList extends ListView<IliasTreeNode> {
 		}
 	}
 
+	public void pdfSynchronizedStateChanged(IliasPdf pdf) {
+		if (listMode != ResultListMode.PDF_NOT_SYNCHRONIZED) {
+			return;
+		}
+		showUnsynchronizedPdfs();
+	}
+
 	public void refresh() {
 		if (listMode == ResultListMode.IGNORE_MODE) {
 			showIgnoredFiles();
 		} else if (listMode == ResultListMode.PDF_NOT_SYNCHRONIZED) {
 			showUnsynchronizedPdfs();
 		} else if (listMode == ResultListMode.SEARCH_MODE) {
-			showPdfMatches(dashboard.getSearchInput());
+			showPdfMatches(dashboard.getSearchFieldInput());
 		}
 	}
 
 	public void showIgnoredFiles() {
 		listMode = ResultListMode.IGNORE_MODE;
+		items.clear();
+		ArrayList<IliasPdf> ignoredPdf = getIgnoredIliasPdfs();
+		setListHeader(" Ignorierte Dateien", "red");
+		for (IliasPdf pdf : ignoredPdf) {
+			items.add(pdf);
+		}
+		dashboard.setStatusText(ignoredPdf.size() + " ignorierte Dateien in Ignorieren-Liste.", false);
+		dashboard.setNumberofIngoredPdfs(ignoredPdf.size());
+	}
+
+	public ArrayList<IliasPdf> getIgnoredIliasPdfs() {
 		final List<IliasPdf> allPdfFiles = IliasTreeProvider.getAllPdfFiles();
 		ArrayList<IliasPdf> ignoredPdf = new ArrayList<IliasPdf>();
 		for (IliasPdf pdf : allPdfFiles) {
@@ -138,18 +159,13 @@ public class ResultList extends ListView<IliasTreeNode> {
 				ignoredPdf.add(pdf);
 			}
 		}
-		items.clear();
-		setListHeader(" Ignorierte Dateien " + "(" + String.valueOf(ignoredPdf.size()) + ")", "red");
-		for (IliasPdf pdf : ignoredPdf) {
-			items.add(pdf);
-		}
-		dashboard.setStatusText(ignoredPdf.size() + " ignorierte Dateien in Ignorieren-Liste.", false);
+		return ignoredPdf;
 	}
 
-	public void showUnsynchronizedPdfs() {
+	protected void showUnsynchronizedPdfs() {
 		listMode = ResultListMode.PDF_NOT_SYNCHRONIZED;
-		final List<IliasPdf> unsynchronizedPdfs = new ArrayList<IliasPdf>();
 		final List<IliasPdf> allPdfFiles = IliasTreeProvider.getAllPdfFiles();
+		final List<IliasPdf> unsynchronizedPdfs = new ArrayList<IliasPdf>();
 
 		final Set<Integer> allLocalPdfSizes = LocalPdfStorage.getInstance().getAllLocalPDFSizes();
 		for (IliasPdf pdf : allPdfFiles) {
@@ -162,12 +178,29 @@ public class ResultList extends ListView<IliasTreeNode> {
 		}
 		dashboard.setStatusText("Gesamt: " + allPdfFiles.size() + ", davon sind " + unsynchronizedPdfs.size()
 				+ " noch nicht im Ilias Ordner.", false);
-		setListHeader(" Lokal nicht vorhandene Dateien " + "(" + String.valueOf(unsynchronizedPdfs.size()) + ")", "");
+		setListHeader(" Lokal nicht vorhandene Dateien ", "");
+		dashboard.setNumberOfUnsynchronizedPdfs(unsynchronizedPdfs.size());
 		items.clear();
 
 		for (IliasPdf pdf : unsynchronizedPdfs) {
 			items.add(pdf);
 		}
+	}
+
+	protected List<IliasPdf> getUnsynchronizedPdfs() {
+		final List<IliasPdf> allPdfFiles = IliasTreeProvider.getAllPdfFiles();
+		final List<IliasPdf> unsynchronizedPdfs = new ArrayList<IliasPdf>();
+
+		final Set<Integer> allLocalPdfSizes = LocalPdfStorage.getInstance().getAllLocalPDFSizes();
+		for (IliasPdf pdf : allPdfFiles) {
+			if (pdf.isIgnored()) {
+				continue;
+			}
+			if (!allLocalPdfSizes.contains(pdf.getSize())) {
+				unsynchronizedPdfs.add(pdf);
+			}
+		}
+		return unsynchronizedPdfs;
 	}
 
 	public void showPdfMatches(String inputString) {
@@ -254,7 +287,7 @@ public class ResultList extends ListView<IliasTreeNode> {
 		listHeader.setStyle(textColor);
 	}
 
-	public BorderPane getPane() {
+	protected BorderPane getPane() {
 		return listPane;
 	}
 }

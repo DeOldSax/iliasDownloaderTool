@@ -61,6 +61,8 @@ public class Dashboard extends Application {
 	private ImageView loaderGif;
 	private boolean loaderRunning;
 	private TextField searchField;
+	private Button showLocalNotThere;
+	private Button showIgnored;
 
 	public static void main(String[] args) {
 		boolean newVersionCalled = new VersionValidator().validate();
@@ -87,7 +89,7 @@ public class Dashboard extends Application {
 		loaderGif = new ImageView("img/loader.gif");
 		Dashboard.stage = stage;
 		background = new BorderPane();
-		background.setPadding(new Insets(20, 50, 50, 50));
+		background.setPadding(new Insets(20, 50, 20, 50));
 
 		actionBar = new GridPane();
 		actionBar.setPadding(new Insets(0, 0, 30, 0));
@@ -127,6 +129,9 @@ public class Dashboard extends Application {
 		login.add(savePwd, 1, 1);
 		login.add(separator, 4, 0);
 		login.setOpacity(0);
+
+		courses = new CoursesTreeView(this);
+		resultList = new ResultList(this);
 
 		actualisationTimePane = new GridPane();
 		actualisationTimePane.setHgap(10);
@@ -184,7 +189,7 @@ public class Dashboard extends Application {
 		signIn = new Button("Anmelden");
 		signIn.setOnAction(new LoginFader(this, 500, login));
 		signIn.prefWidthProperty().bind(actionBar.prefWidthProperty());
-		Button showLocalNotThere = new Button("Lokal nicht vorhandene Dateien");
+		showLocalNotThere = new Button("Lokal nicht vorhandene Dateien " + "(" + resultList.getUnsynchronizedPdfs().size() + ")");
 		showLocalNotThere.prefWidthProperty().bind(actionBar.prefWidthProperty());
 		showLocalNotThere.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
@@ -192,7 +197,7 @@ public class Dashboard extends Application {
 				resultList.showUnsynchronizedPdfs();
 			}
 		});
-		Button showIgnored = new Button("Ignorierte Dateien");
+		showIgnored = new Button("Ignorierte Dateien " + "(" + resultList.getIgnoredIliasPdfs().size() + ")");
 		showIgnored.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
@@ -214,7 +219,7 @@ public class Dashboard extends Application {
 		settingsBtn = new Button();
 		settingsBtn.setGraphic(new ImageView("img/settings.png"));
 		settingsBtn.setId("settingsBtn");
-		settingsBtn.setOnAction(new SettingsMenu());
+		settingsBtn.setOnAction(new SettingsMenu(dashboard));
 
 		ColumnConstraints col1 = new ColumnConstraints();
 		col1.setPercentWidth(5);
@@ -244,9 +249,6 @@ public class Dashboard extends Application {
 
 		splitPane = new SplitPane();
 		splitPane.setId("splitPane");
-
-		courses = new CoursesTreeView(this);
-		resultList = new ResultList(this);
 
 		splitPane.setDividerPositions(0.6f, 0.4f);
 
@@ -295,19 +297,20 @@ public class Dashboard extends Application {
 		}
 	}
 
-	public static void setScene(Scene scene, double minWidth) {
+	public void setScene(Scene scene, double minWidth) {
 		stage.setMinWidth(minWidth);
 		stage.sizeToScene();
 		stage.setScene(scene);
 	}
 
 	public static void setScene() {
-		stage.setMinWidth(950);
+		stage.setMinWidth(1100);
+		stage.setMinHeight(500);
 		stage.setScene(scene);
 		stage.sizeToScene();
 	}
 
-	public static void iliasTreeReloaded(boolean showFinishText) {
+	public void iliasTreeReloaded(boolean showFinishText) {
 		courses.update();
 		resultList.refresh();
 		if (showFinishText) {
@@ -442,7 +445,21 @@ public class Dashboard extends Application {
 		return actionBar;
 	}
 
-	public String getSearchInput() {
+	public String getSearchFieldInput() {
 		return searchField.getText();
+	}
+
+	public void setNumberOfUnsynchronizedPdfs(int number) {
+		showLocalNotThere.setText("Lokal nicht vorhandene Dateien " + "(" + String.valueOf(number) + ")");
+	}
+
+	public void setNumberofIngoredPdfs(int number) {
+		showIgnored.setText("Ignorierte Dateien " + "(" + String.valueOf(number) + ")");
+	}
+
+	public static void fileDownloaded(IliasPdf pdf) {
+		setStatusText("Download abgeschlossen", false);
+		updateGraphicInTree(pdf);
+		resultList.pdfSynchronizedStateChanged(pdf);
 	}
 }

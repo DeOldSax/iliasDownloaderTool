@@ -68,7 +68,7 @@ public class IliasStarter {
 			Settings.getInstance().setUpdateCanceled(false);
 		} else {
 			Settings.getInstance().setUpdateCanceled(false);
-			Dashboard.setStatusText("Aktualisierung abgebrochen.", false);
+			dashboard.setStatusText("Aktualisierung abgebrochen.", false);
 			return;
 		}
 

@@ -49,8 +49,6 @@
     -fx-font-weight: 		bold;
 }
 
-
-
 .button {
 	-fx-background-color: 	#3d3d3d;
 	-fx-background-radius:	20;
@@ -70,4 +68,17 @@
 	-fx-background-color: 	linear-gradient(royalblue,steelblue); 
 	-fx-text-fill:			white; 
 	-fx-effect: 			innershadow( three-pass-box , #1d1d1d, 7, 0.0 , 0 , 2 );
+}
+
+#autoBtn {
+	-fx-background-color: 	#3d3d3d;
+	-fx-background-radius:	20;
+	-fx-text-fill: 			linear-gradient(white, whitesmoke); 
+    -fx-font-size: 			14;
+    -fx-font-weight: 		bold;
+    -fx-effect: 			innershadow( three-pass-box , rgba(0,0,0,0.6) , 4, 0.0 , 0 , 1 );
+}
+#autoBtn:hover {
+	-fx-background-color: 	linear-gradient(royalblue,steelblue); 
+	-fx-effect: 			dropshadow( three-pass-box , rgba(0,0,0,0.7) , 6, 0.0 , 0 , 2 );
 }

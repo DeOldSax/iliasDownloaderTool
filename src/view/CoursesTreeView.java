@@ -32,6 +32,7 @@ public class CoursesTreeView extends TreeView<IliasTreeNode> {
 
 	public CoursesTreeView(Dashboard dashboard) {
 		super();
+		setMinWidth(270);
 		this.dashboard = dashboard;
 		rootItem = new TreeItem<IliasTreeNode>(new IliasFolder("Übersicht", null, null));
 		rootItem.setExpanded(true);

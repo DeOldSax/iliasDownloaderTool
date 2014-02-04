@@ -87,7 +87,6 @@ public class FileDownloader implements Runnable {
 			e.printStackTrace();
 		}
 		LocalPdfStorage.getInstance().addPdf(pdf, targetPath);
-		Dashboard.setStatusText("Download abgeschlossen", false);
-		Dashboard.updateGraphicInTree(pdf);
+		Dashboard.fileDownloaded(pdf);
 	}
 }
