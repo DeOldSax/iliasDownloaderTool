@@ -56,7 +56,7 @@ public class SettingsMenu implements EventHandler<ActionEvent> {
 
 	private void initDialog() {
 
-		final Button goBackTodashboard = new Button("zurück");
+		final Button goBackTodashboard = new Button("zurÃ¼ck");
 		goBackTodashboard.setId("goBackButton");
 		goBackTodashboard.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
@@ -92,7 +92,7 @@ public class SettingsMenu implements EventHandler<ActionEvent> {
 
 		gridPane.add(boxX, 1, 2);
 
-		Label startActions = new Label("Bei jedem Start ausführen:          ");
+		Label startActions = new Label("Bei jedem Start ausfÃ¼hren:          ");
 		autoLogin = new Button("Anmelden");
 		final EventHandler<ActionEvent> toggleButton = new EventHandler<ActionEvent>() {
 			@Override
@@ -161,7 +161,7 @@ public class SettingsMenu implements EventHandler<ActionEvent> {
 		} else if (!localIliasFolderPath.equals(".")) {
 			localIliasPath.setText(localIliasFolderPath);
 		} else {
-			localIliasPath.setText("Ilias Ordner auswählen");
+			localIliasPath.setText("Ilias Ordner auswÃ¤hlen");
 			Settings.getInstance().setLocalIliasPathStored(false);
 		}
 		changeLocalIliasFolderButton();
@@ -202,7 +202,7 @@ public class SettingsMenu implements EventHandler<ActionEvent> {
 			localIliasPath.setOpacity(1);
 		} else {
 			if (Settings.getInstance().loadLocalIliasFolderPath().equals(".")) {
-				localIliasPath.setText("Ilias Ordner auswählen");
+				localIliasPath.setText("Ilias Ordner auswÃ¤hlen");
 			}
 			localIliasPath.setStyle("-fx-background-color: linear-gradient(red, darkred)");
 			getBlinkyTransition().play();

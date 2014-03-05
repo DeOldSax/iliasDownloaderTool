@@ -123,6 +123,8 @@ public class ResultList extends ListView<IliasTreeNode> {
 	}
 
 	public void pdfSynchronizedStateChanged(IliasPdf pdf) {
+		dashboard.setNumberofIngoredPdfs(getIgnoredIliasPdfs().size());
+		dashboard.setNumberOfUnsynchronizedPdfs(getUnsynchronizedPdfs().size());
 		if (listMode != ResultListMode.PDF_NOT_SYNCHRONIZED) {
 			return;
 		}

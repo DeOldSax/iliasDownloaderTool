@@ -8,7 +8,7 @@ import view.Dashboard;
 import view.SettingsMenu;
 
 public class IliasStarter {
-	private static String htmlContent;
+	private static String loginStatusMessage;
 	private String username = null;
 	private String password = null;
 	private static Studierendenportal studierendenportal;
@@ -25,12 +25,19 @@ public class IliasStarter {
 	}
 
 	public boolean login() {
-		final boolean usernameOrPasswordWrong = doLogin(username, password);
-		if (usernameOrPasswordWrong) {
+		Ilias ilias = new Ilias();
+		loginStatusMessage = ilias.login(username, password);
+		if (loginStatusMessage.equals("0")) {
 			dashboard.showLoader(false);
 			dashboard.setSigInTransparent(true);
 			dashboard.fadeInLogin();
 			dashboard.setStatusText("Falsches Passwort!", true);
+			return false;
+		}
+		if (loginStatusMessage.equals("1")) {
+			System.out.println("connection failed");
+			dashboard.setStatusText("Verbindung fehlgeschlagen!", true);
+			dashboard.showLoader(false);
 			return false;
 		}
 		dashboard.setTitle("Ilias - Angemeldet als " + username);
@@ -41,7 +48,7 @@ public class IliasStarter {
 		dashboard.showLoader(false);
 		dashboard.setSignInColor();
 		if (!Settings.getInstance().autoUpdate()) {
-			dashboard.setStatusText("Aktualisiere über den Button in der Menüleiste die Kurse auf deinem Schreibtisch!", false);
+			dashboard.setStatusText("Aktualisiere Ã¼ber den Button in der MenÃ¼leiste die Kurse auf deinem Schreibtisch!", false);
 		}
 		dashboard.setSigInTransparent(true);
 		return true;
@@ -49,13 +56,13 @@ public class IliasStarter {
 
 	private boolean doLogin(String username, String password) {
 		Ilias ilias = new Ilias();
-		htmlContent = ilias.login(username, password);
-		return htmlContent.equals("0");
+		loginStatusMessage = ilias.login(username, password);
+		return loginStatusMessage.equals("0");
 	}
 
 	public void loadIliasTree() {
 		final IliasScraper Scraper = new IliasScraper(dashboard);
-		Scraper.run(htmlContent);
+		Scraper.run(loginStatusMessage);
 		while (Scraper.threadCount.get() > 0) {
 			try {
 				Thread.sleep(100);

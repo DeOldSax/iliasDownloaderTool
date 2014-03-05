@@ -69,21 +69,21 @@ public class FileContextMenu {
 				print();
 			}
 		});
-		openParentFolderItem = new MenuItem("In Ordner öffnen");
+		openParentFolderItem = new MenuItem("In Ordner Ã¶ffnen");
 		openParentFolderItem.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
 				openLocalFolder();
 			}
 		});
-		openFileItem = new MenuItem("Datei öffnen");
+		openFileItem = new MenuItem("Datei Ã¶ffnen");
 		openFileItem.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
 				openFile();
 			}
 		});
-		openForumItem = new MenuItem("Im Browser öffnen");
+		openForumItem = new MenuItem("Im Browser Ã¶ffnen");
 		openForumItem.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {

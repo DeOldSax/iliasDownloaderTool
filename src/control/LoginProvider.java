@@ -33,7 +33,7 @@ public class LoginProvider implements EventHandler<ActionEvent> {
 		final String username = usernameField.getText();
 		final boolean validUsername = username.length() != 5 || !username.startsWith("u");
 		if (validUsername) {
-			dashboard.setStatusText("Ungültiger Benutzername", true);
+			dashboard.setStatusText("UngÃ¼ltiger Benutzername", true);
 			usernameField.requestFocus();
 			usernameField.selectAll();
 			dashboard.fadeInLogin();
@@ -42,7 +42,7 @@ public class LoginProvider implements EventHandler<ActionEvent> {
 		} else {
 			final String password = passwordField.getText();
 			if (password.length() < 1) {
-				dashboard.setStatusText("Ungültiges Passwort", true);
+				dashboard.setStatusText("UngÃ¼ltiges Passwort", true);
 				passwordField.requestFocus();
 				passwordField.selectAll();
 				dashboard.fadeInLogin();

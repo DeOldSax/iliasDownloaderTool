@@ -1,5 +1,6 @@
 package model;
 
+import java.io.File;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
@@ -33,7 +34,11 @@ public class Settings {
 	}
 
 	public String loadLocalIliasFolderPath() {
-		return myPrefs.get(ILIAS_FOLDER, ".");
+		final String path = myPrefs.get(ILIAS_FOLDER, ".");
+		if (!new File(path).exists()) {
+			return ".";
+		}
+		return path;
 	}
 
 	public void storeUsername(String username) {

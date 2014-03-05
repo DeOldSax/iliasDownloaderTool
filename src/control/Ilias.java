@@ -9,7 +9,6 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.ParseException;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.RedirectStrategy;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
@@ -51,10 +50,8 @@ public class Ilias {
 
 		PoolingClientConnectionManager cm = new PoolingClientConnectionManager(schemeRegistry);
 
-		// Http client
 		client = new DefaultHttpClient(cm);
 
-		// automate Redirectory
 		strategy = new LaxRedirectStrategy();
 		client.setRedirectStrategy(strategy);
 
@@ -64,70 +61,50 @@ public class Ilias {
 	public String login(String username, String password) {
 		String htmlStartpage = null;
 
-		// GET get the Cookies
 		request1 = new HttpGet(urlKitAnmeldung);
 
-		// Get methode ausführen
 		try {
 			client.execute(request1, context);
-		} catch (ClientProtocolException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+		} catch (IOException e1) {
+			shutdown();
+			return "1";
+		} finally {
+			request1.releaseConnection();
 		}
 
-		// request schließen
-		request1.releaseConnection();
-
-		// POST click the Button
 		request2 = new HttpPost(urlLoginDialog);
 
-		// ParamList for ButtonClick
 		List<NameValuePair> nvps = new ArrayList<NameValuePair>();
 		nvps.add(new BasicNameValuePair("sendLogin", "1"));
 		nvps.add(new BasicNameValuePair("idp_selection", "https://idp.scc.kit.edu/idp/shibboleth"));
 		nvps.add(new BasicNameValuePair("target", "https://ilias.studium.kit.edu/shib_login.php?target="));
 		nvps.add(new BasicNameValuePair("home_organization_selection", "Mit KIT-Account anmelden"));
 
-		// Liste an POST übergeben
 		request2.setEntity(new UrlEncodedFormEntity(nvps, Consts.UTF_8));
 
-		// POST request ausführen
 		try {
 			client.execute(request2, context);
-		} catch (ClientProtocolException e) {
-			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
+		} finally {
+			request2.releaseConnection();
 		}
 
-		// request schließen
-		request2.releaseConnection();
-
-		// POST enter password and username
 		request3 = new HttpPost(urlAuthnExtUp);
 
-		// ParamList with "username" and "password"
 		List<NameValuePair> nvps2 = new ArrayList<NameValuePair>();
 		nvps2.add(new BasicNameValuePair("j_username", username));
 		nvps2.add(new BasicNameValuePair("j_password", password));
 
-		// Liste an POST übergeben
 		request3.setEntity(new UrlEncodedFormEntity(nvps2, Consts.UTF_8));
 
-		// POST request ausführen
 		try {
 			response3 = client.execute(request3, context);
-		} catch (ClientProtocolException e) {
-			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
+		} finally {
+			entity = response3.getEntity();
 		}
-
-		// Post Request erhalten
-		entity = response3.getEntity();
-
-		// hier noch name und value für den letzten aufruf holen
 
 		String html = null;
 		try {
@@ -136,13 +113,15 @@ public class Ilias {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
+		} finally {
+			request3.releaseConnection();
 		}
 
 		Document doc = Jsoup.parse(html);
 		Element value1 = doc.select("input[name=RelayState]").first();
 		Element value2 = doc.select("input[name=SAMLResponse]").first();
 
-		// überprüfen ob Password bzw Username richtig sind!!!!
+		// if password or username is wrong, value1 will be null
 		if (value1 == null) {
 			shutdown();
 			return "0";
@@ -151,46 +130,32 @@ public class Ilias {
 		String v1 = value1.attr("value");
 		String v2 = value2.attr("value");
 
-		// request schließen
 		request3.releaseConnection();
-
-		// /letzter Schritt, aus letztem entity aus dem script name und
-		// value lesen und damit dann url4 Post aufrufen
 
 		request4 = new HttpPost(urlRedirect);
 
-		// Liste mit Parametern für den ButtenKlick
 		List<NameValuePair> nvps3 = new ArrayList<NameValuePair>();
 		nvps3.add(new BasicNameValuePair("RelayState", v1));
 		nvps3.add(new BasicNameValuePair("SAMLResponse", v2));
 
-		// Liste an POST übergeben
 		request4.setEntity(new UrlEncodedFormEntity(nvps3, Consts.UTF_8));
 
-		// POST request ausführen
 		try {
 			response4 = client.execute(request4, context);
-		} catch (ClientProtocolException e) {
-			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
-		// Post Request erhalten
-		entity = response4.getEntity();
-
-		// System.out.println(entity);
+		final HttpEntity entityX = response4.getEntity();
 		try {
-			htmlStartpage = EntityUtils.toString(entity);
-		} catch (ParseException e) {
+			htmlStartpage = EntityUtils.toString(entityX);
+		} catch (ParseException | IOException e) {
 			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+		} finally {
+			request4.releaseConnection();
 		}
 
-		// request schließen
 		request4.releaseConnection();
-
 		return htmlStartpage;
 	}
 

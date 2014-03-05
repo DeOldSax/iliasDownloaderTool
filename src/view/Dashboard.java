@@ -157,7 +157,7 @@ public class Dashboard extends Application {
 				courses.collapse();
 			}
 		});
-		collapseTree.setTooltip(new Tooltip("Alle Ordner schlieﬂen"));
+		collapseTree.setTooltip(new Tooltip("Alle Ordner schlie√üen"));
 		collapseTree.setGraphic(new ImageView("img/collapse.png"));
 		collapseTree.prefWidthProperty().bind(actionBar.prefWidthProperty());
 		loader = new Button();

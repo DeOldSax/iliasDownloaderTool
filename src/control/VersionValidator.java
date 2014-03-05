@@ -41,7 +41,7 @@ public class VersionValidator {
 			}
 
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.out.println("HttpConnection failed --> no version check");
 			return false;
 		}
 		request.releaseConnection();
@@ -50,8 +50,8 @@ public class VersionValidator {
 			return false;
 		}
 
-		int answer = JOptionPane.showOptionDialog(null, "    Version Herunterladen?", "Neue Version Verfügbar!", JOptionPane.YES_NO_OPTION,
-				JOptionPane.INFORMATION_MESSAGE, null, new Object[] { "Ja", "Später" }, null);
+		int answer = JOptionPane.showOptionDialog(null, "    Version Herunterladen?", "Neue Version VerfÃ¼gbar!", JOptionPane.YES_NO_OPTION,
+				JOptionPane.INFORMATION_MESSAGE, null, new Object[] { "Ja", "SpÃ¤ter" }, null);
 		if (answer == YES) {
 			if (Desktop.isDesktopSupported()) {
 				try {

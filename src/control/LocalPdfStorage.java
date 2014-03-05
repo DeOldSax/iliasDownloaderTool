@@ -88,7 +88,6 @@ public class LocalPdfStorage {
 			if (node instanceof IliasPdf) {
 				final String result = getContainingFolder((IliasPdf) node);
 				if (result != null) {
-					System.out.println(result);
 					return result;
 				}
 			}

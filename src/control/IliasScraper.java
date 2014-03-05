@@ -101,7 +101,7 @@ public class IliasScraper {
 						final int size = new IliasConnector().requestHead(dir.attr("abs:href"));
 						IliasPdf newPdfFile = createPDF(parent, dir, size);
 
-						dashboard.setStatusText(pdfCounter.toString() + " Dateien wurden bereits überprüft.");
+						dashboard.setStatusText(pdfCounter.toString() + " Dateien wurden bereits Ã¼berprÃ¼ft.");
 
 						List<Element> elemse = dir.parent().parent().siblingElements().select("div").select("span");
 						for (Element el : elemse) {
