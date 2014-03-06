@@ -199,12 +199,6 @@
 	-fx-effect: 			innershadow( three-pass-box , #4d4d4d , 0, 0 , 0 , 0 );
 }
 
-#loader:hover {
-	-fx-background-radius:	20;
-	-fx-background-color: 	#4d4d4d;
-	-fx-effect: 			innershadow( three-pass-box , rgba(0,0,0,0.7) , 6, 0.0 , 0 , 2 );
-}
-
 .tooltip {
 	-fx-background-radius: 20 20 20 20;
 	-fx-background-color: 	#c3c4c4,

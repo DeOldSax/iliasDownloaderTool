@@ -1,13 +1,17 @@
 package view;
 
 import javafx.animation.Interpolator;
+import javafx.animation.RotateTransition;
+import javafx.animation.Timeline;
 import javafx.animation.TranslateTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -51,18 +55,19 @@ public class Dashboard extends Application {
 	private static Label lastUpdateTime;
 	private static ResultList resultList;
 	private Button settingsBtn;
-	private Button loader;
+	private Button refreshButton;
 	private static Label statusFooterText;
 	private static CoursesTreeView courses;
 	private Button signIn;
 	private GridPane actionBar;
 	private LoginFader loginFader2;
-	private ImageView loaderIcon;
-	private ImageView loaderGif;
+	private ImageView refreshIcon;
+	private ImageView refreshIconBlack;
 	private boolean loaderRunning;
 	private TextField searchField;
 	private Button showLocalNotThere;
 	private Button showIgnored;
+	private RotateTransition refreshTransition;
 
 	public static void main(String[] args) {
 		boolean newVersionCalled = new VersionValidator().validate();
@@ -85,8 +90,8 @@ public class Dashboard extends Application {
 				System.exit(0);
 			};
 		});
-		loaderIcon = new ImageView("img/loader.png");
-		loaderGif = new ImageView("img/loader.gif");
+		refreshIcon = new ImageView("img/loader.png");
+		refreshIconBlack = new ImageView("img/loaderIconBlack.png");
 		Dashboard.stage = stage;
 		background = new BorderPane();
 		background.setPadding(new Insets(20, 50, 20, 50));
@@ -160,13 +165,28 @@ public class Dashboard extends Application {
 		collapseTree.setTooltip(new Tooltip("Alle Ordner schließen"));
 		collapseTree.setGraphic(new ImageView("img/collapse.png"));
 		collapseTree.prefWidthProperty().bind(actionBar.prefWidthProperty());
-		loader = new Button();
+		refreshButton = new Button();
+		refreshButton.setOnMouseEntered(new EventHandler<Event>() {
+			@Override
+			public void handle(Event event) {
+				refreshButton.setGraphic(refreshIconBlack);
+			};
+		});
+		refreshButton.setOnMouseExited(new EventHandler<Event>() {
+			@Override
+			public void handle(Event event) {
+				refreshButton.setGraphic(refreshIcon);
+			};
+		});
+
+		refreshTransition = new RotateTransition(Duration.millis(1000), refreshButton);
 		final Tooltip tooltip = new Tooltip("Aktualisieren");
-		loader.setTooltip(tooltip);
-		loader.setId("loader");
-		loader.setGraphic(loaderIcon);
-		loader.setMouseTransparent(true);
-		loader.setOnAction(new EventHandler<ActionEvent>() {
+		refreshButton.setTooltip(tooltip);
+		refreshButton.setId("loader");
+		refreshButton.setGraphic(refreshIcon);
+		refreshButton.setAlignment(Pos.CENTER);
+		refreshButton.setMouseTransparent(true);
+		refreshButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
 				if (loaderRunning) {
@@ -238,7 +258,7 @@ public class Dashboard extends Application {
 		actionBar.getColumnConstraints().addAll(col1, col15, col2, col3, col4, col5, col6);
 
 		actionBar.add(collapseTree, 0, 0);
-		actionBar.add(loader, 1, 0);
+		actionBar.add(refreshButton, 1, 0);
 		actionBar.add(signIn, 2, 0);
 		actionBar.add(showLocalNotThere, 3, 0);
 		actionBar.add(showIgnored, 4, 0);
@@ -293,7 +313,8 @@ public class Dashboard extends Application {
 						Platform.runLater(new Runnable() {
 							@Override
 							public void run() {
-								loader.setGraphic(loaderGif);
+								// loader.setGraphic(loaderGif);
+								setLoaderButtonActivated(true);
 								loaderRunning = true;
 							}
 						});
@@ -353,12 +374,14 @@ public class Dashboard extends Application {
 			@Override
 			public void run() {
 				if (show) {
-					loader.setGraphic(loaderGif);
+					setLoaderButtonActivated(true);
 					loaderRunning = true;
+					refreshButton.getTooltip().setText("Aktualisieren abbrechen");
 				} else {
-					loader.setGraphic(loaderIcon);
+					refreshButton.getTooltip().setText("Aktualisieren");
+					setLoaderButtonActivated(false);
 					loaderRunning = false;
-					loader.setMouseTransparent(false);
+					refreshButton.setMouseTransparent(false);
 					signIn.setText("Angemeldet");
 					signIn.setOpacity(1);
 				}
@@ -468,5 +491,17 @@ public class Dashboard extends Application {
 		setStatusText("Download abgeschlossen", false);
 		updateGraphicInTree(pdf);
 		resultList.pdfSynchronizedStateChanged(pdf);
+	}
+
+	private void setLoaderButtonActivated(boolean activate) {
+		if (activate) {
+			refreshTransition.setByAngle(360f);
+			refreshTransition.setCycleCount(Timeline.INDEFINITE);
+			refreshTransition.play();
+		} else {
+			refreshTransition.stop();
+			refreshButton.setStyle(null);
+			refreshButton.setId("loader");
+		}
 	}
 }

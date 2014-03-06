@@ -4,7 +4,7 @@
 
 #delete 	http://www.iconarchive.com/show/refresh-cl-icons-by-tpdkdesign.net/Symbols-Delete-icon.html
 
-#loader		http://www.loadinfo.net/
+#refresh	https://www.iconfinder.com/icons/126579/refresh_reload_sync_icon
 
 #forum		http://www.iconarchive.com/show/essential-toolbar-icons-by-fasticon/user-group-icon.html
 			http://www.fasticon.com
