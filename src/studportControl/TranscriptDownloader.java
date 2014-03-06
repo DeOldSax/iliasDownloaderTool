@@ -8,13 +8,16 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import javax.swing.JFileChooser;
+import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
+import model.Settings;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.HttpContext;
 
+import view.Dashboard;
 import control.IliasClientCloner;
 
 public class TranscriptDownloader implements Runnable {
@@ -23,36 +26,43 @@ public class TranscriptDownloader implements Runnable {
 	private final String downloadPdfUrl;
 	private HttpResponse response;
 	private HttpContext context;
+	private final Studierendenportal studport;
+	private final Dashboard dashboard;
 
-	public TranscriptDownloader(DefaultHttpClient client, String downloadPdfUrl, String filename) {
+	public TranscriptDownloader(Dashboard dashboard, DefaultHttpClient client, String downloadPdfUrl, String filename,
+			Studierendenportal studport) {
+		this.dashboard = dashboard;
 		this.client = client;
 		this.downloadPdfUrl = downloadPdfUrl;
 		this.filename = filename;
+		this.studport = studport;
 	}
 
 	@Override
 	public void run() {
-		final String saveDirectory = getSaveDirectory();
-
-		if (saveDirectory == null) {
-			return;
-		}
-
 		final DefaultHttpClient clonedClient = IliasClientCloner.cloneClient(client);
 
 		try {
 			final HttpGet httpGet = new HttpGet(downloadPdfUrl);
 			response = clonedClient.execute(httpGet, context);
-			File pdfTranscript = new File(saveDirectory);
+
+			String saveDirectory = Settings.getInstance().loadLocalIliasFolderPath();
+			if (saveDirectory == null || !new File(saveDirectory).exists() || saveDirectory.equals(".")) {
+				saveDirectory = openSaveDirectoryDialog();
+				if (saveDirectory == null) {
+					return;
+				}
+			}
+
+			File pdfTranscript = new File(saveDirectory + "/" + filename + ".pdf");
+
+			if (!response.getLastHeader("Content-Type").getValue().contains("pdf")) {
+				System.out.println("TranscriptDownloader:52:download failed");
+				dashboard.setStatusText("Download fehlgeschlagen", true);
+			}
 
 			final InputStream pdfContent = response.getEntity().getContent();
-			// if ("".contains("<!DOCTYPE html PUBLIC")) {
-			// InformationWindow.initWindow("Fehler beim laden des Notenauszugs (Zur Fehlerbehebung Programm neu starten)",
-			// "OK", null,
-			// null);
-			// httpGet.releaseConnection();
-			// return;
-			// }
+
 			BufferedInputStream in = new BufferedInputStream(pdfContent);
 
 			BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(pdfTranscript));
@@ -71,30 +81,35 @@ public class TranscriptDownloader implements Runnable {
 				try {
 					Desktop.getDesktop().open(pdfTranscript);
 				} catch (IOException e) {
+					studport.stopDownload();
 					e.printStackTrace();
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			studport.stopDownload();
+			dashboard.setStatusText("Download fehlgeschlagen", true);
+			System.out.println("TranscriptDownloader:88:download failed");
 		}
+		studport.stopDownload();
+		dashboard.setStatusText("Notenauszug wurde im lokalen Ilias Ordner gespeichert.");
 	}
 
-	private String getSaveDirectory() {
+	private String openSaveDirectoryDialog() {
 		String userSelectedPath;
-		final JFileChooser fileChooser = new JFileChooser();
-		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-		// fileChooser.setSelectedFile(new
-		// File(LocalFolderService.getLocalIliasPathString() + "/" + filename +
-		// ".pdf"));
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle(filename);
+		fileChooser.setInitialFileName(filename);
+		fileChooser.getExtensionFilters().add(new ExtensionFilter("Adobe Acrobat Document", ".pdf"));
+		final File selectedFile = fileChooser.showSaveDialog(null);
 
-		final int returnValue = fileChooser.showSaveDialog(null);
-		if (returnValue == JFileChooser.APPROVE_OPTION) {
-			userSelectedPath = fileChooser.getSelectedFile().getAbsolutePath();
-			if (!userSelectedPath.endsWith(".pdf")) {
-				userSelectedPath = userSelectedPath + ".pdf";
-			}
-		} else {
+		if (selectedFile == null) {
+			studport.stopDownload();
 			return null;
+		}
+
+		userSelectedPath = selectedFile.getAbsolutePath();
+		if (!userSelectedPath.endsWith(".pdf")) {
+			userSelectedPath = userSelectedPath + ".pdf";
 		}
 		return userSelectedPath;
 	}

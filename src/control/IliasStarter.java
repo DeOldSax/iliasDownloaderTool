@@ -3,7 +3,6 @@ package control;
 import javafx.application.Platform;
 import model.IliasTreeProvider;
 import model.Settings;
-import studportControl.Studierendenportal;
 import view.Dashboard;
 import view.SettingsMenu;
 
@@ -11,7 +10,6 @@ public class IliasStarter {
 	private static String loginStatusMessage;
 	private String username = null;
 	private String password = null;
-	private static Studierendenportal studierendenportal;
 	private final Dashboard dashboard;
 
 	public IliasStarter(Dashboard dashboard) {
@@ -42,8 +40,6 @@ public class IliasStarter {
 		}
 		dashboard.setTitle("Ilias - Angemeldet als " + username);
 		dashboard.setStatusText("Angemeldet als: " + username, false);
-		studierendenportal = new Studierendenportal(username, password);
-		new Thread(studierendenportal).start();
 		Settings.getInstance().setLogIn(true);
 		dashboard.showLoader(false);
 		dashboard.setSignInColor();
@@ -96,14 +92,6 @@ public class IliasStarter {
 				SettingsMenu.activatePromptUpdater();
 			}
 		});
-
-		while (!studierendenportal.isReady()) {
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
 		dashboard.showLoader(false);
 	}
 }

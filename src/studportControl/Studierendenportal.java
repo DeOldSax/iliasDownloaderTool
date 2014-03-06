@@ -2,6 +2,8 @@ package studportControl;
 
 import java.util.List;
 
+import javafx.scene.control.Button;
+
 import org.apache.http.Consts;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -17,6 +19,9 @@ import org.apache.http.util.EntityUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+
+import view.Dashboard;
+import view.StudportBar;
 
 public class Studierendenportal implements Runnable {
 
@@ -39,11 +44,18 @@ public class Studierendenportal implements Runnable {
 	private List<NameValuePair> nameValuePairs;
 	private final String username;
 	private final String password;
-	private boolean isReady;
+	private final String choice;
+	private final StudportBar studportBar;
+	private final Button button;
+	private final Dashboard dashboard;
 
-	public Studierendenportal(String username, String password) {
+	public Studierendenportal(Dashboard dashboard, String username, String password, Button button, StudportBar studportBar) {
+		this.dashboard = dashboard;
 		this.username = username;
 		this.password = password;
+		this.button = button;
+		this.studportBar = studportBar;
+		this.choice = button.getText();
 
 		client = new DefaultHttpClient();
 		strategy = new LaxRedirectStrategy();
@@ -53,10 +65,13 @@ public class Studierendenportal implements Runnable {
 
 	@Override
 	public void run() {
-		login(username, password);
+		final boolean login = login(username, password);
+		if (login) {
+			downloadNotenauszug(choice);
+		}
 	}
 
-	public void login(String username, String password) {
+	public boolean login(String username, String password) {
 		try {
 			requestPOST = new HttpPost(loginUrl);
 
@@ -71,16 +86,20 @@ public class Studierendenportal implements Runnable {
 			htmlStartpage = EntityUtils.toString(entity);
 
 			if (htmlStartpage.contains("Sie sind nicht angemeldet")) {
-				// FIXME
+				dashboard.setStatusText("Benutzerdaten falsch!", true);
+				dashboard.fadeInLogin();
+				stopDownload();
+				return false;
 			} else {
 				openTargetWebsite();
 			}
 			requestPOST.releaseConnection();
 
 		} catch (Exception e) {
+			stopDownload();
 			e.printStackTrace();
 		}
-		isReady = true;
+		return true;
 	}
 
 	public void openTargetWebsite() {
@@ -98,10 +117,10 @@ public class Studierendenportal implements Runnable {
 				alleEn = t.attr("abs:href");
 			}
 			if (t.attr("href").contains("studiengangbestanden&$HIS$lastState=notenspiegelStudent&$HIS$xslobject=de")) {
-				alleBestandenEn = t.attr("abs:href");
+				alleBestandenDe = t.attr("abs:href");
 			}
 			if (t.attr("href").contains("studiengangbestanden&$HIS$lastState=notenspiegelStudent&$HIS$xslobject=en")) {
-				alleBestandenDe = t.attr("abs:href");
+				alleBestandenEn = t.attr("abs:href");
 			}
 		}
 	}
@@ -127,7 +146,7 @@ public class Studierendenportal implements Runnable {
 			break;
 		}
 
-		new Thread(new TranscriptDownloader(client, downloadPdfUrl, filename)).start();
+		new Thread(new TranscriptDownloader(dashboard, client, downloadPdfUrl, filename, this)).start();
 	}
 
 	public String requestGet(String url) {
@@ -147,7 +166,7 @@ public class Studierendenportal implements Runnable {
 		return null;
 	}
 
-	public boolean isReady() {
-		return isReady;
+	void stopDownload() {
+		studportBar.changeButtonstate(button, false);
 	}
 }
