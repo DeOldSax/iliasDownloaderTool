@@ -226,7 +226,8 @@ public class SettingsMenu implements EventHandler<ActionEvent> {
 		if (button.equals(autoLogin)) {
 			if (settings.autoLogin()) {
 				settings.setAutoLogin(false);
-				button.setStyle("-fx-background-color: 	#3d3d3d;");
+				button.setStyle(null);
+				button.setId("button");
 			} else {
 				settings.setAutoLogin(true);
 				button.setStyle("-fx-background-color: 	linear-gradient(steelblue,royalblue)");
@@ -236,7 +237,8 @@ public class SettingsMenu implements EventHandler<ActionEvent> {
 		if (button.equals(autoUpdate)) {
 			if (settings.autoUpdate()) {
 				settings.setAutoUpdate(false);
-				button.setStyle("-fx-background-color: 	#3d3d3d;");
+				button.setStyle(null);
+				button.setId("button");
 			} else {
 				settings.setAutoUpdate(true);
 				button.setStyle("-fx-background-color: 	linear-gradient(steelblue,royalblue)");
