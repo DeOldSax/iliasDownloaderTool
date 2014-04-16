@@ -282,12 +282,12 @@ public class Dashboard extends Application {
 		statusFooterText.setId("statusFooterText");
 		statusFooter.add(statusFooterText, 0, 0);
 
-		StudportBar studportBar = new StudportBar(this);
+//		StudportBar studportBar = new StudportBar(this);
 
 		GridPane footer = new GridPane();
 		footer.setVgap(20);
 		footer.add(statusFooter, 0, 0);
-		footer.add(studportBar, 0, 1);
+//		footer.add(studportBar, 0, 1);
 		background.setBottom(footer);
 
 		scene = new Scene(background);

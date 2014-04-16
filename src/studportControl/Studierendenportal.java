@@ -1,5 +1,6 @@
 package studportControl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javafx.scene.control.Button;
@@ -14,19 +15,24 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.LaxRedirectStrategy;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.util.EntityUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import view.Dashboard;
 import view.StudportBar;
 
 public class Studierendenportal implements Runnable {
 
-	private final String loginUrl = "https://studium.kit.edu/_layouts/login.aspx?ReturnUrl=%2f";
-	private String htmlStartpage = null;
+	private final String cookieUrl = "https://campus.studium.kit.edu/";
+	private final String loginUrl = "https://campus.studium.kit.edu/Shibboleth.sso/Login?target=https%3A//campus.studium.kit.edu/reports/examsextract.php";
+	private final String authnUrl = "https://idp.scc.kit.edu/idp/Authn/ExtUP";
+	private final String scriptUrl = "https://idp.scc.kit.edu/idp/profile/SAML2/Redirect/SSO";
+	private final String examExtractUrl = "https://campus.studium.kit.edu/reports/examsextract.php";
 
 	private String alleEn = null;
 	private String alleDe = null;
@@ -41,7 +47,6 @@ public class Studierendenportal implements Runnable {
 	private HttpPost requestPOST;
 	private HttpResponse response;
 	private HttpEntity entity;
-	private List<NameValuePair> nameValuePairs;
 	private final String username;
 	private final String password;
 	private final String choice;
@@ -73,27 +78,48 @@ public class Studierendenportal implements Runnable {
 
 	public boolean login(String username, String password) {
 		try {
-			requestPOST = new HttpPost(loginUrl);
 
-			nameValuePairs = new NameValuePairFactory().create(username, password);
+			requestGET = new HttpGet(cookieUrl);
+			response = client.execute(requestGET, context);
+			requestGET.releaseConnection();
 
-			requestPOST.setEntity(new UrlEncodedFormEntity(nameValuePairs, Consts.UTF_8));
+			requestGET = new HttpGet(loginUrl);
+			response = client.execute(requestGET, context);
+			requestGET.releaseConnection();
 
+			List<NameValuePair> nvps = new ArrayList<NameValuePair>();
+			nvps.add(new BasicNameValuePair("j_username", username));
+			nvps.add(new BasicNameValuePair("j_password", password));
+			nvps.add(new BasicNameValuePair("submit", "Einloggen"));
+			requestPOST = new HttpPost(authnUrl);
+			requestPOST.setEntity(new UrlEncodedFormEntity(nvps, Consts.UTF_8));
 			response = client.execute(requestPOST, context);
 
-			entity = response.getEntity();
-
-			htmlStartpage = EntityUtils.toString(entity);
-
-			if (htmlStartpage.contains("Sie sind nicht angemeldet")) {
-				dashboard.setStatusText("Benutzerdaten falsch!", true);
-				dashboard.fadeInLogin();
-				stopDownload();
-				return false;
-			} else {
-				openTargetWebsite();
-			}
+			Document doc = Jsoup.parse(EntityUtils.toString(response.getEntity()));
+			final Elements value1 = doc.select("input[name=RelayState]");
+			String v1 = value1.attr("value");
+			final Elements value2 = doc.select("input[name=SAMLResponse]");
+			String v2 = value2.attr("value");
 			requestPOST.releaseConnection();
+
+			List<NameValuePair> nvps2 = new ArrayList<NameValuePair>();
+			nvps2.add(new BasicNameValuePair("RelayState", v1));
+			nvps2.add(new BasicNameValuePair("SAMLResponse", v2));
+			requestPOST = new HttpPost(scriptUrl);
+			requestPOST.setEntity(new UrlEncodedFormEntity(nvps2, Consts.UTF_8));
+			response = client.execute(requestPOST, context);
+			System.out.println(EntityUtils.toString(response.getEntity()));
+			requestPOST.releaseConnection();
+
+			// if (htmlStartpage.contains("Sie sind nicht angemeldet")) {
+			// dashboard.setStatusText("Benutzerdaten falsch!", true);
+			// dashboard.fadeInLogin();
+			// stopDownload();
+			// return false;
+			// } else {
+			// openTargetWebsite();
+			// }
+			// requestPOST.releaseConnection();
 
 		} catch (Exception e) {
 			stopDownload();
