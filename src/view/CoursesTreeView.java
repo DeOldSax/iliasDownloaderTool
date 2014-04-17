@@ -4,6 +4,7 @@ import java.awt.Desktop;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javafx.application.Platform;
@@ -22,7 +23,7 @@ import model.IliasPdf;
 import model.IliasTreeNode;
 import model.IliasTreeProvider;
 import model.Settings;
-import control.Downloader;
+import control.DownloaderTask;
 import control.LocalPdfStorage;
 
 public class CoursesTreeView extends TreeView<IliasTreeNode> {
@@ -34,7 +35,7 @@ public class CoursesTreeView extends TreeView<IliasTreeNode> {
 		super();
 		setMinWidth(270);
 		this.dashboard = dashboard;
-		rootItem = new TreeItem<IliasTreeNode>(new IliasFolder("Übersicht", null, null));
+		rootItem = new TreeItem<IliasTreeNode>(new IliasFolder("ï¿½bersicht", null, null));
 		rootItem.setExpanded(true);
 		setRoot(rootItem);
 		setShowRoot(false);
@@ -55,16 +56,23 @@ public class CoursesTreeView extends TreeView<IliasTreeNode> {
 						return;
 					} else if (selectedItem.getValue() instanceof IliasPdf) {
 						if (Settings.getInstance().userIsLoggedIn()) {
-							new Downloader().download(((CoursesTreeView) event.getSource()).getSelectionModel().getSelectedItem()
-									.getValue());
+							new Thread(new DownloaderTask(((CoursesTreeView) event.getSource()).getSelectionModel().getSelectedItem()
+									.getValue())).start();
 						}
 					}
 				}
 				if (event.getButton() == MouseButton.SECONDARY) {
-					if (!(selectedItem.getValue() instanceof IliasPdf || selectedItem.getValue() instanceof IliasForum)) {
+					ObservableList<TreeItem<IliasTreeNode>> selectedItems = getSelectionModel().getSelectedItems(); 
+					IliasTreeNode firstItem = selectedItems.get(0).getValue();
+					if (selectedItems.size() == 1 && !(firstItem instanceof IliasPdf || firstItem instanceof IliasForum)) {
 						return;
 					}
-					showContextMenu(selectedItem, event);
+
+					List<IliasTreeNode> selectedNodes = new ArrayList<IliasTreeNode>(); 
+					for (TreeItem<IliasTreeNode> treeItem : selectedItems) {
+						selectedNodes.add(treeItem.getValue()); 					
+					}
+					showContextMenu(selectedNodes, event);
 				}
 			};
 		});
@@ -83,9 +91,9 @@ public class CoursesTreeView extends TreeView<IliasTreeNode> {
 		}
 	}
 
-	private void showContextMenu(TreeItem<IliasTreeNode> item, MouseEvent event) {
+	private void showContextMenu(List<IliasTreeNode> selectedNodes, MouseEvent event) {
 		menu.getItems().clear();
-		menu = new FileContextMenu(dashboard).createMenu(item.getValue(), event);
+		menu = new FileContextMenu(dashboard).createMenu(selectedNodes, event);
 		menu.show(this, event.getScreenX(), event.getScreenY());
 	}
 

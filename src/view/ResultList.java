@@ -22,7 +22,7 @@ import model.IliasPdf;
 import model.IliasTreeNode;
 import model.IliasTreeProvider;
 import model.Settings;
-import control.Downloader;
+import control.DownloaderTask;
 import control.LocalPdfStorage;
 
 public class ResultList extends ListView<IliasTreeNode> {
@@ -59,12 +59,12 @@ public class ResultList extends ListView<IliasTreeNode> {
 		setId("listView");
 		items = FXCollections.observableArrayList();
 		setItems(items);
-		getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+		getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 		setOnMouseClicked(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
 				if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2 && Settings.getInstance().userIsLoggedIn()) {
-					new Downloader().download(((ResultList) event.getSource()).getSelectionModel().getSelectedItem());
+					new Thread(new DownloaderTask(((ResultList) event.getSource()).getSelectionModel().getSelectedItem())).start();
 				} else {
 					showContextMenu(event);
 				}
@@ -89,20 +89,22 @@ public class ResultList extends ListView<IliasTreeNode> {
 			final IliasTreeNode selectedDirectory = ((ResultList) event.getSource()).getSelectionModel().getSelectedItem();
 			dashboard.getCoursesTreeView().selectPdf((IliasPdf) selectedDirectory);
 		} else if (event.getCode() == KeyCode.ENTER && Settings.getInstance().userIsLoggedIn()) {
-			new Downloader().download(getSelectionModel().getSelectedItem());
+			new Thread(new DownloaderTask(getSelectionModel().getSelectedItem())).start();
 		}
 	}
 
 	private void showContextMenu(MouseEvent event) {
 		menu.hide();
-		final IliasTreeNode selectedNode = ((ResultList) event.getSource()).getSelectionModel().getSelectedItem();
-		if (selectedNode == null) {
+		final List<IliasTreeNode> selectedNodes = ((ResultList) event.getSource()).getSelectionModel().getSelectedItems();
+		if (selectedNodes.isEmpty() || selectedNodes == null) {
 			return;
 		}
-		dashboard.getCoursesTreeView().selectPdf((IliasPdf) selectedNode);
+		if (selectedNodes.size() == 1) {
+			dashboard.getCoursesTreeView().selectPdf((IliasPdf) selectedNodes.get(0));
+		}
+		
 		if (event.getButton() == MouseButton.SECONDARY) {
-			final IliasPdf pdf = (IliasPdf) selectedNode;
-			menu = new FileContextMenu(dashboard).createMenu(pdf, event);
+			menu = new FileContextMenu(dashboard).createMenu(selectedNodes, event);
 			menu.show(this, event.getScreenX(), event.getScreenY());
 		}
 	}
