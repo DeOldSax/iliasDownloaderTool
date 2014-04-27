@@ -13,24 +13,26 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import model.IliasFolder;
 import model.IliasForum;
 import model.IliasPdf;
 import model.IliasTreeNode;
 import model.Settings;
-import control.DownloadMode;
-import control.DownloaderTask;
 import control.LocalPdfStorage;
+import download.DownloadMode;
+import download.DownloaderTask;
+import download.IliasFolderDownloaderTask;
 
 public class FileContextMenu {
 
 	private final ContextMenu menu;
-	private final MenuItem downloadItem;
+	private final MenuItem downloadIliasPdfItem;
+	private final MenuItem downloadIliasFolderItem;
+	private final MenuItem downloadIliasFoldersItem;
 	private final MenuItem ignoreItem;
-//	private final MenuItem ignoreAllItem;
 	private MenuItem ignoreItemCancel;
-//	private MenuItem ignoreAllItemCancel;
-	private MenuItem autoDownloadItem;
-	private MenuItem normalDownloadItem;
+	private MenuItem autoDownloadIliasPdfItem;
+	private MenuItem normalDownloadIliasPdfsItem;
 	private final MenuItem printItem;
 	private final MenuItem openParentFolderItem;
 	private final MenuItem openFileItem;
@@ -43,24 +45,44 @@ public class FileContextMenu {
 		this.dashboard = dashboard;
 		// FIXME add param Dashboard
 		menu = new ContextMenu();
-		downloadItem = new MenuItem("Herunterladen");
-		downloadItem.setGraphic(new ImageView("img/downloadArrow.png"));
-		downloadItem.setOnAction(new EventHandler<ActionEvent>() {
+		downloadIliasPdfItem = new MenuItem("Herunterladen");
+		downloadIliasPdfItem.setGraphic(new ImageView("img/downloadArrow.png"));
+		downloadIliasPdfItem.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				download(selectedIliasTreeNode);
+				downloadIliasPdf(selectedIliasTreeNode);
 			}
 		});
-		autoDownloadItem = new MenuItem("Auswahl Herunterladen AUTO");
-		normalDownloadItem = new MenuItem("Auswahl Herunterladen");
-		normalDownloadItem.setOnAction(new EventHandler<ActionEvent>() {
+		downloadIliasFolderItem = new MenuItem("Ordner Herunterladen (AUTO)"); 
+		downloadIliasFolderItem.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				download(selectedIliasTreeNodes);
+				downloadIliasFolder((IliasFolder)selectedIliasTreeNode); 
+			}
+		});
+		downloadIliasFoldersItem = new MenuItem("Ordner Herunterladen (AUTO)"); 
+		downloadIliasFoldersItem.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				downloadIliasFolders(selectedIliasTreeNodes); 
+			}
+		});
+		
+		autoDownloadIliasPdfItem = new MenuItem("PDF-Dateien Herunterladen (AUTO)");
+		autoDownloadIliasPdfItem.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				downloadIliasPdfs(selectedIliasTreeNodes, DownloadMode.AUTO);
+			}
+		});
+		normalDownloadIliasPdfsItem = new MenuItem("PDF-Dateien Herunterladen");
+		normalDownloadIliasPdfsItem.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				downloadIliasPdfs(selectedIliasTreeNodes, DownloadMode.NORMAL);
 			}
 		});
 		ignoreItem = new MenuItem("Ignorieren");
-//		ignoreItem = new MenuItem("Auswahl ignorieren"); 
 		ignoreItem.setGraphic(new ImageView("img/ignore.png"));
 		ignoreItemCancel = new MenuItem("Ignorieren aufheben");
 		ignoreItemCancel = new MenuItem("Ignorieren für Auswahl aufheben"); 
@@ -108,40 +130,49 @@ public class FileContextMenu {
 			}
 		});
 	}
-
 	
 	public ContextMenu createMenu(List<IliasTreeNode> selectedNodes, MouseEvent event) {
 		menu.getItems().clear();
 		if (selectedNodes.size() == 1) {
-			System.out.println("only one item selected");
 			return createMenu(selectedNodes.get(0), event); 
 		} 
-		// filter selection for IliasPdfs.
+
 		if (Settings.getInstance().userIsLoggedIn()) {
+			boolean selectedNodesContainsPdf = false; 
+			boolean selectedNodesContainsFolder = false; 
 			for (IliasTreeNode iliasTreeNode : selectedNodes) {
-				if (!(iliasTreeNode instanceof IliasPdf)) {
+				if (!selectedNodesContainsPdf && iliasTreeNode instanceof IliasPdf) {
+					menu.getItems().addAll(autoDownloadIliasPdfItem, normalDownloadIliasPdfsItem); 
+					selectedNodesContainsPdf = true; 
+				}
+				if (!selectedNodesContainsFolder && iliasTreeNode instanceof IliasFolder) {
+					menu.getItems().add(downloadIliasFoldersItem);
+					selectedNodesContainsFolder = true; 
+				}
+				if (iliasTreeNode instanceof IliasForum) {
 					selectedNodes.remove(iliasTreeNode); 
 				}
 			}
 			selectedIliasTreeNodes = selectedNodes; 
-			menu.getItems().addAll(autoDownloadItem, normalDownloadItem); 
 		}
 		return menu;
 	}
 
 	private ContextMenu createMenu(final IliasTreeNode node, final MouseEvent event) {
-		this.selectedIliasTreeNode = node;
 		menu.getItems().clear();
-
-		if (node instanceof IliasForum) {
+		this.selectedIliasTreeNode = node;
+		
+		if (node instanceof IliasFolder && Settings.getInstance().userIsLoggedIn()) {
+			menu.getItems().add(0, downloadIliasFolderItem); 
+		} else if (node instanceof IliasForum) {
 			menu.getItems().add(openForumItem);
 			return menu;
 		} else if (node instanceof IliasPdf) {
 			IliasPdf pdf = (IliasPdf) node;
 			if (pdf.isIgnored()) {
-				menu.getItems().add(ignoreItem);
-			} else {
 				menu.getItems().add(ignoreItemCancel);
+			} else {
+				menu.getItems().add(ignoreItem);
 			}
 			if (LocalPdfStorage.getInstance().contains(pdf)) {
 				menu.getItems().add(printItem);
@@ -150,19 +181,27 @@ public class FileContextMenu {
 			}
 		}
 		if (Settings.getInstance().userIsLoggedIn() && node instanceof IliasPdf) {
-			menu.getItems().add(0, downloadItem);
+			menu.getItems().add(0, downloadIliasPdfItem);
 		}
 		return menu;
 	}
 
-	private void download(IliasTreeNode iliasTreeNode) {
-		new Thread(new DownloaderTask(iliasTreeNode)).start(); 
+	private void downloadIliasPdf(IliasTreeNode selectediliasPdf) {
+		new Thread(new DownloaderTask(selectediliasPdf)).start(); 
+	}
+
+	private void downloadIliasFolder(IliasFolder selectedIliasFolder) {
+		new Thread(new IliasFolderDownloaderTask(selectedIliasFolder)).start();
 	}
 	
-	private void download(List<IliasTreeNode> iliasTreeNodes) {
-		for (IliasTreeNode iliasTreeNode : iliasTreeNodes) {
-			new Thread(new DownloaderTask(iliasTreeNode, DownloadMode.AUTO)).start(); 
+	private void downloadIliasPdfs(List<IliasTreeNode> selectedIliasTreeNodes, DownloadMode mode) {
+		for (IliasTreeNode iliasTreeNode : selectedIliasTreeNodes) {
+			new Thread(new DownloaderTask(iliasTreeNode, mode)).start(); 
 		}
+	}
+
+	private void downloadIliasFolders(List<IliasTreeNode> selectedIliasFolders) {
+		new Thread(new IliasFolderDownloaderTask(selectedIliasFolders)).start();
 	}
 
 	private void openFile() {

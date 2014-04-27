@@ -23,8 +23,8 @@ import model.IliasPdf;
 import model.IliasTreeNode;
 import model.IliasTreeProvider;
 import model.Settings;
-import control.DownloaderTask;
 import control.LocalPdfStorage;
+import download.DownloaderTask;
 
 public class CoursesTreeView extends TreeView<IliasTreeNode> {
 	private final TreeItem<IliasTreeNode> rootItem;
@@ -35,11 +35,11 @@ public class CoursesTreeView extends TreeView<IliasTreeNode> {
 		super();
 		setMinWidth(270);
 		this.dashboard = dashboard;
-		rootItem = new TreeItem<IliasTreeNode>(new IliasFolder("�bersicht", null, null));
+		rootItem = new TreeItem<IliasTreeNode>(new IliasFolder("Übersicht", null, null));
 		rootItem.setExpanded(true);
 		setRoot(rootItem);
 		setShowRoot(false);
-		getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+		getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 		menu = new ContextMenu();
 
 		setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -60,19 +60,8 @@ public class CoursesTreeView extends TreeView<IliasTreeNode> {
 									.getValue())).start();
 						}
 					}
-				}
-				if (event.getButton() == MouseButton.SECONDARY) {
-					ObservableList<TreeItem<IliasTreeNode>> selectedItems = getSelectionModel().getSelectedItems(); 
-					IliasTreeNode firstItem = selectedItems.get(0).getValue();
-					if (selectedItems.size() == 1 && !(firstItem instanceof IliasPdf || firstItem instanceof IliasForum)) {
-						return;
-					}
-
-					List<IliasTreeNode> selectedNodes = new ArrayList<IliasTreeNode>(); 
-					for (TreeItem<IliasTreeNode> treeItem : selectedItems) {
-						selectedNodes.add(treeItem.getValue()); 					
-					}
-					showContextMenu(selectedNodes, event);
+				} else if (event.getButton() == MouseButton.SECONDARY) {
+					showContextMenu(getSelectionModel().getSelectedItems(), event);
 				}
 			};
 		});
@@ -91,9 +80,15 @@ public class CoursesTreeView extends TreeView<IliasTreeNode> {
 		}
 	}
 
-	private void showContextMenu(List<IliasTreeNode> selectedNodes, MouseEvent event) {
+	private void showContextMenu(ObservableList<TreeItem<IliasTreeNode>> selectedItems, MouseEvent event) {
 		menu.getItems().clear();
-		menu = new FileContextMenu(dashboard).createMenu(selectedNodes, event);
+
+		List<IliasTreeNode> selectedIliasTreeNodes = new ArrayList<IliasTreeNode>(); 
+		for (TreeItem<IliasTreeNode> treeItem : selectedItems) {
+			selectedIliasTreeNodes.add(treeItem.getValue()); 					
+		}
+		
+		menu = new FileContextMenu(dashboard).createMenu(selectedIliasTreeNodes, event);
 		menu.show(this, event.getScreenX(), event.getScreenY());
 	}
 

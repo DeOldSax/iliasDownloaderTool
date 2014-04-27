@@ -1,4 +1,4 @@
-package control;
+package download;
 
 public enum DownloadMode {
 	AUTO, NORMAL

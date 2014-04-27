@@ -22,8 +22,8 @@ import model.IliasPdf;
 import model.IliasTreeNode;
 import model.IliasTreeProvider;
 import model.Settings;
-import control.DownloaderTask;
 import control.LocalPdfStorage;
+import download.DownloaderTask;
 
 public class ResultList extends ListView<IliasTreeNode> {
 	private final Dashboard dashboard;
