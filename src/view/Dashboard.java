@@ -1,5 +1,9 @@
 package view;
 
+import java.io.File;
+
+import org.apache.log4j.PropertyConfigurator;
+
 import javafx.animation.Interpolator;
 import javafx.animation.RotateTransition;
 import javafx.animation.Timeline;
@@ -70,6 +74,9 @@ public class Dashboard extends Application {
 	private RotateTransition refreshTransition;
 
 	public static void main(String[] args) {
+		new File(System.getProperty("user.home") + "/.ilias/ilias.log").delete(); 
+		PropertyConfigurator.configure(Dashboard.class.getResourceAsStream("log4j.properties"));
+		
 		boolean newVersionCalled = new VersionValidator().validate();
 		if (newVersionCalled) {
 			System.exit(0);
