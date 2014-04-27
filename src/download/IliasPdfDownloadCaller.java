@@ -12,16 +12,23 @@ import model.IliasPdf;
 import model.IliasTreeNode;
 import model.IliasTreeProvider;
 
-public class DownloaderTask extends Task<Void> {
+/**
+ * This class provides the option to ask the User for a position to store the file and 
+ * calls {@link IliasPdfDownloaderTask}.
+ * 
+ * @author deoldsax
+ *
+ */
+public class IliasPdfDownloadCaller extends Task<Void> {
 	private IliasTreeNode node;
 	private DownloadMode mode;
 
-	public DownloaderTask(final IliasTreeNode node, DownloadMode mode) {
+	public IliasPdfDownloadCaller(final IliasTreeNode node, DownloadMode mode) {
 		this.node = node;
 		this.mode = mode;
 	}
 
-	public DownloaderTask(final IliasTreeNode node) {
+	public IliasPdfDownloadCaller(final IliasTreeNode node) {
 		this(node, DownloadMode.NORMAL);
 	}
 
@@ -41,6 +48,7 @@ public class DownloaderTask extends Task<Void> {
 	}
 
 	private void download(IliasPdf pdf, String type) {
+		System.out.println("download");
 		String targetPath = LocalPdfStorage.getInstance().suggestDownloadPath(pdf);
 		String name = WinUtils.makeFileNameValid(pdf.getName()); 
 

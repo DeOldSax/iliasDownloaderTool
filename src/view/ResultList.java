@@ -23,7 +23,7 @@ import model.IliasTreeNode;
 import model.IliasTreeProvider;
 import model.Settings;
 import control.LocalPdfStorage;
-import download.DownloaderTask;
+import download.IliasPdfDownloadCaller;
 
 public class ResultList extends ListView<IliasTreeNode> {
 	private final Dashboard dashboard;
@@ -64,7 +64,7 @@ public class ResultList extends ListView<IliasTreeNode> {
 			@Override
 			public void handle(MouseEvent event) {
 				if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2 && Settings.getInstance().userIsLoggedIn()) {
-					new Thread(new DownloaderTask(((ResultList) event.getSource()).getSelectionModel().getSelectedItem())).start();
+					new Thread(new IliasPdfDownloadCaller(((ResultList) event.getSource()).getSelectionModel().getSelectedItem())).start();
 				} else {
 					showContextMenu(event);
 				}
@@ -89,7 +89,7 @@ public class ResultList extends ListView<IliasTreeNode> {
 			final IliasTreeNode selectedDirectory = ((ResultList) event.getSource()).getSelectionModel().getSelectedItem();
 			dashboard.getCoursesTreeView().selectPdf((IliasPdf) selectedDirectory);
 		} else if (event.getCode() == KeyCode.ENTER && Settings.getInstance().userIsLoggedIn()) {
-			new Thread(new DownloaderTask(getSelectionModel().getSelectedItem())).start();
+			new Thread(new IliasPdfDownloadCaller(getSelectionModel().getSelectedItem())).start();
 		}
 	}
 

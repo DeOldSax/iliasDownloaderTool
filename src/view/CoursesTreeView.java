@@ -7,16 +7,24 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
+import utils.DesktopHelper;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Label;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.util.Callback;
 import model.IliasFolder;
 import model.IliasForum;
 import model.IliasPdf;
@@ -24,7 +32,8 @@ import model.IliasTreeNode;
 import model.IliasTreeProvider;
 import model.Settings;
 import control.LocalPdfStorage;
-import download.DownloaderTask;
+import download.IliasPdfDownloadCaller;
+import download.IliasFolderDownloaderTask;
 
 public class CoursesTreeView extends TreeView<IliasTreeNode> {
 	private final TreeItem<IliasTreeNode> rootItem;
@@ -41,7 +50,14 @@ public class CoursesTreeView extends TreeView<IliasTreeNode> {
 		setShowRoot(false);
 		getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 		menu = new ContextMenu();
-
+		setCellFactory(new Callback<TreeView<IliasTreeNode>, TreeCell<IliasTreeNode>>() {
+			
+			@Override
+			public TreeCell<IliasTreeNode> call(TreeView<IliasTreeNode> arg0) {
+				return new IliasTreeCell();
+			}
+		});
+		
 		setOnMouseClicked(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
@@ -56,7 +72,7 @@ public class CoursesTreeView extends TreeView<IliasTreeNode> {
 						return;
 					} else if (selectedItem.getValue() instanceof IliasPdf) {
 						if (Settings.getInstance().userIsLoggedIn()) {
-							new Thread(new DownloaderTask(((CoursesTreeView) event.getSource()).getSelectionModel().getSelectedItem()
+							new Thread(new IliasPdfDownloadCaller(((CoursesTreeView) event.getSource()).getSelectionModel().getSelectedItem()
 									.getValue())).start();
 						}
 					}
@@ -193,5 +209,145 @@ public class CoursesTreeView extends TreeView<IliasTreeNode> {
 				treeItem.setExpanded(!treeItem.isExpanded());
 			}
 		});
+	}
+	
+	/**
+	 * This class draws the ListCells.
+	 * 
+	 * @author deoldsax
+	 *
+	 */
+	private class IliasTreeCell extends TreeCell<IliasTreeNode> {
+		
+		@Override
+		protected void updateItem(final IliasTreeNode node, final boolean empty) {
+			super.updateItem(node, empty);
+
+			if (!empty) {
+				redraw(false, node); 
+			}
+
+			this.setOnMouseEntered(new EventHandler<MouseEvent>() {
+				@Override
+				public void handle(MouseEvent arg0) {
+					if (!empty) {
+						redraw(true, node);
+					}
+				}
+			});
+			
+			setOnMouseExited(new EventHandler<MouseEvent>() {
+				@Override
+				public void handle(MouseEvent arg0) {
+					if (!empty) {
+						redraw(false, node);
+					}
+				}
+			});
+		}
+		
+		private void redraw(boolean addOptions, final IliasTreeNode node) {
+			final BorderPane pane = new BorderPane(); 
+			final Label box = new Label();
+
+			if (node instanceof IliasFolder) {
+				IliasFolder folder = (IliasFolder) node;
+				if (LocalPdfStorage.getInstance().isFolderSynchronized(folder)) {
+					box.setGraphic(new ImageView("img/folder.png"));
+				} else {
+					box.setGraphic(new ImageView("img/folder_pdf_not_there.png"));
+				}
+			} else if (node instanceof IliasPdf) {
+				IliasPdf pdf = (IliasPdf) node;
+				if (pdf.isIgnored()) {
+					box.setGraphic(new ImageView("img/pdf_ignored.png"));
+				} else if (!(LocalPdfStorage.getInstance().contains(pdf))) {
+					box.setGraphic(new ImageView("img/pdf_local_not_there.png"));
+				} else {
+					box.setGraphic(new ImageView("img/pdf.png"));
+				}
+			} else if (node instanceof IliasForum) {
+				box.setGraphic(new ImageView("img/forum.png"));
+			}
+			
+			box.setText(node.toString());
+			pane.setLeft(box);
+			if (addOptions) {
+				createAndAddActions(node, pane);
+			}
+			setGraphic(pane);
+		}
+
+		private void createAndAddActions(final IliasTreeNode node, final BorderPane pane) {
+			Button downloadButton = new Button(); 
+			downloadButton.setId("listActionButton");
+			downloadButton.setGraphic(new ImageView("img/downloadArrow.png"));
+			downloadButton.setOnAction(new EventHandler<ActionEvent>() {
+				@Override
+				public void handle(ActionEvent arg0) {
+					download(node); 
+				}
+			});
+			Button ignoreButton = new Button(); 
+			ignoreButton.setId("listActionButton");
+			ignoreButton.setOnAction(new EventHandler<ActionEvent>() {
+				@Override
+				public void handle(ActionEvent event) {
+					toggleIgnoredState(node);
+				}
+			});
+			Button openerButton = new Button(); 
+			openerButton.setId("listActionButton");
+			openerButton.setGraphic(new ImageView("img/folder_small.png"));
+			openerButton.setOnAction(new EventHandler<ActionEvent>() {
+				@Override
+				public void handle(ActionEvent event) {
+					DesktopHelper.openFile((IliasPdf)node);
+				}
+			});
+			Button printerButton = new Button(); 
+			printerButton.setId("listActionButton"); 
+			printerButton.setGraphic(new ImageView("img/printer.png"));
+			printerButton.setOnAction(new EventHandler<ActionEvent>() {
+				@Override
+				public void handle(ActionEvent event) {
+					DesktopHelper.print((IliasPdf)node);
+				}
+			});
+			
+			HBox actions = new HBox(); 
+			actions.setSpacing(10);
+			
+			if (!(node instanceof IliasForum)) {
+				actions.getChildren().add(downloadButton); 
+			}
+			if (node instanceof IliasPdf) {
+				if (((IliasPdf)node).isIgnored()) {
+					ignoreButton.setGraphic(new ImageView("img/check.png"));
+				} else {
+					ignoreButton.setGraphic(new ImageView("img/ignore.png"));
+				}
+				actions.getChildren().add(ignoreButton); 
+				actions.getChildren().add(openerButton); 
+				actions.getChildren().add(printerButton); 
+			}
+			pane.setRight(actions);
+		}
+		
+		private void download(IliasTreeNode node) {
+			if (node instanceof IliasPdf) {
+				new Thread(new IliasPdfDownloadCaller(node)).start(); 
+			} else if (node instanceof IliasFolder) {
+				new Thread(new IliasFolderDownloaderTask(node)).start();
+			}
+		}
+
+		private void toggleIgnoredState(final IliasTreeNode node) {
+			IliasPdf pdf = (IliasPdf)node;
+			Settings.getInstance().togglePdfIgnored(pdf);
+			dashboard.pdfIgnoredStateChanged(pdf);
+			dashboard.getResultList().pdfIgnoredStateChanged(pdf);
+			pdfStatusChanged(pdf);
+		}
 	}
 }

@@ -60,6 +60,21 @@
     -fx-effect: 			innershadow( three-pass-box , rgba(0,0,0,0.6) , 3, 0.0 , 0 , 1 );
 }
 
+#listActionButton {
+	-fx-background-color: 	white; 
+	-fx-background-radius:	20;
+    -fx-font-weight: 		bold;
+    -fx-effect: 			dropshadow( three-pass-box , rgba(0,0,0,0.6) , 3, 0.0 , 0 , 1 );
+}
+
+#listActionButton:hover {
+	-fx-effect: 		innershadow(three-pass-box , white , 0, 0.0 , 0 , 0 );
+}
+
+#listActionButton:pressed {
+	-fx-effect: 		innershadow(three-pass-box , rgba(0,0,0,0.6) , 3, 0.0 , 0 , 1 );
+}
+
 .radio-button .dot{
 	-fx-text-fill: 			darkgrey; 
 }

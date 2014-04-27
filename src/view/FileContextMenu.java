@@ -1,7 +1,6 @@
 package view;
 
 import java.awt.Desktop;
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -18,10 +17,11 @@ import model.IliasForum;
 import model.IliasPdf;
 import model.IliasTreeNode;
 import model.Settings;
+import utils.DesktopHelper;
 import control.LocalPdfStorage;
 import download.DownloadMode;
-import download.DownloaderTask;
 import download.IliasFolderDownloaderTask;
+import download.IliasPdfDownloadCaller;
 
 public class FileContextMenu {
 
@@ -105,21 +105,21 @@ public class FileContextMenu {
 		printItem.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				print();
+				DesktopHelper.print((IliasPdf)selectedIliasTreeNode);
 			}
 		});
 		openParentFolderItem = new MenuItem("In Ordner öffnen");
 		openParentFolderItem.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				openLocalFolder();
+				DesktopHelper.openLocalFolder((IliasPdf)selectedIliasTreeNode);
 			}
 		});
 		openFileItem = new MenuItem("Datei öffnen");
 		openFileItem.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				openFile();
+				DesktopHelper.openFile((IliasPdf)selectedIliasTreeNode);
 			}
 		});
 		openForumItem = new MenuItem("Im Browser öffnen");
@@ -187,7 +187,7 @@ public class FileContextMenu {
 	}
 
 	private void downloadIliasPdf(IliasTreeNode selectediliasPdf) {
-		new Thread(new DownloaderTask(selectediliasPdf)).start(); 
+		new Thread(new IliasPdfDownloadCaller(selectediliasPdf)).start(); 
 	}
 
 	private void downloadIliasFolder(IliasFolder selectedIliasFolder) {
@@ -196,30 +196,14 @@ public class FileContextMenu {
 	
 	private void downloadIliasPdfs(List<IliasTreeNode> selectedIliasTreeNodes, DownloadMode mode) {
 		for (IliasTreeNode iliasTreeNode : selectedIliasTreeNodes) {
-			new Thread(new DownloaderTask(iliasTreeNode, mode)).start(); 
+			new Thread(new IliasPdfDownloadCaller(iliasTreeNode, mode)).start(); 
 		}
 	}
 
 	private void downloadIliasFolders(List<IliasTreeNode> selectedIliasFolders) {
 		new Thread(new IliasFolderDownloaderTask(selectedIliasFolders)).start();
 	}
-
-	private void openFile() {
-		final IliasPdf pdf = (IliasPdf) this.selectedIliasTreeNode;
-		final File file = LocalPdfStorage.getInstance().getFile(pdf);
-		if (file != null && file.exists()) {
-			if (Desktop.isDesktopSupported()) {
-				try {
-					Desktop.getDesktop().open(file);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		} else {
-			// showErrorMessage();
-		}
-	}
-
+	
 	private void openForum() {
 		final IliasForum forum = (IliasForum) this.selectedIliasTreeNode;
 		if (Desktop.isDesktopSupported()) {
@@ -230,36 +214,6 @@ public class FileContextMenu {
 			}
 		} else {
 			dashboard.browse(forum.getUrl());
-		}
-	}
-
-	private void openLocalFolder() {
-		IliasPdf pdf = (IliasPdf) this.selectedIliasTreeNode;
-		final File file = LocalPdfStorage.getInstance().getFile(pdf);
-		if (file != null && file.exists()) {
-			if (Desktop.isDesktopSupported()) {
-				try {
-					Desktop.getDesktop().open(file.getParentFile());
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		} else {
-			// showErrorMessage();
-		}
-	}
-
-	private void print() {
-		IliasPdf pdf = (IliasPdf) this.selectedIliasTreeNode;
-		final File file = LocalPdfStorage.getInstance().getFile(pdf);
-		if (file != null && file.exists()) {
-			try {
-				Desktop.getDesktop().print(file);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		} else {
-			// showErrorMessage();
 		}
 	}
 }
