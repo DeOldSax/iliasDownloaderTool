@@ -1,23 +1,24 @@
 package model;
 
 
-public class IliasPdf extends IliasFile {
-	private static final long serialVersionUID = -2841996600829969452L;
+public class IliasFile extends IliasTreeNode {
+	private static final long serialVersionUID = -6286982393008142116L;
+	
 	private final int size;
-
-	public IliasPdf(String name, String url, IliasFolder parentDirectory, int size) {
-		super(name, url, parentDirectory, size);
+	
+	public IliasFile(String name, String url, IliasFolder parentFolder, int size) {
+		super(name, url, parentFolder);
 		this.size = size;
 	}
-
+	
 	public int getSize() {
 		return size;
 	}
-
+	
 	public boolean isIgnored() {
 		return Settings.getInstance().isIgnored(createStoreKey()) != -1;
 	}
-
+	
 	public void setIgnored(boolean b) {
 		if (b) {
 			Settings.getInstance().storeIgnoredFileSize(createStoreKey(), getSize());
@@ -25,7 +26,7 @@ public class IliasPdf extends IliasFile {
 			Settings.getInstance().removeIgnoredFileSize(createStoreKey());
 		}
 	}
-
+	
 	private String createStoreKey() {
 		String key = getUrl();
 		final int beginIndex = key.indexOf("ref_id=");

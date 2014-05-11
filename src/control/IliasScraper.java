@@ -4,10 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import model.IliasDoc;
+import model.IliasFile;
 import model.IliasFolder;
 import model.IliasForum;
 import model.IliasPdf;
 import model.IliasTreeNode;
+import model.IliasZip;
 import model.Settings;
 
 import org.jsoup.Jsoup;
@@ -18,14 +21,14 @@ import view.Dashboard;
 
 public class IliasScraper {
 	public AtomicInteger threadCount;
-	public AtomicInteger pdfCounter;
+	public AtomicInteger fileCounter;
 	private List<IliasFolder> iliasTree;
 	private final Dashboard dashboard;
 
 	public IliasScraper(Dashboard dashboard) {
 		this.dashboard = dashboard;
 		threadCount = new AtomicInteger(0);
-		pdfCounter = new AtomicInteger(0);
+		fileCounter = new AtomicInteger(0);
 	}
 
 	public void run(String dashboardHtml) {
@@ -73,17 +76,18 @@ public class IliasScraper {
 	}
 
 	private class IliasScraperThread implements Runnable {
-		private final IliasScraper iliasPdfFinder;
-		private final List<IliasFolder> kurse;
+		String BASE_URI = "https://ilias.studium.kit.edu/";
+		private final IliasScraper iliasScraper;
+		private final List<IliasFolder> courses;
 
-		private IliasScraperThread(IliasScraper iliasPdfFinder, List<IliasFolder> kurse) {
-			this.iliasPdfFinder = iliasPdfFinder;
-			this.kurse = kurse;
+		private IliasScraperThread(IliasScraper iliasScraper, List<IliasFolder> courses) {
+			this.iliasScraper = iliasScraper;
+			this.courses = courses;
 		}
 
 		@Override
 		public void run() {
-			for (IliasFolder parent : kurse) {
+			for (IliasFolder parent : courses) {
 				if (Settings.getInstance().updateCanceled()) {
 					break;
 				}
@@ -92,41 +96,52 @@ public class IliasScraper {
 					if (Settings.getInstance().updateCanceled()) {
 						break;
 					}
-					final boolean dirIstPdfFile = dir.attr("href").contains("cmd=sendfile");
+					// if the file is not specified yet, use the "standard" file
+					final boolean linkToFile = dir.attr("href").contains("cmd=sendfile");
+					final boolean linkToPdf = false; 
+					final boolean linkToZip = false; 
+					final boolean linkToDoc = false; 
 					final boolean linkToFolder = dir.attr("href").contains("goto_produktiv_fold_")
 							|| dir.attr("href").contains("goto_produktiv_grp_");
 					final boolean linkToForum = dir.attr("href").contains("goto_produktiv_frm_");
-					if (dirIstPdfFile) {
-						dir.setBaseUri("https://ilias.studium.kit.edu/");
-						final int size = new IliasConnector().requestHead(dir.attr("abs:href"));
-						IliasPdf newPdfFile = createPDF(parent, dir, size);
+					final boolean linkToHyperlink = false; 
 
-						dashboard.setStatusText(pdfCounter.toString() + " Dateien wurden bereits überprüft.");
+					int size = 0; 
 
-						List<Element> elemse = dir.parent().parent().siblingElements().select("div").select("span");
-						for (Element el : elemse) {
-							final boolean istUngelesen = el.attr("class").contains("il_ItemAlertProperty");
-							if (istUngelesen) {
-								newPdfFile.setRead(false);
-							}
+					if (linkToFile) {
+						updateStatusText();
+						size = new IliasConnector().getFileSize(dir.attr("abs:href"));
+						if (linkToPdf) {
+							createPdf(parent, dir, size);
+						} else if (linkToZip) {
+							createZip(parent, dir, size); 
+						} else if (linkToDoc) {
+							createDoc(parent, dir, size); 
+						} else {
+							// if the file is not specified yet, use the "standard" file
+							createFile(parent, dir, size); 
 						}
-					}
-					if (linkToForum) {
+					} else if (linkToHyperlink) {
+						//TODO implement
+					} else if (linkToForum) {
 						createForum(parent, dir);
-					}
-					if (linkToFolder) {
+					} else if (linkToFolder) {
 						List<IliasFolder> tempo = new ArrayList<IliasFolder>();
 						IliasFolder newFolder = createFolder(parent, dir);
 						tempo.add(newFolder);
-						iliasPdfFinder.startThread(tempo);
+						iliasScraper.startThread(tempo);
 					}
 				}
 			}
-			iliasPdfFinder.threadCount.decrementAndGet();
+			iliasScraper.threadCount.decrementAndGet();
+		}
+
+		private void updateStatusText() {
+			dashboard.setStatusText(fileCounter.toString() + " Dateien wurden bereits überprüft.");
 		}
 
 		private IliasForum createForum(IliasFolder parent, Element dir) {
-			dir.setBaseUri("https://ilias.studium.kit.edu/");
+			dir.setBaseUri(BASE_URI);
 			final String name = dir.text();
 			final String link = dir.attr("abs:href");
 			final IliasForum forum = new IliasForum(name, link, parent);
@@ -134,20 +149,47 @@ public class IliasScraper {
 		}
 
 		private IliasFolder createFolder(IliasFolder kurs, Element dir) {
-			dir.setBaseUri("https://ilias.studium.kit.edu/");
+			dir.setBaseUri(BASE_URI);
 			final String name = dir.text();
 			final String downloadLink = dir.attr("abs:href");
 			final IliasFolder folder = new IliasFolder(name, downloadLink, kurs);
 			return folder;
 		}
-
-		private IliasPdf createPDF(IliasFolder parentDirectory, Element dir, int size) {
-			pdfCounter.incrementAndGet();
-			dir.setBaseUri("https://ilias.studium.kit.edu/");
+		
+		private IliasFile createFile (IliasFolder parentFolder, Element dir, int size) {
+			fileCounter.incrementAndGet();
+			dir.setBaseUri(BASE_URI);
 			final String name = dir.text();
 			final String downloadLink = dir.attr("abs:href");
-			final IliasPdf pdf = new IliasPdf(name, downloadLink, parentDirectory, size);
+			final IliasFile pdf = new IliasFile(name, downloadLink, parentFolder, size);
 			return pdf;
+		}
+
+		private IliasPdf createPdf(IliasFolder parentFolder, Element dir, int size) {
+			fileCounter.incrementAndGet();
+			dir.setBaseUri(BASE_URI);
+			final String name = dir.text();
+			final String downloadLink = dir.attr("abs:href");
+			final IliasPdf pdf = new IliasPdf(name, downloadLink, parentFolder, size);
+			return pdf;
+		}
+		
+		private IliasZip createZip(IliasFolder parentFolder, Element dir, int size) {
+			fileCounter.incrementAndGet(); 
+			dir.setBaseUri(BASE_URI);
+			final String name = dir.text(); 
+			final String downloadLink = dir.attr("abs:href"); 
+			final IliasZip zip = new IliasZip(name, downloadLink, parentFolder, size);
+			return zip; 
+		}
+
+		private IliasDoc createDoc(IliasFolder parentFolder, Element dir, int size) {
+			fileCounter.incrementAndGet(); 
+			dir.setBaseUri(BASE_URI);
+			final String name = dir.text(); 
+			final String downloadLink = dir.attr("abs:href"); 
+			final IliasDoc doc = new IliasDoc(name, downloadLink, parentFolder, size);
+			return doc; 
 		}
 
 		private List<Element> openFolder(IliasTreeNode kurs) {

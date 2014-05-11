@@ -57,7 +57,7 @@ public class Settings {
 		return myPrefs.get(PASSWORD, "");
 	}
 
-	public void storeIgnoredPdfSize(String key, int size) {
+	public void storeIgnoredFileSize(String key, int size) {
 		myPrefs.putInt(key, size);
 	}
 
@@ -65,7 +65,7 @@ public class Settings {
 		return myPrefs.getInt(key, -1);
 	}
 
-	public void removeIgnoredPdfSize(String key) {
+	public void removeIgnoredFileSize(String key) {
 		myPrefs.remove(key);
 	}
 

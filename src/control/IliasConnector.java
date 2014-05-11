@@ -37,7 +37,7 @@ public class IliasConnector {
 		return html;
 	}
 
-	public int requestHead(String url) {
+	public int getFileSize(String url) {
 		context = new BasicHttpContext();
 		HttpHead head = new HttpHead(url);
 		try {
@@ -47,8 +47,8 @@ public class IliasConnector {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		Header[] pdfSize = response.getHeaders("Content-Length");
-		final int size = Integer.parseInt(pdfSize[0].getValue());
+		Header[] fileSize = response.getHeaders("Content-Length");
+		final int size = Integer.parseInt(fileSize[0].getValue());
 		return size;
 	}
 }
