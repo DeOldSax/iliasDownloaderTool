@@ -4,12 +4,12 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import utils.WinUtils;
 import javafx.concurrent.Task;
+import model.IliasFile;
 import model.IliasFolder;
-import model.IliasPdf;
 import model.IliasTreeNode;
 import model.Settings;
+import utils.WinUtils;
 
 /**
  * This task recursively downloads the complete structure of all passed
@@ -53,8 +53,8 @@ public class IliasFolderDownloaderTask extends Task<Void> {
 					createFolder(node);
 					String newDownloadPath = WinUtils.makeDirectoryNameValid(currentLevelDownloadPath + "/" + node.getName());
 					new Thread(new Downloader(((IliasFolder) node).getChildNodes(), newDownloadPath)).start();
-				} else if (node instanceof IliasPdf) {
-					downloadPdf(node);
+				} else if (node instanceof IliasFile) {
+					downloadFile((IliasFile)node);
 				}
 			}
 		}
@@ -67,12 +67,12 @@ public class IliasFolderDownloaderTask extends Task<Void> {
 			}
 		}
 
-		private void downloadPdf(IliasTreeNode node) {
-			IliasPdf pdf = (IliasPdf) node;
-			String validName = WinUtils.makeFileNameValid(pdf.getName());
+		private void downloadFile(IliasFile node) {
+			IliasFile file = (IliasFile) node;
+			String validName = WinUtils.makeFileNameValid(file.getName());
 			String path = WinUtils.makeDirectoryNameValid(currentLevelDownloadPath); 
-			path += "/" + validName + ".pdf";
-			new Thread(new IliasPdfDownloaderTask(pdf, path)).start();
+			path += "/" + validName + "." + node.getExtension();
+			new Thread(new IliasPdfDownloaderTask(file, path)).start();
 		}
 	}
 }

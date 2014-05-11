@@ -12,13 +12,13 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import model.IliasFile;
 import model.IliasFolder;
 import model.IliasForum;
-import model.IliasPdf;
 import model.IliasTreeNode;
 import model.Settings;
 import utils.DesktopHelper;
-import control.LocalPdfStorage;
+import control.LocalFileStorage;
 import download.DownloadMode;
 import download.IliasFolderDownloaderTask;
 import download.IliasPdfDownloadCaller;
@@ -26,7 +26,7 @@ import download.IliasPdfDownloadCaller;
 public class FileContextMenu {
 
 	private final ContextMenu menu;
-	private final MenuItem downloadIliasPdfItem;
+	private final MenuItem downloadIliasFileItem;
 	private final MenuItem downloadIliasFolderItem;
 	private final MenuItem downloadIliasFoldersItem;
 	private final MenuItem ignoreItem;
@@ -45,9 +45,9 @@ public class FileContextMenu {
 		this.dashboard = dashboard;
 		// FIXME add param Dashboard
 		menu = new ContextMenu();
-		downloadIliasPdfItem = new MenuItem("Herunterladen");
-		downloadIliasPdfItem.setGraphic(new ImageView("img/downloadArrow.png"));
-		downloadIliasPdfItem.setOnAction(new EventHandler<ActionEvent>() {
+		downloadIliasFileItem = new MenuItem("Herunterladen");
+		downloadIliasFileItem.setGraphic(new ImageView("img/downloadArrow.png"));
+		downloadIliasFileItem.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
 				downloadIliasPdf(selectedIliasTreeNode);
@@ -91,10 +91,10 @@ public class FileContextMenu {
 		final EventHandler<ActionEvent> pdfIgnorer = new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				final IliasPdf pdf = (IliasPdf) selectedIliasTreeNode;
-				Settings.getInstance().togglePdfIgnored(pdf);
-				dashboard.pdfIgnoredStateChanged(pdf);
-				dashboard.getResultList().pdfIgnoredStateChanged(pdf);
+				final IliasFile file = (IliasFile) selectedIliasTreeNode;
+				Settings.getInstance().toggleFileIgnored(file);
+				dashboard.pdfIgnoredStateChanged(file);
+				dashboard.getResultList().pdfIgnoredStateChanged(file);
 			}
 		};
 
@@ -105,21 +105,21 @@ public class FileContextMenu {
 		printItem.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				DesktopHelper.print((IliasPdf)selectedIliasTreeNode);
+				DesktopHelper.print((IliasFile)selectedIliasTreeNode);
 			}
 		});
 		openParentFolderItem = new MenuItem("In Ordner öffnen");
 		openParentFolderItem.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				DesktopHelper.openLocalFolder((IliasPdf)selectedIliasTreeNode);
+				DesktopHelper.openLocalFolder((IliasFile)selectedIliasTreeNode);
 			}
 		});
 		openFileItem = new MenuItem("Datei öffnen");
 		openFileItem.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				DesktopHelper.openFile((IliasPdf)selectedIliasTreeNode);
+				DesktopHelper.openFile((IliasFile)selectedIliasTreeNode);
 			}
 		});
 		openForumItem = new MenuItem("Im Browser öffnen");
@@ -138,12 +138,12 @@ public class FileContextMenu {
 		} 
 
 		if (Settings.getInstance().userIsLoggedIn()) {
-			boolean selectedNodesContainsPdf = false; 
+			boolean selectedNodesContainsFiles = false; 
 			boolean selectedNodesContainsFolder = false; 
 			for (IliasTreeNode iliasTreeNode : selectedNodes) {
-				if (!selectedNodesContainsPdf && iliasTreeNode instanceof IliasPdf) {
+				if (!selectedNodesContainsFiles && iliasTreeNode instanceof IliasFile) {
 					menu.getItems().addAll(autoDownloadIliasPdfItem, normalDownloadIliasPdfsItem); 
-					selectedNodesContainsPdf = true; 
+					selectedNodesContainsFiles = true; 
 				}
 				if (!selectedNodesContainsFolder && iliasTreeNode instanceof IliasFolder) {
 					menu.getItems().add(downloadIliasFoldersItem);
@@ -167,21 +167,21 @@ public class FileContextMenu {
 		} else if (node instanceof IliasForum) {
 			menu.getItems().add(openForumItem);
 			return menu;
-		} else if (node instanceof IliasPdf) {
-			IliasPdf pdf = (IliasPdf) node;
-			if (pdf.isIgnored()) {
+		} else if (node instanceof IliasFile) {
+			IliasFile file = (IliasFile) node;
+			if (file.isIgnored()) {
 				menu.getItems().add(ignoreItemCancel);
 			} else {
 				menu.getItems().add(ignoreItem);
 			}
-			if (LocalPdfStorage.getInstance().contains(pdf)) {
+			if (LocalFileStorage.getInstance().contains(file)) {
 				menu.getItems().add(printItem);
 				menu.getItems().add(openParentFolderItem);
 				menu.getItems().add(openFileItem);
 			}
 		}
-		if (Settings.getInstance().userIsLoggedIn() && node instanceof IliasPdf) {
-			menu.getItems().add(0, downloadIliasPdfItem);
+		if (Settings.getInstance().userIsLoggedIn() && node instanceof IliasFile) {
+			menu.getItems().add(0, downloadIliasFileItem);
 		}
 		return menu;
 	}

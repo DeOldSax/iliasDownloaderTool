@@ -69,11 +69,11 @@ public class Settings {
 		myPrefs.remove(key);
 	}
 
-	public void togglePdfIgnored(IliasPdf pdf) {
-		if (pdf.isIgnored()) {
-			pdf.setIgnored(false);
+	public void toggleFileIgnored(IliasFile file) {
+		if (file.isIgnored()) {
+			file.setIgnored(false);
 		} else {
-			pdf.setIgnored(true);
+			file.setIgnored(true);
 		}
 	}
 

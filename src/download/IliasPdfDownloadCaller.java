@@ -2,15 +2,16 @@ package download;
 
 import java.io.File;
 import java.util.List;
-import utils.WinUtils;
-import control.LocalPdfStorage;
+
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import model.IliasPdf;
+import model.IliasFile;
 import model.IliasTreeNode;
 import model.IliasTreeProvider;
+import utils.WinUtils;
+import control.LocalFileStorage;
 
 /**
  * This class provides the option to ask the User for a position to store the file and 
@@ -34,12 +35,12 @@ public class IliasPdfDownloadCaller extends Task<Void> {
 
 	@Override
 	protected Void call() throws Exception {
-		final List<IliasPdf> allPdfFiles = IliasTreeProvider.getAllPdfFiles();
+		final List<IliasFile> allFiles = IliasTreeProvider.getAllIliasFiles();
 
-		for (IliasPdf pdf : allPdfFiles) {
-			if (node instanceof IliasPdf) {
-				if (pdf.getUrl().equals(node.getUrl())) {
-					download(pdf, ".pdf");
+		for (IliasFile file : allFiles) {
+			if (node instanceof IliasFile) {
+				if (file.getUrl().equals(node.getUrl())) {
+					download(file);
 				}
 			}
 		}
@@ -47,26 +48,26 @@ public class IliasPdfDownloadCaller extends Task<Void> {
 		return null;
 	}
 
-	private void download(IliasPdf pdf, String type) {
+	private void download(IliasFile file) {
 		System.out.println("download");
-		String targetPath = LocalPdfStorage.getInstance().suggestDownloadPath(pdf);
-		String name = WinUtils.makeFileNameValid(pdf.getName()); 
+		String targetPath = LocalFileStorage.getInstance().suggestDownloadPath(file);
+		String name = WinUtils.makeFileNameValid(file.getName()); 
 
 		switch (mode) {
 		case AUTO:
-			targetPath = targetPath + "\\" + name + ".pdf";
-			new Thread(new IliasPdfDownloaderTask(pdf, targetPath)).start();
+			targetPath = targetPath + "\\" + name + "." + file.getExtension();
+			new Thread(new IliasPdfDownloaderTask(file, targetPath)).start();
 			break;
 		case NORMAL:
-			askForStoragePosition(name, targetPath, type, pdf);
+			askForStoragePosition(name, targetPath, file);
 			break;
 		}
 	}
 
-	private void askForStoragePosition(String name, final String targetPath, String type, final IliasPdf pdf) {
+	private void askForStoragePosition(String name, final String targetPath, final IliasFile file) {
 		final FileChooser fileChooser = new FileChooser();
 		fileChooser.setInitialDirectory(new File(targetPath));
-		fileChooser.setInitialFileName(name + type);
+		fileChooser.setInitialFileName(name + "." + file.getExtension());
 
 		Platform.runLater(new Runnable() {
 			@Override
@@ -75,10 +76,10 @@ public class IliasPdfDownloadCaller extends Task<Void> {
 				String path = targetPath;
 				if (selectedFile != null) {
 					path = selectedFile.getAbsolutePath();
-					if (!path.endsWith(".pdf")) {
-						path = path + ".pdf";
+					if (!path.endsWith("." + file.getExtension())) {
+						path = path + "." + file.getExtension();
 					}
-					new Thread(new IliasPdfDownloaderTask(pdf, path)).start();
+					new Thread(new IliasPdfDownloaderTask(file, path)).start();
 				}
 			}
 		});

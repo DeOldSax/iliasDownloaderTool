@@ -8,34 +8,34 @@ import java.io.IOException;
 
 import javafx.application.Platform;
 import javafx.concurrent.Task;
-import model.IliasPdf;
+import model.IliasFile;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.protocol.BasicHttpContext;
 
-import control.Ilias;
-import control.LocalPdfStorage;
 import view.Dashboard;
+import control.Ilias;
+import control.LocalFileStorage;
 
 public class IliasPdfDownloaderTask extends Task<Void> {
 	private HttpGet request;
 	private HttpResponse response;
 	private BasicHttpContext context;
 	private HttpEntity entity;
-	private IliasPdf pdf;
+	private IliasFile file;
 	private String targetPath;
 
-	protected IliasPdfDownloaderTask(IliasPdf pdf, String targetPath) {
-		this.pdf = pdf;
+	protected IliasPdfDownloaderTask(IliasFile file, String targetPath) {
+		this.file = file;
 		this.targetPath = targetPath;
 	}
 	
 	@Override
 	protected Void call() throws Exception {
 		try {
-			request = new HttpGet(pdf.getUrl());
+			request = new HttpGet(file.getUrl());
 
 			response = Ilias.getClient().execute(request, context);
 			entity = response.getEntity();
@@ -56,12 +56,12 @@ public class IliasPdfDownloaderTask extends Task<Void> {
 			e.printStackTrace();
 		}
 		
-		LocalPdfStorage.getInstance().addPdf(pdf, targetPath);
+		LocalFileStorage.getInstance().addIliasFile(file, targetPath);
 		Platform.runLater(new Runnable() {
 			
 			@Override
 			public void run() {
-				Dashboard.fileDownloaded(pdf);
+				Dashboard.fileDownloaded(file);
 			}
 		});
 		return null;

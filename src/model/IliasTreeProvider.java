@@ -6,10 +6,10 @@ import java.util.List;
 public class IliasTreeProvider {
 	private static List<IliasFolder> allFiles = null;
 
-	public static List<IliasPdf> getAllPdfFiles() {
-		List<IliasPdf> allPdfs = new ArrayList<IliasPdf>();
-		pdfFilter(getTree(), allPdfs);
-		return allPdfs;
+	public static List<IliasFile> getAllIliasFiles() {
+		List<IliasFile> allFiles = new ArrayList<IliasFile>();
+		pdfFilter(getTree(), allFiles);
+		return allFiles;
 	}
 
 	public static List<IliasFolder> getTree() {
@@ -27,12 +27,12 @@ public class IliasTreeProvider {
 		IliasTreeProvider.allFiles = allFiles;
 	}
 
-	private static void pdfFilter(final List<? extends IliasTreeNode> nodes, final List<IliasPdf> allPdfs) {
+	private static void pdfFilter(final List<? extends IliasTreeNode> nodes, final List<IliasFile> allIliasFiles) {
 		for (IliasTreeNode node : nodes) {
-			if (node instanceof IliasPdf) {
-				allPdfs.add((IliasPdf) node);
+			if (node instanceof IliasFile) {
+				allIliasFiles.add((IliasFile) node);
 			} else if (node instanceof IliasFolder) {
-				pdfFilter(((IliasFolder) node).getChildNodes(), allPdfs);
+				pdfFilter(((IliasFolder) node).getChildNodes(), allIliasFiles);
 			}
 		}
 	}

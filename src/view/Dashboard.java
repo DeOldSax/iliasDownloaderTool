@@ -2,8 +2,6 @@ package view;
 
 import java.io.File;
 
-import org.apache.log4j.PropertyConfigurator;
-
 import javafx.animation.Interpolator;
 import javafx.animation.RotateTransition;
 import javafx.animation.Timeline;
@@ -37,11 +35,15 @@ import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Duration;
-import model.IliasPdf;
+import model.IliasFile;
 import model.IliasTreeStorage;
 import model.Settings;
+
+import org.apache.log4j.PropertyConfigurator;
+import org.apache.log4j.helpers.Loader;
+
 import control.IliasStarter;
-import control.LocalPdfStorage;
+import control.LocalFileStorage;
 import control.LoginProvider;
 import control.VersionValidator;
 
@@ -75,7 +77,7 @@ public class Dashboard extends Application {
 
 	public static void main(String[] args) {
 		new File(System.getProperty("user.home") + "/.ilias/ilias.log").delete(); 
-		PropertyConfigurator.configure(Dashboard.class.getResourceAsStream("log4j.properties"));
+		PropertyConfigurator.configure(Loader.getResource("properties/log4j.properties"));
 		
 		boolean newVersionCalled = new VersionValidator().validate();
 		if (newVersionCalled) {
@@ -208,7 +210,7 @@ public class Dashboard extends Application {
 								new IliasStarter(dashboard).loadIliasTree();
 							}
 						}).start();
-						LocalPdfStorage.getInstance().refresh();
+						LocalFileStorage.getInstance().refresh();
 					}
 				}
 			}
@@ -301,7 +303,7 @@ public class Dashboard extends Application {
 		scene.getStylesheets().add("skin/DashboardStyle.css");
 		setScene();
 		stage.setTitle("Ilias");
-		LocalPdfStorage.getInstance().refresh();
+		LocalFileStorage.getInstance().refresh();
 		iliasTreeReloaded(false);
 		stage.show();
 
@@ -433,17 +435,17 @@ public class Dashboard extends Application {
 		});
 	}
 
-	public static void updateGraphicInTree(IliasPdf pdf) {
-		courses.pdfStatusChanged(pdf);
+	public static void updateGraphicInTree(IliasFile file) {
+		courses.fileStatusChanged(file);
 	}
 
-	public void pdfIgnoredStateChanged(IliasPdf pdf) {
-		if (pdf.isIgnored()) {
-			setStatusText(pdf.getName() + " wurde auf ignorieren gesetzt.", false);
+	public void pdfIgnoredStateChanged(IliasFile file) {
+		if (file.isIgnored()) {
+			setStatusText(file.getName() + " wurde auf ignorieren gesetzt.", false);
 		} else {
-			setStatusText(pdf.getName() + " wird nicht mehr ignoriert.", false);
+			setStatusText(file.getName() + " wird nicht mehr ignoriert.", false);
 		}
-		courses.pdfStatusChanged(pdf);
+		courses.fileStatusChanged(file);
 	}
 
 	public void browse(String url) {
@@ -494,10 +496,10 @@ public class Dashboard extends Application {
 		showIgnored.setText("Ignorierte Dateien " + "(" + String.valueOf(number) + ")");
 	}
 
-	public static void fileDownloaded(IliasPdf pdf) {
+	public static void fileDownloaded(IliasFile file) {
 		setStatusText("Download abgeschlossen", false);
-		updateGraphicInTree(pdf);
-		resultList.pdfSynchronizedStateChanged(pdf);
+		updateGraphicInTree(file);
+		resultList.fileSynchronizedStateChanged(file);
 	}
 
 	private void setLoaderButtonActivated(boolean activate) {

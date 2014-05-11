@@ -4,18 +4,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import model.IliasDoc;
 import model.IliasFile;
 import model.IliasFolder;
 import model.IliasForum;
-import model.IliasPdf;
 import model.IliasTreeNode;
-import model.IliasZip;
 import model.Settings;
 
+import org.apache.log4j.Logger;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import view.Dashboard;
 
@@ -98,9 +97,7 @@ public class IliasScraper {
 					}
 					// if the file is not specified yet, use the "standard" file
 					final boolean linkToFile = dir.attr("href").contains("cmd=sendfile");
-					final boolean linkToPdf = false; 
-					final boolean linkToZip = false; 
-					final boolean linkToDoc = false; 
+					final String fileExtension = suggestFileExtension(dir); 
 					final boolean linkToFolder = dir.attr("href").contains("goto_produktiv_fold_")
 							|| dir.attr("href").contains("goto_produktiv_grp_");
 					final boolean linkToForum = dir.attr("href").contains("goto_produktiv_frm_");
@@ -111,16 +108,7 @@ public class IliasScraper {
 					if (linkToFile) {
 						updateStatusText();
 						size = new IliasConnector().getFileSize(dir.attr("abs:href"));
-						if (linkToPdf) {
-							createPdf(parent, dir, size);
-						} else if (linkToZip) {
-							createZip(parent, dir, size); 
-						} else if (linkToDoc) {
-							createDoc(parent, dir, size); 
-						} else {
-							// if the file is not specified yet, use the "standard" file
-							createFile(parent, dir, size); 
-						}
+						createFile(parent, dir, size, fileExtension);
 					} else if (linkToHyperlink) {
 						//TODO implement
 					} else if (linkToForum) {
@@ -156,40 +144,13 @@ public class IliasScraper {
 			return folder;
 		}
 		
-		private IliasFile createFile (IliasFolder parentFolder, Element dir, int size) {
+		private IliasFile createFile (IliasFolder parentFolder, Element dir, int size, String fileExtension) {
 			fileCounter.incrementAndGet();
 			dir.setBaseUri(BASE_URI);
 			final String name = dir.text();
 			final String downloadLink = dir.attr("abs:href");
-			final IliasFile pdf = new IliasFile(name, downloadLink, parentFolder, size);
-			return pdf;
-		}
-
-		private IliasPdf createPdf(IliasFolder parentFolder, Element dir, int size) {
-			fileCounter.incrementAndGet();
-			dir.setBaseUri(BASE_URI);
-			final String name = dir.text();
-			final String downloadLink = dir.attr("abs:href");
-			final IliasPdf pdf = new IliasPdf(name, downloadLink, parentFolder, size);
-			return pdf;
-		}
-		
-		private IliasZip createZip(IliasFolder parentFolder, Element dir, int size) {
-			fileCounter.incrementAndGet(); 
-			dir.setBaseUri(BASE_URI);
-			final String name = dir.text(); 
-			final String downloadLink = dir.attr("abs:href"); 
-			final IliasZip zip = new IliasZip(name, downloadLink, parentFolder, size);
-			return zip; 
-		}
-
-		private IliasDoc createDoc(IliasFolder parentFolder, Element dir, int size) {
-			fileCounter.incrementAndGet(); 
-			dir.setBaseUri(BASE_URI);
-			final String name = dir.text(); 
-			final String downloadLink = dir.attr("abs:href"); 
-			final IliasDoc doc = new IliasDoc(name, downloadLink, parentFolder, size);
-			return doc; 
+			final IliasFile iliasFile = new IliasFile(name, downloadLink, fileExtension, parentFolder, size);
+			return iliasFile;
 		}
 
 		private List<Element> openFolder(IliasTreeNode kurs) {
@@ -198,6 +159,17 @@ public class IliasScraper {
 			Document doc = Jsoup.parse(newHtmlContent);
 			directory = doc.select("h4").select("a");
 			return directory;
+		}
+		
+		private String suggestFileExtension(Element dir) {
+			Elements siblingElements = dir.parent().parent().siblingElements();
+			for (Element element : siblingElements) {
+				if (element.attr("class").equals("il_ItemProperties")) {
+					return element.child(0).text(); 
+				}
+			}
+			Logger.getLogger(getClass()).debug("ERROR: File Extension could not be found");
+			return "unknown"; 
 		}
 	}
 }

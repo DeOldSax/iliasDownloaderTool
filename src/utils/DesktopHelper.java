@@ -3,13 +3,14 @@ package utils;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
-import model.IliasPdf;
-import control.LocalPdfStorage;
+
+import model.IliasFile;
+import control.LocalFileStorage;
 
 public class DesktopHelper {
 	
-	public static void print(IliasPdf pdf) {
-		final File file = LocalPdfStorage.getInstance().getFile(pdf);
+	public static void print(IliasFile iliasFile) {
+		final File file = LocalFileStorage.getInstance().getFile(iliasFile);
 		if (file != null && file.exists()) {
 			try {
 				Desktop.getDesktop().print(file);
@@ -21,8 +22,8 @@ public class DesktopHelper {
 		}
 	}
 	
-	public static void openFile(IliasPdf pdf) {
-		final File file = LocalPdfStorage.getInstance().getFile(pdf);
+	public static void openFile(IliasFile iliasFile) {
+		final File file = LocalFileStorage.getInstance().getFile(iliasFile);
 		if (file != null && file.exists()) {
 			if (Desktop.isDesktopSupported()) {
 				try {
@@ -36,8 +37,8 @@ public class DesktopHelper {
 		}
 	}
 
-	public static void openLocalFolder(IliasPdf pdf) {
-		final File file = LocalPdfStorage.getInstance().getFile(pdf);
+	public static void openLocalFolder(IliasFile iliasFile) {
+		final File file = LocalFileStorage.getInstance().getFile(iliasFile);
 		if (file != null && file.exists()) {
 			if (Desktop.isDesktopSupported()) {
 				try {

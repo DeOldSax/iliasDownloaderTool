@@ -18,11 +18,11 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.TextAlignment;
-import model.IliasPdf;
+import model.IliasFile;
 import model.IliasTreeNode;
 import model.IliasTreeProvider;
 import model.Settings;
-import control.LocalPdfStorage;
+import control.LocalFileStorage;
 import download.IliasPdfDownloadCaller;
 
 public class ResultList extends ListView<IliasTreeNode> {
@@ -80,14 +80,14 @@ public class ResultList extends ListView<IliasTreeNode> {
 
 	private void handleKeyEvents(KeyEvent event) {
 		if (event.getCode() == KeyCode.DELETE && listMode.equals(ResultListMode.IGNORE_MODE)) {
-			final IliasPdf pdf = (IliasPdf) getSelectionModel().getSelectedItem();
-			Settings.getInstance().togglePdfIgnored(pdf);
-			dashboard.pdfIgnoredStateChanged(pdf);
-			pdfIgnoredStateChanged(pdf);
+			final IliasFile file = (IliasFile) getSelectionModel().getSelectedItem();
+			Settings.getInstance().toggleFileIgnored(file);
+			dashboard.pdfIgnoredStateChanged(file);
+			pdfIgnoredStateChanged(file);
 			getSelectionModel().selectNext();
 		} else if (event.getCode() == KeyCode.UP || event.getCode() == KeyCode.DOWN) {
 			final IliasTreeNode selectedDirectory = ((ResultList) event.getSource()).getSelectionModel().getSelectedItem();
-			dashboard.getCoursesTreeView().selectPdf((IliasPdf) selectedDirectory);
+			dashboard.getCoursesTreeView().selectFile((IliasFile) selectedDirectory);
 		} else if (event.getCode() == KeyCode.ENTER && Settings.getInstance().userIsLoggedIn()) {
 			new Thread(new IliasPdfDownloadCaller(getSelectionModel().getSelectedItem())).start();
 		}
@@ -100,7 +100,7 @@ public class ResultList extends ListView<IliasTreeNode> {
 			return;
 		}
 		if (selectedNodes.size() == 1) {
-			dashboard.getCoursesTreeView().selectPdf((IliasPdf) selectedNodes.get(0));
+			dashboard.getCoursesTreeView().selectFile((IliasFile) selectedNodes.get(0));
 		}
 		
 		if (event.getButton() == MouseButton.SECONDARY) {
@@ -109,22 +109,22 @@ public class ResultList extends ListView<IliasTreeNode> {
 		}
 	}
 
-	public void pdfIgnoredStateChanged(IliasPdf pdf) {
+	public void pdfIgnoredStateChanged(IliasFile file) {
 		dashboard.setNumberofIngoredPdfs(getIgnoredIliasPdfs().size());
 		dashboard.setNumberOfUnsynchronizedPdfs(getUnsynchronizedPdfs().size());
 		if (listMode != ResultListMode.IGNORE_MODE) {
 			return;
 		}
-		if (pdf.isIgnored()) {
-			if (!items.contains(pdf)) {
-				items.add(pdf);
+		if (file.isIgnored()) {
+			if (!items.contains(file)) {
+				items.add(file);
 			}
 		} else {
-			items.remove(pdf);
+			items.remove(file);
 		}
 	}
 
-	public void pdfSynchronizedStateChanged(IliasPdf pdf) {
+	public void fileSynchronizedStateChanged(IliasFile file) {
 		dashboard.setNumberofIngoredPdfs(getIgnoredIliasPdfs().size());
 		dashboard.setNumberOfUnsynchronizedPdfs(getUnsynchronizedPdfs().size());
 		if (listMode != ResultListMode.PDF_NOT_SYNCHRONIZED) {
@@ -148,62 +148,62 @@ public class ResultList extends ListView<IliasTreeNode> {
 	public void showIgnoredFiles() {
 		listMode = ResultListMode.IGNORE_MODE;
 		items.clear();
-		ArrayList<IliasPdf> ignoredPdf = getIgnoredIliasPdfs();
+		ArrayList<IliasFile> ignoredPdf = getIgnoredIliasPdfs();
 		setListHeader(" Ignorierte Dateien", "red");
-		for (IliasPdf pdf : ignoredPdf) {
+		for (IliasFile pdf : ignoredPdf) {
 			items.add(pdf);
 		}
 		dashboard.setStatusText(ignoredPdf.size() + " ignorierte Dateien in Ignorieren-Liste.", false);
 		dashboard.setNumberofIngoredPdfs(ignoredPdf.size());
 	}
 
-	public ArrayList<IliasPdf> getIgnoredIliasPdfs() {
-		final List<IliasPdf> allPdfFiles = IliasTreeProvider.getAllPdfFiles();
-		ArrayList<IliasPdf> ignoredPdf = new ArrayList<IliasPdf>();
-		for (IliasPdf pdf : allPdfFiles) {
-			if (pdf.isIgnored()) {
-				ignoredPdf.add(pdf);
+	public ArrayList<IliasFile> getIgnoredIliasPdfs() {
+		final List<IliasFile> allFiles = IliasTreeProvider.getAllIliasFiles();
+		ArrayList<IliasFile> ignoredFiles = new ArrayList<IliasFile>();
+		for (IliasFile file : allFiles) {
+			if (file.isIgnored()) {
+				ignoredFiles.add(file);
 			}
 		}
-		return ignoredPdf;
+		return ignoredFiles;
 	}
 
 	protected void showUnsynchronizedPdfs() {
 		listMode = ResultListMode.PDF_NOT_SYNCHRONIZED;
-		final List<IliasPdf> allPdfFiles = IliasTreeProvider.getAllPdfFiles();
-		final List<IliasPdf> unsynchronizedPdfs = new ArrayList<IliasPdf>();
+		final List<IliasFile> allFiles = IliasTreeProvider.getAllIliasFiles();
+		final List<IliasFile> unsynchronizedFiles = new ArrayList<IliasFile>();
 
-		final Set<Integer> allLocalPdfSizes = LocalPdfStorage.getInstance().getAllLocalPDFSizes();
-		for (IliasPdf pdf : allPdfFiles) {
-			if (pdf.isIgnored()) {
+		final Set<Integer> allLocalFileSizes = LocalFileStorage.getInstance().getAllLocalFileSizes();
+		for (IliasFile file : allFiles) {
+			if (file.isIgnored()) {
 				continue;
 			}
-			if (!allLocalPdfSizes.contains(pdf.getSize())) {
-				unsynchronizedPdfs.add(pdf);
+			if (!allLocalFileSizes.contains(file.getSize())) {
+				unsynchronizedFiles.add(file);
 			}
 		}
-		dashboard.setStatusText("Gesamt: " + allPdfFiles.size() + ", davon sind " + unsynchronizedPdfs.size()
+		dashboard.setStatusText("Gesamt: " + allFiles.size() + ", davon sind " + unsynchronizedFiles.size()
 				+ " noch nicht im Ilias Ordner.", false);
 		setListHeader(" Lokal nicht vorhandene Dateien ", "");
-		dashboard.setNumberOfUnsynchronizedPdfs(unsynchronizedPdfs.size());
+		dashboard.setNumberOfUnsynchronizedPdfs(unsynchronizedFiles.size());
 		items.clear();
 
-		for (IliasPdf pdf : unsynchronizedPdfs) {
-			items.add(pdf);
+		for (IliasFile file : unsynchronizedFiles) {
+			items.add(file);
 		}
 	}
 
-	protected List<IliasPdf> getUnsynchronizedPdfs() {
-		final List<IliasPdf> allPdfFiles = IliasTreeProvider.getAllPdfFiles();
-		final List<IliasPdf> unsynchronizedPdfs = new ArrayList<IliasPdf>();
+	protected List<IliasFile> getUnsynchronizedPdfs() {
+		final List<IliasFile> allFiles = IliasTreeProvider.getAllIliasFiles();
+		final List<IliasFile> unsynchronizedPdfs = new ArrayList<IliasFile>();
 
-		final Set<Integer> allLocalPdfSizes = LocalPdfStorage.getInstance().getAllLocalPDFSizes();
-		for (IliasPdf pdf : allPdfFiles) {
-			if (pdf.isIgnored()) {
+		final Set<Integer> allLocalPdfSizes = LocalFileStorage.getInstance().getAllLocalFileSizes();
+		for (IliasFile file : allFiles) {
+			if (file.isIgnored()) {
 				continue;
 			}
-			if (!allLocalPdfSizes.contains(pdf.getSize())) {
-				unsynchronizedPdfs.add(pdf);
+			if (!allLocalPdfSizes.contains(file.getSize())) {
+				unsynchronizedPdfs.add(file);
 			}
 		}
 		return unsynchronizedPdfs;
@@ -218,61 +218,61 @@ public class ResultList extends ListView<IliasTreeNode> {
 			return;
 		}
 
-		final List<IliasPdf> allPdfFiles = IliasTreeProvider.getAllPdfFiles();
+		final List<IliasFile> allFiles = IliasTreeProvider.getAllIliasFiles();
 
-		if (allPdfFiles.isEmpty()) {
+		if (allFiles.isEmpty()) {
 			dashboard.setStatusText("Keine passende Datei gefunden.", false);
 			return;
 		}
 		dashboard.setStatusText("");
 
-		List<IliasPdf> alreadyAddedPDF = new ArrayList<IliasPdf>();
+		List<IliasFile> alreadyAddedFile = new ArrayList<IliasFile>();
 
-		for (IliasPdf pdf : allPdfFiles) {
-			if (pdf.isIgnored()) {
+		for (IliasFile file : allFiles) {
+			if (file.isIgnored()) {
 				continue;
 			}
-			final String[] splitedStrings = pdf.getName().split(" ");
+			final String[] splitedStrings = file.getName().split(" ");
 			for (int i = 0; i < splitedStrings.length; i++) {
 				splitedStrings[i] = (splitedStrings[i] + " ").toLowerCase();
 			}
 			for (int i = 0; i < splitedStrings.length; i++) {
-				if (splitedStrings[i].startsWith(inputString.toLowerCase()) && !alreadyAddedPDF.contains(pdf)) {
-					alreadyAddedPDF.add(pdf);
+				if (splitedStrings[i].startsWith(inputString.toLowerCase()) && !alreadyAddedFile.contains(file)) {
+					alreadyAddedFile.add(file);
 					continue;
 				}
-				if (inputString.contains(" ") && pdf.getName().toLowerCase().contains(inputString.toLowerCase())
-						&& !alreadyAddedPDF.contains(pdf)) {
-					alreadyAddedPDF.add(pdf);
+				if (inputString.contains(" ") && file.getName().toLowerCase().contains(inputString.toLowerCase())
+						&& !alreadyAddedFile.contains(file)) {
+					alreadyAddedFile.add(file);
 					continue;
 				}
-				if (splitedStrings[i].toLowerCase().contains(inputString.toLowerCase()) && !alreadyAddedPDF.contains(pdf)) {
-					alreadyAddedPDF.add(pdf);
+				if (splitedStrings[i].toLowerCase().contains(inputString.toLowerCase()) && !alreadyAddedFile.contains(file)) {
+					alreadyAddedFile.add(file);
 					continue;
 				}
-				if (pdf.getParentFolder() != null) {
-					if (inputString.length() > 3 && pdf.getParentFolder().getName().toLowerCase().contains(inputString.toLowerCase())
-							&& !alreadyAddedPDF.contains(pdf)) {
-						alreadyAddedPDF.add(pdf);
+				if (file.getParentFolder() != null) {
+					if (inputString.length() > 3 && file.getParentFolder().getName().toLowerCase().contains(inputString.toLowerCase())
+							&& !alreadyAddedFile.contains(file)) {
+						alreadyAddedFile.add(file);
 					}
 					continue;
 				}
-				if (pdf.getParentFolder().getParentFolder() != null) {
+				if (file.getParentFolder().getParentFolder() != null) {
 					if (inputString.length() > 3
-							&& pdf.getParentFolder().getParentFolder().getName().toLowerCase().contains(inputString.toLowerCase())
-							&& !alreadyAddedPDF.contains(pdf)) {
-						alreadyAddedPDF.add(pdf);
+							&& file.getParentFolder().getParentFolder().getName().toLowerCase().contains(inputString.toLowerCase())
+							&& !alreadyAddedFile.contains(file)) {
+						alreadyAddedFile.add(file);
 					}
 					continue;
 				}
 			}
 		}
-		setListHeader(" Gefundene Dateien " + "(" + String.valueOf(alreadyAddedPDF.size()) + ")", "green");
-		if (alreadyAddedPDF.isEmpty()) {
+		setListHeader(" Gefundene Dateien " + "(" + String.valueOf(alreadyAddedFile.size()) + ")", "green");
+		if (alreadyAddedFile.isEmpty()) {
 			dashboard.setStatusText("Keine Datei gefunden.");
 		} else {
-			for (IliasPdf pdf : alreadyAddedPDF) {
-				items.add(pdf);
+			for (IliasFile file : alreadyAddedFile) {
+				items.add(file);
 			}
 		}
 	}

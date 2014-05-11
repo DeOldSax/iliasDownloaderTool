@@ -1,13 +1,18 @@
 package model;
 
+import utils.FileAppearanceManager;
+import control.LocalFileStorage;
+import javafx.scene.image.ImageView;
 
 public class IliasFile extends IliasTreeNode {
 	private static final long serialVersionUID = -6286982393008142116L;
 	
 	private final int size;
+	private String extension; 
 	
-	public IliasFile(String name, String url, IliasFolder parentFolder, int size) {
+	public IliasFile(String name, String url, String extension, IliasFolder parentFolder, int size) {
 		super(name, url, parentFolder);
+		this.extension = extension;
 		this.size = size;
 	}
 	
@@ -33,5 +38,28 @@ public class IliasFile extends IliasTreeNode {
 		final int endIndex = key.indexOf("&cmd=sendfile");
 		key = key.substring(beginIndex + 7, endIndex);
 		return key;
+	}
+
+	@Override
+	public final ImageView getGraphic() {
+		FileAppearanceManager appearanceManager = FileAppearanceManager.getInstance();
+		if (isIgnored()) {
+			return appearanceManager.getIgnoredPicture(extension);
+		} else if (!(LocalFileStorage.getInstance().contains(this))) {
+			return appearanceManager.getNotSynchronizedPicture(extension);
+		} else {
+			return appearanceManager.getNormalPicture(extension); 
+		}
+	}
+
+	/**
+	 * Returns the files' {@link #extension}.
+	 * e. g. "pdf" or "txt" 
+	 * <br><b>NOT<b> .pdf !
+	 * 
+	 * @return {@link #extension}
+	 */
+	public String getExtension() {
+		return extension; 
 	}
 }
