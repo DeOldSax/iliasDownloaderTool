@@ -104,7 +104,7 @@ public class Dashboard extends Application {
 		background.setPadding(new Insets(20, 50, 20, 50));
 
 		actionBar = new GridPane();
-		actionBar.setPadding(new Insets(0, 0, 30, 0));
+//		actionBar.setPadding(new Insets(0, 0, 30, 0));
 
 		final GridPane login = new GridPane();
 		login.setId("loginBackground");
@@ -251,7 +251,7 @@ public class Dashboard extends Application {
 		ColumnConstraints col1 = new ColumnConstraints();
 		col1.setPercentWidth(5);
 		ColumnConstraints col15 = new ColumnConstraints();
-		col1.setPercentWidth(5);
+		col15.setPercentWidth(5);
 		ColumnConstraints col2 = new ColumnConstraints();
 		col2.setPercentWidth(15);
 		ColumnConstraints col3 = new ColumnConstraints();

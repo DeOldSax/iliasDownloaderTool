@@ -12,6 +12,7 @@ import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
@@ -42,6 +43,7 @@ public class CoursesTreeView extends TreeView<IliasTreeNode> {
 
 	public CoursesTreeView(Dashboard dashboard) {
 		super();
+		setId("coursesTree");
 		setMinWidth(270);
 		this.dashboard = dashboard;
 		rootItem = new TreeItem<IliasTreeNode>(new IliasFolder("Übersicht", null, null));
@@ -219,36 +221,42 @@ public class CoursesTreeView extends TreeView<IliasTreeNode> {
 	 */
 	private class IliasTreeCell extends TreeCell<IliasTreeNode> {
 		
+		private IliasTreeNode node; 
+		
+		public IliasTreeCell() {
+			EventHandler<MouseEvent> mouseHandler = new EventHandler<MouseEvent>() {
+				@Override
+				public void handle(MouseEvent arg0) {
+					if (node != null) {
+						redraw();
+					}
+				}
+			};
+			setOnMouseEntered(mouseHandler);
+			setOnMouseExited(mouseHandler);
+		}
+		
 		@Override
 		protected void updateItem(final IliasTreeNode node, final boolean empty) {
 			super.updateItem(node, empty);
-
-			if (!empty) {
-				redraw(false, node); 
-			}
-
-			this.setOnMouseEntered(new EventHandler<MouseEvent>() {
-				@Override
-				public void handle(MouseEvent arg0) {
-					if (!empty) {
-						redraw(true, node);
-					}
-				}
-			});
 			
-			setOnMouseExited(new EventHandler<MouseEvent>() {
-				@Override
-				public void handle(MouseEvent arg0) {
-					if (!empty) {
-						redraw(false, node);
-					}
-				}
-			});
+			if (empty) {
+				this.node = null; 
+			} else {
+				this.node = node; 
+			}
+			redraw(); 
 		}
 		
-		private void redraw(boolean addOptions, final IliasTreeNode node) {
+		private void redraw() {
+			if (node == null) {
+				setGraphic(null);
+				return; 
+			}
+			boolean addOptions = this.isHover(); 
 			final BorderPane pane = new BorderPane(); 
 			final Label box = new Label();
+			box.setAlignment(Pos.TOP_LEFT);
 
 			if (node instanceof IliasFolder) {
 				IliasFolder folder = (IliasFolder) node;
@@ -272,15 +280,12 @@ public class CoursesTreeView extends TreeView<IliasTreeNode> {
 			
 			box.setText(node.toString());
 			pane.setLeft(box);
-			if (addOptions) {
-				createAndAddActions(node, pane);
-			}
+			createAndAddActions(node, pane);
 			setGraphic(pane);
 		}
 
 		private void createAndAddActions(final IliasTreeNode node, final BorderPane pane) {
 			Button downloadButton = new Button(); 
-			downloadButton.setId("listActionButton");
 			downloadButton.setGraphic(new ImageView("img/downloadArrow.png"));
 			downloadButton.setOnAction(new EventHandler<ActionEvent>() {
 				@Override
@@ -289,7 +294,6 @@ public class CoursesTreeView extends TreeView<IliasTreeNode> {
 				}
 			});
 			Button ignoreButton = new Button(); 
-			ignoreButton.setId("listActionButton");
 			ignoreButton.setOnAction(new EventHandler<ActionEvent>() {
 				@Override
 				public void handle(ActionEvent event) {
@@ -297,7 +301,6 @@ public class CoursesTreeView extends TreeView<IliasTreeNode> {
 				}
 			});
 			Button openerButton = new Button(); 
-			openerButton.setId("listActionButton");
 			openerButton.setGraphic(new ImageView("img/folder_small.png"));
 			openerButton.setOnAction(new EventHandler<ActionEvent>() {
 				@Override
@@ -306,7 +309,6 @@ public class CoursesTreeView extends TreeView<IliasTreeNode> {
 				}
 			});
 			Button printerButton = new Button(); 
-			printerButton.setId("listActionButton"); 
 			printerButton.setGraphic(new ImageView("img/printer.png"));
 			printerButton.setOnAction(new EventHandler<ActionEvent>() {
 				@Override
@@ -316,6 +318,7 @@ public class CoursesTreeView extends TreeView<IliasTreeNode> {
 			});
 			
 			HBox actions = new HBox(); 
+			actions.setId("actionBar");
 			actions.setSpacing(10);
 			
 			if (!(node instanceof IliasForum)) {
