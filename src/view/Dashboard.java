@@ -39,6 +39,7 @@ import model.IliasFile;
 import model.IliasTreeStorage;
 import model.Settings;
 
+import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.apache.log4j.helpers.Loader;
 
@@ -77,7 +78,8 @@ public class Dashboard extends Application {
 
 	public static void main(String[] args) {
 		new File(System.getProperty("user.home") + "/.ilias/ilias.log").delete(); 
-		PropertyConfigurator.configure(Loader.getResource("properties/log4j.properties"));
+		PropertyConfigurator.configure(Dashboard.class.getResource("log4j.properties"));
+		Logger.getLogger(Dashboard.class).debug("Start IliasDownloaderTool.");
 		
 		boolean newVersionCalled = new VersionValidator().validate();
 		if (newVersionCalled) {

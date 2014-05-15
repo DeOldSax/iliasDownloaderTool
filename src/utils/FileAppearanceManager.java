@@ -76,8 +76,11 @@ public class FileAppearanceManager {
 	}
 	
 	private ImageView getPicture(Map<String, String> map, String extension) {
-		if (map.get(extension) != null) {
-			return new ImageView(notSynchronizedPictures.get(extension)); 
+		String pathToImage = map.get(extension);
+		if (pathToImage == null) {
+			Logger.getLogger(getClass()).debug("No Picture specified for: " + extension + ".");
+		} else {
+			return new ImageView(pathToImage); 
 		}
 		return defaultFileImage; 
 	}
