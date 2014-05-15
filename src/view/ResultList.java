@@ -149,7 +149,7 @@ public class ResultList extends ListView<IliasTreeNode> {
 		listMode = ResultListMode.IGNORE_MODE;
 		items.clear();
 		ArrayList<IliasPdf> ignoredPdf = getIgnoredIliasPdfs();
-		setListHeader(" Ignorierte Dateien", "red");
+		setListHeader(" Ignorierte Dateien", "yellow");
 		for (IliasPdf pdf : ignoredPdf) {
 			items.add(pdf);
 		}
@@ -280,8 +280,8 @@ public class ResultList extends ListView<IliasTreeNode> {
 	private void setListHeader(String text, String color) {
 		String textColor = "-fx-text-fill: #3d3d3d";
 		listHeader.setText(text);
-		if (color.equals("red")) {
-			color = "-fx-background-color: linear-gradient(red, darkred)";
+		if (color.equals("yellow")) {
+			color = "-fx-background-color: linear-gradient(yellow, gold)";
 			textColor = "-fx-text-fill: white";
 		} else if (color.equals("green")) {
 			color = "-fx-background-color: linear-gradient(lime, limegreen)";
