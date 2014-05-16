@@ -401,7 +401,14 @@ public class Dashboard extends Application {
 	}
 
 	public void setTitle(String title) {
-		stage.setTitle(title);
+//		TODO remove this and find a better solution
+		Platform.runLater(new Runnable() {
+			
+			@Override
+			public void run() {
+				stage.setTitle(title);
+			}
+		});
 	}
 
 	public static void setStatusText(final String text, boolean alert) {
