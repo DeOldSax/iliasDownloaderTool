@@ -57,7 +57,7 @@ public class Settings {
 		return myPrefs.get(PASSWORD, "");
 	}
 
-	public void storeIgnoredPdfSize(String key, int size) {
+	public void storeIgnoredFileSize(String key, int size) {
 		myPrefs.putInt(key, size);
 	}
 
@@ -65,15 +65,15 @@ public class Settings {
 		return myPrefs.getInt(key, -1);
 	}
 
-	public void removeIgnoredPdfSize(String key) {
+	public void removeIgnoredFileSize(String key) {
 		myPrefs.remove(key);
 	}
 
-	public void togglePdfIgnored(IliasPdf pdf) {
-		if (pdf.isIgnored()) {
-			pdf.setIgnored(false);
+	public void toggleFileIgnored(IliasFile file) {
+		if (file.isIgnored()) {
+			file.setIgnored(false);
 		} else {
-			pdf.setIgnored(true);
+			file.setIgnored(true);
 		}
 	}
 

@@ -4,28 +4,30 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import model.IliasFile;
 import model.IliasFolder;
 import model.IliasForum;
-import model.IliasPdf;
 import model.IliasTreeNode;
 import model.Settings;
 
+import org.apache.log4j.Logger;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import view.Dashboard;
 
 public class IliasScraper {
 	public AtomicInteger threadCount;
-	public AtomicInteger pdfCounter;
+	public AtomicInteger fileCounter;
 	private List<IliasFolder> iliasTree;
 	private final Dashboard dashboard;
 
 	public IliasScraper(Dashboard dashboard) {
 		this.dashboard = dashboard;
 		threadCount = new AtomicInteger(0);
-		pdfCounter = new AtomicInteger(0);
+		fileCounter = new AtomicInteger(0);
 	}
 
 	public void run(String dashboardHtml) {
@@ -73,17 +75,18 @@ public class IliasScraper {
 	}
 
 	private class IliasScraperThread implements Runnable {
-		private final IliasScraper iliasPdfFinder;
-		private final List<IliasFolder> kurse;
+		String BASE_URI = "https://ilias.studium.kit.edu/";
+		private final IliasScraper iliasScraper;
+		private final List<IliasFolder> courses;
 
-		private IliasScraperThread(IliasScraper iliasPdfFinder, List<IliasFolder> kurse) {
-			this.iliasPdfFinder = iliasPdfFinder;
-			this.kurse = kurse;
+		private IliasScraperThread(IliasScraper iliasScraper, List<IliasFolder> courses) {
+			this.iliasScraper = iliasScraper;
+			this.courses = courses;
 		}
 
 		@Override
 		public void run() {
-			for (IliasFolder parent : kurse) {
+			for (IliasFolder parent : courses) {
 				if (Settings.getInstance().updateCanceled()) {
 					break;
 				}
@@ -92,41 +95,43 @@ public class IliasScraper {
 					if (Settings.getInstance().updateCanceled()) {
 						break;
 					}
-					final boolean dirIstPdfFile = dir.attr("href").contains("cmd=sendfile");
+					// if the file is not specified yet, use the "standard" file
+					final boolean linkToFile = dir.attr("href").contains("cmd=sendfile");
+					final String fileExtension = suggestFileExtension(dir); 
 					final boolean linkToFolder = dir.attr("href").contains("goto_produktiv_fold_")
 							|| dir.attr("href").contains("goto_produktiv_grp_");
 					final boolean linkToForum = dir.attr("href").contains("goto_produktiv_frm_");
-					if (dirIstPdfFile) {
-						dir.setBaseUri("https://ilias.studium.kit.edu/");
-						final int size = new IliasConnector().requestHead(dir.attr("abs:href"));
-						IliasPdf newPdfFile = createPDF(parent, dir, size);
+					final boolean linkToHyperlink = false; 
 
-						dashboard.setStatusText(pdfCounter.toString() + " Dateien wurden bereits überprüft.");
+					int size = 0; 
 
-						List<Element> elemse = dir.parent().parent().siblingElements().select("div").select("span");
-						for (Element el : elemse) {
-							final boolean istUngelesen = el.attr("class").contains("il_ItemAlertProperty");
-							if (istUngelesen) {
-								newPdfFile.setRead(false);
-							}
-						}
-					}
-					if (linkToForum) {
+					if (linkToFile) {
+						updateStatusText();
+						dir.setBaseUri(BASE_URI);
+						String attr = dir.attr("abs:href");
+						size = new IliasConnector().getFileSize(attr);
+						createFile(parent, dir, size, fileExtension);
+					} else if (linkToHyperlink) {
+						//TODO implement
+					} else if (linkToForum) {
 						createForum(parent, dir);
-					}
-					if (linkToFolder) {
+					} else if (linkToFolder) {
 						List<IliasFolder> tempo = new ArrayList<IliasFolder>();
 						IliasFolder newFolder = createFolder(parent, dir);
 						tempo.add(newFolder);
-						iliasPdfFinder.startThread(tempo);
+						iliasScraper.startThread(tempo);
 					}
 				}
 			}
-			iliasPdfFinder.threadCount.decrementAndGet();
+			iliasScraper.threadCount.decrementAndGet();
+		}
+
+		private void updateStatusText() {
+			dashboard.setStatusText(fileCounter.toString() + " Dateien wurden bereits überprüft.");
 		}
 
 		private IliasForum createForum(IliasFolder parent, Element dir) {
-			dir.setBaseUri("https://ilias.studium.kit.edu/");
+			dir.setBaseUri(BASE_URI);
 			final String name = dir.text();
 			final String link = dir.attr("abs:href");
 			final IliasForum forum = new IliasForum(name, link, parent);
@@ -134,20 +139,20 @@ public class IliasScraper {
 		}
 
 		private IliasFolder createFolder(IliasFolder kurs, Element dir) {
-			dir.setBaseUri("https://ilias.studium.kit.edu/");
+			dir.setBaseUri(BASE_URI);
 			final String name = dir.text();
 			final String downloadLink = dir.attr("abs:href");
 			final IliasFolder folder = new IliasFolder(name, downloadLink, kurs);
 			return folder;
 		}
-
-		private IliasPdf createPDF(IliasFolder parentDirectory, Element dir, int size) {
-			pdfCounter.incrementAndGet();
-			dir.setBaseUri("https://ilias.studium.kit.edu/");
+		
+		private IliasFile createFile (IliasFolder parentFolder, Element dir, int size, String fileExtension) {
+			fileCounter.incrementAndGet();
+			dir.setBaseUri(BASE_URI);
 			final String name = dir.text();
 			final String downloadLink = dir.attr("abs:href");
-			final IliasPdf pdf = new IliasPdf(name, downloadLink, parentDirectory, size);
-			return pdf;
+			final IliasFile iliasFile = new IliasFile(name, downloadLink, fileExtension, parentFolder, size);
+			return iliasFile;
 		}
 
 		private List<Element> openFolder(IliasTreeNode kurs) {
@@ -156,6 +161,17 @@ public class IliasScraper {
 			Document doc = Jsoup.parse(newHtmlContent);
 			directory = doc.select("h4").select("a");
 			return directory;
+		}
+		
+		private String suggestFileExtension(Element dir) {
+			Elements siblingElements = dir.parent().parent().siblingElements();
+			for (Element element : siblingElements) {
+				if (element.attr("class").equals("il_ItemProperties")) {
+					return element.child(0).text().replace("\u00a0", "").trim();
+				}
+			}
+			Logger.getLogger(getClass()).debug("ERROR: File Extension could not be found");
+			return "unknown"; 
 		}
 	}
 }

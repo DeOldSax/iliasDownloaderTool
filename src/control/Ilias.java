@@ -23,6 +23,7 @@ import org.apache.http.impl.conn.PoolingClientConnectionManager;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.util.EntityUtils;
+import org.apache.log4j.Logger;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -41,6 +42,7 @@ public class Ilias {
 	private HttpPost request2, request3, request4;
 	private HttpResponse response3, response4;
 	private HttpEntity entity;
+	private Logger LOGGER = Logger.getLogger(getClass());
 
 	public Ilias() {
 
@@ -85,7 +87,7 @@ public class Ilias {
 		try {
 			client.execute(request2, context);
 		} catch (IOException e) {
-			e.printStackTrace();
+			LOGGER.warn(e.getStackTrace());
 		} finally {
 			request2.releaseConnection();
 		}
@@ -101,7 +103,7 @@ public class Ilias {
 		try {
 			response3 = client.execute(request3, context);
 		} catch (IOException e) {
-			e.printStackTrace();
+			LOGGER.warn(e.getStackTrace());
 		} finally {
 			entity = response3.getEntity();
 		}
@@ -110,9 +112,9 @@ public class Ilias {
 		try {
 			html = EntityUtils.toString(entity);
 		} catch (ParseException e) {
-			e.printStackTrace();
+			LOGGER.warn(e.getStackTrace());
 		} catch (IOException e) {
-			e.printStackTrace();
+			LOGGER.warn(e.getStackTrace());
 		} finally {
 			request3.releaseConnection();
 		}
@@ -143,14 +145,14 @@ public class Ilias {
 		try {
 			response4 = client.execute(request4, context);
 		} catch (IOException e) {
-			e.printStackTrace();
+			LOGGER.warn(e.getStackTrace());
 		}
 
 		final HttpEntity entityX = response4.getEntity();
 		try {
 			htmlStartpage = EntityUtils.toString(entityX);
 		} catch (ParseException | IOException e) {
-			e.printStackTrace();
+			LOGGER.warn(e.getStackTrace());
 		} finally {
 			request4.releaseConnection();
 		}
