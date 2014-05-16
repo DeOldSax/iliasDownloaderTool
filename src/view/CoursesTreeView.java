@@ -7,7 +7,6 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
-import utils.DesktopHelper;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -31,9 +30,9 @@ import model.IliasForum;
 import model.IliasTreeNode;
 import model.IliasTreeProvider;
 import model.Settings;
-import control.LocalFileStorage;
-import download.IliasPdfDownloadCaller;
+import utils.DesktopHelper;
 import download.IliasFolderDownloaderTask;
+import download.IliasPdfDownloadCaller;
 
 public class CoursesTreeView extends TreeView<IliasTreeNode> {
 	private final TreeItem<IliasTreeNode> rootItem;
@@ -127,11 +126,6 @@ public class CoursesTreeView extends TreeView<IliasTreeNode> {
 			} else if (node instanceof IliasForum) {
 				item.setGraphic(node.getGraphic());
 			} 
-			
-//			else if (node instanceof IliasPdf) {
-//			    IliasPdf pdf = (IliasPdf) node;
-//				item.setGraphic(node.getGraphic());
-//			} 
 		}
 	}
 
@@ -173,24 +167,13 @@ public class CoursesTreeView extends TreeView<IliasTreeNode> {
 		return null;
 	}
 
-	public void fileStatusChanged(IliasFile pdf) {
-		final LocalFileStorage localFileStorage = LocalFileStorage.getInstance();
-		TreeItem<IliasTreeNode> treeItem = getItem(pdf);
-		if (pdf.isIgnored()) {
-			setGraphic(treeItem, new ImageView("img/pdf_ignored.png"));
-		} else if (localFileStorage.contains(pdf)) {
-			setGraphic(treeItem, new ImageView("img/pdf.png"));
-		} else {
-			setGraphic(treeItem, new ImageView("img/pdf_local_not_there.png"));
-		}
+	public void fileStatusChanged(IliasFile iliasFile) {
+		TreeItem<IliasTreeNode> treeItem = getItem(iliasFile);
+		setGraphic(treeItem, iliasFile.getGraphic()); 
 		while (treeItem.getParent() != null) {
 			treeItem = treeItem.getParent();
 			IliasFolder folder = (IliasFolder) treeItem.getValue();
-			if (LocalFileStorage.getInstance().isFolderSynchronized(folder)) {
-				setGraphic(treeItem, new ImageView("img/folder.png"));
-			} else {
-				setGraphic(treeItem, new ImageView("img/folder_pdf_not_there.png"));
-			}
+			setGraphic(treeItem, folder.getGraphic());
 		}
 	}
 
@@ -246,20 +229,10 @@ public class CoursesTreeView extends TreeView<IliasTreeNode> {
 
 			if (node instanceof IliasFolder) {
 				IliasFolder folder = (IliasFolder) node;
-				if (LocalFileStorage.getInstance().isFolderSynchronized(folder)) {
-					box.setGraphic(new ImageView("img/folder.png"));
-				} else {
-					box.setGraphic(new ImageView("img/folder_pdf_not_there.png"));
-				}
+				box.setGraphic(folder.getGraphic());
 			} else if (node instanceof IliasFile) {
 				IliasFile file = (IliasFile) node;
-				if (file.isIgnored()) {
-					box.setGraphic(new ImageView("img/pdf_ignored.png"));
-				} else if (!(LocalFileStorage.getInstance().contains(file))) {
-					box.setGraphic(new ImageView("img/pdf_local_not_there.png"));
-				} else {
-					box.setGraphic(new ImageView("img/pdf.png"));
-				}
+				box.setGraphic(file.getGraphic());
 			} else if (node instanceof IliasForum) {
 				box.setGraphic(new ImageView("img/forum.png"));
 			}

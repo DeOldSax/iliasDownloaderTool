@@ -20,7 +20,7 @@ public class FileAppearanceManager {
 	private final String NORMAL_DESCRIPTOR = "normal"; 
 	private final String IGNORED_DESCRIPTOR = "ignored"; 
 	private final String NOTSYNCHRONIZED_DESCRIPTOR = "notSynchronized"; 
-	private ImageView defaultFileImage; 
+	private final String DEFAULT = "default"; 
 	private List<String> fileExtensions; 
 	private Map<String, String> normalPictures; 
 	private Map<String, String> notSynchronizedPictures; 
@@ -77,12 +77,11 @@ public class FileAppearanceManager {
 	
 	private ImageView getPicture(Map<String, String> map, String extension) {
 		String pathToImage = map.get(extension);
-		if (pathToImage == null) {
-			Logger.getLogger(getClass()).debug("No Picture specified for: " + extension + ".");
-		} else {
+		if (pathToImage != null) {
 			return new ImageView(pathToImage); 
 		}
-		return defaultFileImage; 
+		Logger.getLogger(getClass()).warn("No Picture specified for: " + extension + ", use default.");
+		return new ImageView(map.get(DEFAULT)); 
 	}
 	
 	public static FileAppearanceManager getInstance() {

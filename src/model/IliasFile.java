@@ -8,7 +8,7 @@ public class IliasFile extends IliasTreeNode {
 	private static final long serialVersionUID = -6286982393008142116L;
 	
 	private final int size;
-	private String extension; 
+	private final String extension; 
 	
 	public IliasFile(String name, String url, String extension, IliasFolder parentFolder, int size) {
 		super(name, url, parentFolder);
@@ -53,7 +53,7 @@ public class IliasFile extends IliasTreeNode {
 	}
 
 	/**
-	 * Returns the files' {@link #extension}.
+	 * Returns the files {@link #extension}.
 	 * e. g. "pdf" or "txt" 
 	 * <br><b>NOT<b> .pdf !
 	 * 

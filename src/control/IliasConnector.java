@@ -11,12 +11,14 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpHead;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.util.EntityUtils;
+import org.apache.log4j.Logger;
 
 public class IliasConnector {
 	private HttpGet request;
 	private HttpResponse response;
 	private HttpEntity entity;
 	private BasicHttpContext context;
+	private Logger LOGGER = Logger.getLogger(getClass());
 
 	public String requestGet(String url) {
 		context = new BasicHttpContext();
@@ -32,7 +34,7 @@ public class IliasConnector {
 			request.releaseConnection();
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOGGER.warn(e.getStackTrace());
 		}
 		return html;
 	}
@@ -43,9 +45,9 @@ public class IliasConnector {
 		try {
 			response = Ilias.getClient().execute(head, context);
 		} catch (ClientProtocolException e) {
-			e.printStackTrace();
+			LOGGER.warn(e.getStackTrace());
 		} catch (IOException e) {
-			e.printStackTrace();
+			LOGGER.warn(e.getStackTrace());
 		}
 		Header[] fileSize = response.getHeaders("Content-Length");
 		final int size = Integer.parseInt(fileSize[0].getValue());

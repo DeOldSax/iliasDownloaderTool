@@ -1,5 +1,7 @@
 package control;
 
+import org.apache.log4j.Logger;
+
 import javafx.application.Platform;
 import model.IliasTreeProvider;
 import model.Settings;
@@ -11,6 +13,7 @@ public class IliasStarter {
 	private String username = null;
 	private String password = null;
 	private final Dashboard dashboard;
+	private Logger LOGGER = Logger.getLogger(getClass());
 
 	public IliasStarter(Dashboard dashboard) {
 		this.dashboard = dashboard;
@@ -63,7 +66,7 @@ public class IliasStarter {
 			try {
 				Thread.sleep(100);
 			} catch (InterruptedException e) {
-				e.printStackTrace();
+				LOGGER.warn(e.getStackTrace());
 			}
 		}
 		if (!(Settings.getInstance().updateCanceled())) {

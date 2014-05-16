@@ -79,7 +79,7 @@ public class Dashboard extends Application {
 	public static void main(String[] args) {
 		new File(System.getProperty("user.home") + "/.ilias/ilias.log").delete(); 
 		PropertyConfigurator.configure(Dashboard.class.getResource("log4j.properties"));
-		Logger.getLogger(Dashboard.class).debug("Start IliasDownloaderTool.");
+		Logger.getLogger(Dashboard.class).warn("Start IliasDownloaderTool.");
 		
 		boolean newVersionCalled = new VersionValidator().validate();
 		if (newVersionCalled) {
@@ -255,7 +255,7 @@ public class Dashboard extends Application {
 		ColumnConstraints col1 = new ColumnConstraints();
 		col1.setPercentWidth(5);
 		ColumnConstraints col15 = new ColumnConstraints();
-		col1.setPercentWidth(5);
+		col15.setPercentWidth(5);
 		ColumnConstraints col2 = new ColumnConstraints();
 		col2.setPercentWidth(15);
 		ColumnConstraints col3 = new ColumnConstraints();
@@ -401,11 +401,23 @@ public class Dashboard extends Application {
 	}
 
 	public void setSignInColor() {
-		signIn.setStyle("-fx-background-color: linear-gradient(lime, limegreen)");
+		Platform.runLater(new Runnable() {
+			
+			@Override
+			public void run() {
+				signIn.setStyle("-fx-background-color: linear-gradient(lime, limegreen)");
+			}
+		});
 	}
 
 	public void setTitle(String title) {
-		stage.setTitle(title);
+		Platform.runLater(new Runnable() {
+			
+			@Override
+			public void run() {
+				stage.setTitle(title);
+			}
+		});
 	}
 
 	public static void setStatusText(final String text, boolean alert) {

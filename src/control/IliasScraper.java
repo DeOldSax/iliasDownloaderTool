@@ -150,7 +150,6 @@ public class IliasScraper {
 			fileCounter.incrementAndGet();
 			dir.setBaseUri(BASE_URI);
 			final String name = dir.text();
-			System.out.println(fileExtension + "  " + fileExtension.length());
 			final String downloadLink = dir.attr("abs:href");
 			final IliasFile iliasFile = new IliasFile(name, downloadLink, fileExtension, parentFolder, size);
 			return iliasFile;
@@ -168,7 +167,7 @@ public class IliasScraper {
 			Elements siblingElements = dir.parent().parent().siblingElements();
 			for (Element element : siblingElements) {
 				if (element.attr("class").equals("il_ItemProperties")) {
-					return element.child(0).text().trim().replace("\n", ""); 
+					return element.child(0).text().replace("\u00a0", "").trim();
 				}
 			}
 			Logger.getLogger(getClass()).debug("ERROR: File Extension could not be found");

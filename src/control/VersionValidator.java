@@ -11,6 +11,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
+import org.apache.log4j.Logger;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -20,6 +21,7 @@ public class VersionValidator {
 	private final int YES = 0;
 	private final String VERSION = "v0.2.2";
 	private String LATEST_VERSION;
+	private Logger LOGGER = Logger.getLogger(getClass());
 
 	public boolean validate() {
 
@@ -41,7 +43,7 @@ public class VersionValidator {
 			}
 
 		} catch (IOException e) {
-			System.out.println("HttpConnection failed --> no version check");
+			LOGGER.warn("HttpConnection failed --> no version check", e);
 			return false;
 		}
 		request.releaseConnection();
@@ -57,7 +59,7 @@ public class VersionValidator {
 				try {
 					Desktop.getDesktop().browse(new URI("https://github.com/DeOldSax/iliasDownloaderTool/releases/latest"));
 				} catch (IOException | URISyntaxException e) {
-					e.printStackTrace();
+					LOGGER.warn(e.getMessage(), e);
 				}
 			} else {
 				JOptionPane.showMessageDialog(null, "https://github.com/DeOldSax/iliasDownloaderTool/releases/latest", "follow link",

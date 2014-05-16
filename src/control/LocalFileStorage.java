@@ -47,7 +47,7 @@ public class LocalFileStorage {
 		for (File file : files) {
 			if (file.isDirectory()) {
 				scanFolders(file.getAbsolutePath());
-//			} else if (file.isFile() && file.getPath().toLowerCase().endsWith(".pdf")) {
+														//.zip is not detected as a "file"
 			} else if (file.isFile() || file.getPath().toLowerCase().endsWith(".zip")) {
 				localFileLocations.put((int) file.length(), file.getAbsolutePath());
 			}
