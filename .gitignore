@@ -3,7 +3,5 @@
 /.classpath
 /.project
 /release
-/resources
 /tasklist
-/downloadCounter
-/lib
+/target

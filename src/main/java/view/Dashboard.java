@@ -78,7 +78,7 @@ public class Dashboard extends Application {
 
 	public static void main(String[] args) {
 		new File(System.getProperty("user.home") + "/.ilias/ilias.log").delete(); 
-		PropertyConfigurator.configure(Dashboard.class.getResource("log4j.properties"));
+		PropertyConfigurator.configure(Dashboard.class.getResourceAsStream("log4j.properties"));
 		Logger.getLogger(Dashboard.class).warn("Start IliasDownloaderTool.");
 		
 		boolean newVersionCalled = new VersionValidator().validate();
@@ -411,14 +411,7 @@ public class Dashboard extends Application {
 	}
 
 	public void setTitle(String title) {
-//		TODO remove this and find a better solution
-		Platform.runLater(new Runnable() {
-			
-			@Override
-			public void run() {
-				stage.setTitle(title);
-			}
-		});
+		stage.setTitle(title);
 	}
 
 	public static void setStatusText(final String text, boolean alert) {

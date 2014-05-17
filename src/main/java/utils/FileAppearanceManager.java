@@ -9,14 +9,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
-
 import javafx.scene.image.ImageView;
+
+import org.apache.log4j.Logger;
 
 public class FileAppearanceManager {
 	
 	private static FileAppearanceManager instance; 
-	private final String PROPERTIES_FILE_PATH = "properties/fileAppearance.properties";
+	private final String PROPERTIES_FILE_PATH = "fileAppearance.properties";
 	private final String NORMAL_DESCRIPTOR = "normal"; 
 	private final String IGNORED_DESCRIPTOR = "ignored"; 
 	private final String NOTSYNCHRONIZED_DESCRIPTOR = "notSynchronized"; 
@@ -53,7 +53,7 @@ public class FileAppearanceManager {
 
 	private void readPropertyFile() throws FileNotFoundException, IOException {
 		Properties p = new Properties(); 
-		p.load(new FileInputStream(PROPERTIES_FILE_PATH));
+		p.load(FileAppearanceManager.class.getResourceAsStream(PROPERTIES_FILE_PATH));
 		for (int i = 0; true; i++) {
 			String extension = p.getProperty(String.valueOf(i)); 
 			if (extension != null) {
