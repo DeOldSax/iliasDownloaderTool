@@ -14,12 +14,13 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.protocol.BasicHttpContext;
+import org.apache.log4j.Logger;
 
 import view.Dashboard;
 import control.Ilias;
 import control.LocalFileStorage;
 
-public class IliasPdfDownloaderTask extends Task<Void> {
+public class IliasFileDownloaderTask extends Task<Void> {
 	private HttpGet request;
 	private HttpResponse response;
 	private BasicHttpContext context;
@@ -27,7 +28,7 @@ public class IliasPdfDownloaderTask extends Task<Void> {
 	private IliasFile file;
 	private String targetPath;
 
-	protected IliasPdfDownloaderTask(IliasFile file, String targetPath) {
+	protected IliasFileDownloaderTask(IliasFile file, String targetPath) {
 		this.file = file;
 		this.targetPath = targetPath;
 	}
@@ -53,12 +54,12 @@ public class IliasPdfDownloaderTask extends Task<Void> {
 
 			request.releaseConnection();
 		} catch (IOException e) {
-			e.printStackTrace();
+			Logger.getLogger(getClass()).warn("", e);
 		}
 		
 		LocalFileStorage.getInstance().addIliasFile(file, targetPath);
+		
 		Platform.runLater(new Runnable() {
-			
 			@Override
 			public void run() {
 				Dashboard.fileDownloaded(file);

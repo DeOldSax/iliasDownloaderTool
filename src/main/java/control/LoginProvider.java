@@ -1,5 +1,6 @@
 package control;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.PasswordField;
@@ -31,22 +32,14 @@ public class LoginProvider implements EventHandler<ActionEvent> {
 		dashboard.setMenuTransparent(false);
 		dashboard.setSigInTransparent(true);
 		final String username = usernameField.getText();
-		final boolean validUsername = username.length() != 5 || !username.startsWith("u");
-		if (validUsername) {
-			dashboard.setStatusText("Ungültiger Benutzername", true);
-			usernameField.requestFocus();
-			usernameField.selectAll();
-			dashboard.fadeInLogin();
-			dashboard.showLoader(false);
+		final boolean validUsername = username.length() == 5 || username.startsWith("u");
+		if (!validUsername) {
+			toggleDashboardLoginState("Ungültiger Benutzername");
 			return;
 		} else {
 			final String password = passwordField.getText();
 			if (password.length() < 1) {
-				dashboard.setStatusText("Ungültiges Passwort", true);
-				passwordField.requestFocus();
-				passwordField.selectAll();
-				dashboard.fadeInLogin();
-				dashboard.showLoader(false);
+				toggleDashboardLoginState("Ungültiges Passwort");
 				return;
 			}
 			if (savePwd.isSelected()) {
@@ -65,4 +58,17 @@ public class LoginProvider implements EventHandler<ActionEvent> {
 			}).start();
 		}
 	}
+	private void toggleDashboardLoginState(final String message) {
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				dashboard.setStatusText(message, true);
+				usernameField.requestFocus();
+				usernameField.selectAll();
+				dashboard.fadeInLogin();
+				dashboard.showLoader(false);
+			}
+		});
+	}
+	
 }

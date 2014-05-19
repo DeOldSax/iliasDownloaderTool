@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>deoldsax</groupId>
   <artifactId>Ilias</artifactId>
-  <version>v0.2.2</version>
+  <version>v0.2.3</version>
   
    <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -13,6 +13,16 @@
 	</organization>
   
   <dependencies>
+  	
+  	 <!-- use this to remove eclipse warnings on javafx 
+  	 		remove it when using javafx8-->
+  	 <dependency>
+  		<groupId>com.oracle</groupId>
+  		<artifactId>javafx</artifactId>
+  		<version>2.2.3</version>
+  		<scope>system</scope>
+  		<systemPath>${project.basedir}\lib\jfxrt.jar</systemPath>
+	 </dependency>
   
 	 <dependency>
   		<groupId>log4j</groupId>
@@ -82,8 +92,11 @@
 		           </goals>
                     <configuration>
                         <tasks>
-                            <copy todir="release/IliasDownloaderTool-${version}" overwrite="true">
+                            <copy todir="release/IliasDownloaderTool-${version}/app" overwrite="true">
 							    <fileset dir="target/jfx/app"></fileset>
+							 </copy>
+                            <copy todir="release/IliasDownloaderTool-${version}/win" overwrite="true">
+							    <fileset dir="target/jfx/native/bundles/Ilias-${version}"></fileset>
 							 </copy>
                         </tasks>
                     </configuration>

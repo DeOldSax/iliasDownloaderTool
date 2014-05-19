@@ -45,9 +45,9 @@ public class IliasConnector {
 		try {
 			response = Ilias.getClient().execute(head, context);
 		} catch (ClientProtocolException e) {
-			LOGGER.warn(e.getStackTrace());
+			LOGGER.warn("", e);
 		} catch (IOException e) {
-			LOGGER.warn(e.getStackTrace());
+			LOGGER.warn("", e);
 		}
 		Header[] fileSize = response.getHeaders("Content-Length");
 		final int size = Integer.parseInt(fileSize[0].getValue());

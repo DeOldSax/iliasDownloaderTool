@@ -41,7 +41,6 @@ import model.Settings;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-import org.apache.log4j.helpers.Loader;
 
 import control.IliasStarter;
 import control.LocalFileStorage;
@@ -108,7 +107,6 @@ public class Dashboard extends Application {
 		background.setPadding(new Insets(20, 50, 20, 50));
 
 		actionBar = new GridPane();
-//		actionBar.setPadding(new Insets(0, 0, 30, 0));
 
 		final GridPane login = new GridPane();
 		login.setId("loginBackground");
@@ -349,7 +347,7 @@ public class Dashboard extends Application {
 		stage.sizeToScene();
 	}
 
-	public void iliasTreeReloaded(boolean showFinishText) {
+	public void iliasTreeReloaded(final boolean showFinishText) {
 		courses.update();
 		resultList.refresh();
 		if (showFinishText) {
@@ -364,20 +362,25 @@ public class Dashboard extends Application {
 	}
 
 	public void fadeInLogin() {
+		loginFader2.fadeIn();
+	}
+
+	public void setMenuTransparent(final boolean b) {
 		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {
-				loginFader2.fadeIn();
+				actionBar.setMouseTransparent(b);
 			}
 		});
 	}
 
-	public void setMenuTransparent(boolean b) {
-		actionBar.setMouseTransparent(b);
-	}
-
-	public void setSigInTransparent(boolean b) {
-		signIn.setMouseTransparent(b);
+	public void setSigInTransparent(final boolean b) {
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				signIn.setMouseTransparent(b);
+			}
+		});
 	}
 
 	public void showLoader(final boolean show) {
@@ -401,16 +404,10 @@ public class Dashboard extends Application {
 	}
 
 	public void setSignInColor() {
-		Platform.runLater(new Runnable() {
-			
-			@Override
-			public void run() {
-				signIn.setStyle("-fx-background-color: linear-gradient(lime, limegreen)");
-			}
-		});
+		signIn.setStyle("-fx-background-color: linear-gradient(lime, limegreen)");
 	}
 
-	public void setTitle(String title) {
+	public void setTitle(final String title) {
 		stage.setTitle(title);
 	}
 
@@ -443,7 +440,7 @@ public class Dashboard extends Application {
 		});
 	}
 
-	public static void updateGraphicInTree(IliasFile file) {
+	public static void updateGraphicInTree(final IliasFile file) {
 		courses.fileStatusChanged(file);
 	}
 
@@ -480,6 +477,12 @@ public class Dashboard extends Application {
 		engine.load(url);
 	}
 
+	public static void fileDownloaded(IliasFile file) {
+		setStatusText("Download abgeschlossen", false);
+		updateGraphicInTree(file);
+		resultList.fileSynchronizedStateChanged(file);
+	}
+
 	public ResultList getResultList() {
 		return resultList;
 	}
@@ -502,12 +505,6 @@ public class Dashboard extends Application {
 
 	public void setNumberofIngoredPdfs(int number) {
 		showIgnored.setText("Ignorierte Dateien " + "(" + String.valueOf(number) + ")");
-	}
-
-	public static void fileDownloaded(IliasFile file) {
-		setStatusText("Download abgeschlossen", false);
-		updateGraphicInTree(file);
-		resultList.fileSynchronizedStateChanged(file);
 	}
 
 	private void setLoaderButtonActivated(boolean activate) {

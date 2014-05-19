@@ -230,7 +230,7 @@ public class CoursesTreeView extends TreeView<IliasTreeNode> {
 				setGraphic(null);
 				return; 
 			}
-			boolean addOptions = this.isHover(); 
+
 			final BorderPane pane = new BorderPane(); 
 			final Label box = new Label();
 			box.setAlignment(Pos.TOP_LEFT);

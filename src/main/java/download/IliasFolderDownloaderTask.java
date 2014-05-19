@@ -72,7 +72,7 @@ public class IliasFolderDownloaderTask extends Task<Void> {
 			String validName = WinUtils.makeFileNameValid(file.getName());
 			String path = WinUtils.makeDirectoryNameValid(currentLevelDownloadPath); 
 			path += "/" + validName + "." + node.getExtension();
-			new Thread(new IliasPdfDownloaderTask(file, path)).start();
+			new Thread(new IliasFileDownloaderTask(file, path)).start();
 		}
 	}
 }

@@ -6,6 +6,7 @@ import java.util.Map;
 import javafx.animation.FadeTransition;
 import javafx.animation.Timeline;
 import javafx.animation.Transition;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
@@ -64,8 +65,13 @@ public class StudportBar extends GridPane {
 		final String password = Settings.getInstance().getPassword();
 
 		if (username == null || username.isEmpty() || password.isEmpty() || password == null) {
-			dashboard.fadeInLogin();
-			dashboard.setStatusText("Deine Benutzerdaten fehlen!", true);
+			Platform.runLater(new Runnable() {
+				@Override
+				public void run() {
+					dashboard.fadeInLogin();
+					dashboard.setStatusText("Deine Benutzerdaten fehlen!", true);
+				}
+			});
 			return;
 		}
 

@@ -15,7 +15,7 @@ import control.LocalFileStorage;
 
 /**
  * This class provides the option to ask the User for a position to store the file and 
- * calls {@link IliasPdfDownloaderTask}.
+ * calls {@link IliasFileDownloaderTask}.
  * 
  * @author deoldsax
  *
@@ -49,14 +49,13 @@ public class IliasPdfDownloadCaller extends Task<Void> {
 	}
 
 	private void download(IliasFile file) {
-		System.out.println("download");
 		String targetPath = LocalFileStorage.getInstance().suggestDownloadPath(file);
 		String name = WinUtils.makeFileNameValid(file.getName()); 
 
 		switch (mode) {
 		case AUTO:
 			targetPath = targetPath + "\\" + name + "." + file.getExtension();
-			new Thread(new IliasPdfDownloaderTask(file, targetPath)).start();
+			new Thread(new IliasFileDownloaderTask(file, targetPath)).start();
 			break;
 		case NORMAL:
 			askForStoragePosition(name, targetPath, file);
@@ -79,7 +78,7 @@ public class IliasPdfDownloadCaller extends Task<Void> {
 					if (!path.endsWith("." + file.getExtension())) {
 						path = path + "." + file.getExtension();
 					}
-					new Thread(new IliasPdfDownloaderTask(file, path)).start();
+					new Thread(new IliasFileDownloaderTask(file, path)).start();
 				}
 			}
 		});
