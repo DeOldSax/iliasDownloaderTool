@@ -15,3 +15,6 @@
 
 #check		http://www.iconarchive.com/show/must-have-icons-by-visualpharm/Check-icon.html
 			http://www.visualpharm.com
+			
+#defaultDocumentIcon
+			http://www.iconarchive.com/show/plump-icons-by-zerode/Document-txt-icon.html

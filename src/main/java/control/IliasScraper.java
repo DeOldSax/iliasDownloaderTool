@@ -95,9 +95,9 @@ public class IliasScraper {
 					if (Settings.getInstance().updateCanceled()) {
 						break;
 					}
-					// if the file is not specified yet, use the "standard" file
+
 					final boolean linkToFile = dir.attr("href").contains("cmd=sendfile");
-					final String fileExtension = suggestFileExtension(dir); 
+					String fileExtension = ""; 
 					final boolean linkToFolder = dir.attr("href").contains("goto_produktiv_fold_")
 							|| dir.attr("href").contains("goto_produktiv_grp_");
 					final boolean linkToForum = dir.attr("href").contains("goto_produktiv_frm_");
@@ -110,6 +110,7 @@ public class IliasScraper {
 						dir.setBaseUri(BASE_URI);
 						String attr = dir.attr("abs:href");
 						size = new IliasConnector().getFileSize(attr);
+						fileExtension = suggestFileExtension(dir); 
 						createFile(parent, dir, size, fileExtension);
 					} else if (linkToHyperlink) {
 						//TODO implement
@@ -164,13 +165,21 @@ public class IliasScraper {
 		}
 		
 		private String suggestFileExtension(Element dir) {
+			// 1. find il_ItemProperties bar
+			// 2. find element before size element --> fileExtension
 			Elements siblingElements = dir.parent().parent().siblingElements();
 			for (Element element : siblingElements) {
 				if (element.attr("class").equals("il_ItemProperties")) {
-					return element.child(0).text().replace("\u00a0", "").trim();
+					Elements children = element.children(); 
+					for (int i = 0; i < children.size(); i++) {
+						String text = children.get(i).text().replace("\u00a0", "").trim();
+						if (text.matches("(\\d)(.*)(B|b)(.*)")) {
+							return children.get(i-1).text().replace("\u00a0", "").trim(); 
+						}
+					}
 				}
 			}
-			Logger.getLogger(getClass()).debug("ERROR: File Extension could not be found");
+			Logger.getLogger(getClass()).warn("ERROR: File Extension could not be found");
 			return "unknown"; 
 		}
 	}

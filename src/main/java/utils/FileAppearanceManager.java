@@ -1,6 +1,5 @@
 package utils;
 
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -80,7 +79,6 @@ public class FileAppearanceManager {
 		if (pathToImage != null) {
 			return new ImageView(pathToImage); 
 		}
-		Logger.getLogger(getClass()).warn("No Picture specified for: " + extension + ", use default.");
 		return new ImageView(map.get(DEFAULT)); 
 	}
 	
