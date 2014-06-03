@@ -16,6 +16,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
@@ -213,6 +214,7 @@ public class CoursesTreeView extends TreeView<IliasTreeNode> {
 			setOnMouseExited(mouseHandler);
 		}
 		
+
 		@Override
 		protected void updateItem(final IliasTreeNode node, final boolean empty) {
 			super.updateItem(node, empty);
@@ -224,7 +226,7 @@ public class CoursesTreeView extends TreeView<IliasTreeNode> {
 			}
 			redraw(); 
 		}
-		
+
 		private void redraw() {
 			if (node == null) {
 				setGraphic(null);
@@ -249,6 +251,17 @@ public class CoursesTreeView extends TreeView<IliasTreeNode> {
 			pane.setLeft(box);
 			createAndAddActions(node, pane);
 			setGraphic(pane);
+			createToolTip(); 
+		}
+
+		private void createToolTip() {
+			if (node instanceof IliasFile) {
+				Tooltip tooltip = new Tooltip();
+				String fileExtension = ((IliasFile) this.node).getExtension(); 
+				String fileSizeLabel = ((IliasFile) this.node).getSizeLabel(); 
+				tooltip.setText("Elementtyp: " + fileExtension + "\n" + "Größe: " + fileSizeLabel);
+				this.setTooltip(tooltip);
+			}
 		}
 
 		private void createAndAddActions(final IliasTreeNode node, final BorderPane pane) {

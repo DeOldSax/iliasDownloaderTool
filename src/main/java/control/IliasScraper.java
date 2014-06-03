@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import model.IliasFile;
+import model.IliasFileMetaInformation;
 import model.IliasFolder;
 import model.IliasForum;
 import model.IliasTreeNode;
@@ -97,7 +98,6 @@ public class IliasScraper {
 					}
 
 					final boolean linkToFile = dir.attr("href").contains("cmd=sendfile");
-					String fileExtension = ""; 
 					final boolean linkToFolder = dir.attr("href").contains("goto_produktiv_fold_")
 							|| dir.attr("href").contains("goto_produktiv_grp_");
 					final boolean linkToForum = dir.attr("href").contains("goto_produktiv_frm_");
@@ -110,8 +110,7 @@ public class IliasScraper {
 						dir.setBaseUri(BASE_URI);
 						String attr = dir.attr("abs:href");
 						size = new IliasConnector().getFileSize(attr);
-						fileExtension = suggestFileExtension(dir); 
-						createFile(parent, dir, size, fileExtension);
+						createFile(parent, dir, size);
 					} else if (linkToHyperlink) {
 						//TODO implement
 					} else if (linkToForum) {
@@ -147,12 +146,14 @@ public class IliasScraper {
 			return folder;
 		}
 		
-		private IliasFile createFile (IliasFolder parentFolder, Element dir, int size, String fileExtension) {
+		private IliasFile createFile (IliasFolder parentFolder, Element dir, int size) {
 			fileCounter.incrementAndGet();
 			dir.setBaseUri(BASE_URI);
 			final String name = dir.text();
 			final String downloadLink = dir.attr("abs:href");
-			final IliasFile iliasFile = new IliasFile(name, downloadLink, fileExtension, parentFolder, size);
+			final IliasFileMetaInformation metaInf = suggestMetaInformation(dir); 
+			final IliasFile iliasFile = new IliasFile(name, downloadLink, parentFolder, size, 
+													  metaInf.getSizeLabel(), metaInf.getFileExtension());
 			return iliasFile;
 		}
 
@@ -164,9 +165,9 @@ public class IliasScraper {
 			return directory;
 		}
 		
-		private String suggestFileExtension(Element dir) {
-			// 1. find il_ItemProperties bar
-			// 2. find element before size element --> fileExtension
+		private IliasFileMetaInformation suggestMetaInformation(Element dir) {
+			String sizeLabel = "unknown"; 
+			String fileExtension = "unknown"; 
 			Elements siblingElements = dir.parent().parent().siblingElements();
 			for (Element element : siblingElements) {
 				if (element.attr("class").equals("il_ItemProperties")) {
@@ -174,13 +175,15 @@ public class IliasScraper {
 					for (int i = 0; i < children.size(); i++) {
 						String text = children.get(i).text().replace("\u00a0", "").trim();
 						if (text.matches("(\\d)(.*)(B|b)(.*)")) {
-							return children.get(i-1).text().replace("\u00a0", "").trim(); 
+							sizeLabel = text; 
+							fileExtension = children.get(i-1).text().replace("\u00a0", "").trim(); 
+							return new IliasFileMetaInformation(sizeLabel, fileExtension); 
 						}
 					}
 				}
 			}
 			Logger.getLogger(getClass()).warn("ERROR: File Extension could not be found");
-			return "unknown"; 
-		}
+			return new IliasFileMetaInformation(sizeLabel, fileExtension); 
+		}	
 	}
 }

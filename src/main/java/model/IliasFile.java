@@ -1,19 +1,21 @@
 package model;
 
+import javafx.scene.image.ImageView;
 import utils.FileAppearanceManager;
 import control.LocalFileStorage;
-import javafx.scene.image.ImageView;
 
 public class IliasFile extends IliasTreeNode {
+
 	private static final long serialVersionUID = -6286982393008142116L;
-	
 	private final int size;
 	private final String extension; 
+	private final String sizeLabel; 
 	
-	public IliasFile(String name, String url, String extension, IliasFolder parentFolder, int size) {
+	public IliasFile(String name, String url, IliasFolder parentFolder, int size, String sizeLabel, String extension) {
 		super(name, url, parentFolder);
-		this.extension = extension;
 		this.size = size;
+		this.extension = extension; 
+		this.sizeLabel = sizeLabel; 
 	}
 	
 	public int getSize() {
@@ -44,11 +46,11 @@ public class IliasFile extends IliasTreeNode {
 	public final ImageView getGraphic() {
 		FileAppearanceManager appearanceManager = FileAppearanceManager.getInstance();
 		if (isIgnored()) {
-			return appearanceManager.getIgnoredPicture(extension);
+			return appearanceManager.getIgnoredPicture(getExtension());
 		} else if (!(LocalFileStorage.getInstance().contains(this))) {
-			return appearanceManager.getNotSynchronizedPicture(extension);
+			return appearanceManager.getNotSynchronizedPicture(getExtension());
 		} else {
-			return appearanceManager.getNormalPicture(extension); 
+			return appearanceManager.getNormalPicture(getExtension()); 
 		}
 	}
 
@@ -61,5 +63,9 @@ public class IliasFile extends IliasTreeNode {
 	 */
 	public String getExtension() {
 		return extension; 
+	}
+	
+	public String getSizeLabel() {
+		return sizeLabel; 
 	}
 }
