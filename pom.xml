@@ -92,11 +92,11 @@
 		           </goals>
                     <configuration>
                         <tasks>
-                            <copy todir="release/IliasDownloaderTool-${version}/app" overwrite="true">
+                            <copy todir="release/IliasDownloaderTool-${project.version}/app">
 							    <fileset dir="target/jfx/app"></fileset>
 							 </copy>
-                            <copy todir="release/IliasDownloaderTool-${version}/win" overwrite="true">
-							    <fileset dir="target/jfx/native/bundles/Ilias-${version}"></fileset>
+                            <copy todir="release/IliasDownloaderTool-${project.version}/win">
+							    <fileset dir="target/jfx/native/bundles/Ilias-${project.version}"></fileset>
 							 </copy>
                         </tasks>
                     </configuration>
