@@ -14,16 +14,6 @@
   
   <dependencies>
   	
-  	 <!-- use this to remove eclipse warnings on javafx 
-  	 		remove it when using javafx8-->
-  	 <dependency>
-  		<groupId>com.oracle</groupId>
-  		<artifactId>javafx</artifactId>
-  		<version>2.2.3</version>
-  		<scope>system</scope>
-  		<systemPath>${project.basedir}\lib\jfxrt.jar</systemPath>
-	 </dependency>
-  
 	 <dependency>
   		<groupId>log4j</groupId>
   		<artifactId>log4j</artifactId>
@@ -58,7 +48,7 @@
   
  	 <build>
       <plugins>
-      <!-- 
+      
         <plugin>
 		    <artifactId>maven-assembly-plugin</artifactId>
 		    <executions>
@@ -80,7 +70,7 @@
 		        </execution>
 		    </executions>
 			</plugin>
-		 -->	
+		 	
   		<plugin>
         	<artifactId>maven-antrun-plugin</artifactId>
         	<version>1.7</version>
@@ -92,33 +82,20 @@
 		           </goals>
                     <configuration>
                         <tasks>
-                            <copy todir="release/IliasDownloaderTool-${project.version}/app">
-							    <fileset dir="target/jfx/app"></fileset>
-							 </copy>
-                            <copy todir="release/IliasDownloaderTool-${project.version}/win">
-							    <fileset dir="target/jfx/native/bundles/Ilias-${project.version}"></fileset>
+                            <copy file="target/Ilias-${project.version}-jar-with-dependencies.jar"
+                            		tofile="release/IliasDownloaderTool-${project.version}/Ilias-${project.version}.jar">
 							 </copy>
                         </tasks>
                     </configuration>
                </execution>
            </executions>
 		</plugin>
-		
-		<plugin>
-	    	<groupId>com.zenjava</groupId>
-    		<artifactId>javafx-maven-plugin</artifactId>
-    		<version>2.0</version>
-    		<configuration>
-       	 		<mainClass>view.Dashboard</mainClass>
-    		</configuration>
-		</plugin> 
-		
 		<plugin>
 			<groupId>org.apache.maven.plugins</groupId>
 			<artifactId>maven-compiler-plugin</artifactId>
 			<configuration>
-				<source>1.7</source>
-				<target>1.7</target>
+				<source>1.8</source>
+				<target>1.8</target>
 			</configuration>
 		</plugin>
 		

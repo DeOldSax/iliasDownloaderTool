@@ -47,10 +47,13 @@ public class Ilias {
 	public Ilias() {
 
 		SchemeRegistry schemeRegistry = new SchemeRegistry();
-		schemeRegistry.register(new Scheme("https", 80, PlainSocketFactory.getSocketFactory()));
-		schemeRegistry.register(new Scheme("https", 443, SSLSocketFactory.getSocketFactory()));
+		schemeRegistry.register(new Scheme("https", 80, PlainSocketFactory
+				.getSocketFactory()));
+		schemeRegistry.register(new Scheme("https", 443, SSLSocketFactory
+				.getSocketFactory()));
 
-		PoolingClientConnectionManager cm = new PoolingClientConnectionManager(schemeRegistry);
+		PoolingClientConnectionManager cm = new PoolingClientConnectionManager(
+				schemeRegistry);
 
 		client = new DefaultHttpClient(cm);
 
@@ -78,9 +81,12 @@ public class Ilias {
 
 		List<NameValuePair> nvps = new ArrayList<NameValuePair>();
 		nvps.add(new BasicNameValuePair("sendLogin", "1"));
-		nvps.add(new BasicNameValuePair("idp_selection", "https://idp.scc.kit.edu/idp/shibboleth"));
-		nvps.add(new BasicNameValuePair("target", "https://ilias.studium.kit.edu/shib_login.php?target="));
-		nvps.add(new BasicNameValuePair("home_organization_selection", "Mit KIT-Account anmelden"));
+		nvps.add(new BasicNameValuePair("idp_selection",
+				"https://idp.scc.kit.edu/idp/shibboleth"));
+		nvps.add(new BasicNameValuePair("target",
+				"https://ilias.studium.kit.edu/shib_login.php?target="));
+		nvps.add(new BasicNameValuePair("home_organization_selection",
+				"Mit KIT-Account anmelden"));
 
 		request2.setEntity(new UrlEncodedFormEntity(nvps, Consts.UTF_8));
 
