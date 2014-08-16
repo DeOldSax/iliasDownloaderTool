@@ -1,7 +1,11 @@
-package model;
+package model.persistance;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import model.IliasFile;
+import model.IliasFolder;
+import model.IliasTreeNode;
 
 public class IliasTreeProvider {
 	private static List<IliasFolder> allFiles = null;

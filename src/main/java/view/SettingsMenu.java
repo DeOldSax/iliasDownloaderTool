@@ -22,7 +22,7 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import model.persistance.Flags;
-import model.persistance.NewSettings;
+import model.persistance.Settings;
 
 public class SettingsMenu implements EventHandler<ActionEvent> {
 	private static Button localIliasPath;
@@ -109,7 +109,7 @@ public class SettingsMenu implements EventHandler<ActionEvent> {
 		HBox box = new HBox();
 		box.setSpacing(20);
 		box.getChildren().addAll(autoLogin, autoUpdate);
-		Flags flags = NewSettings.getInstance().getFlags();
+		Flags flags = Settings.getInstance().getFlags();
 		if (flags.isAutoLogin()) {
 			autoLogin.setStyle("-fx-background-color: linear-gradient(steelblue,royalblue)");
 		}
@@ -148,7 +148,7 @@ public class SettingsMenu implements EventHandler<ActionEvent> {
 		final DirectoryChooser directoryChooser = new DirectoryChooser();
 		directoryChooser.setTitle("Lokaler Ilias Ordner");
 
-		final String localIliasFolderPath = NewSettings.getInstance().getIliasFolderSettings().getLocalIliasFolderPath();
+		final String localIliasFolderPath = Settings.getInstance().getIliasFolderSettings().getLocalIliasFolderPath();
 		if (!localIliasFolderPath.equals(".")) {
 			directoryChooser.setInitialDirectory(new File(localIliasFolderPath));
 		}
@@ -156,15 +156,15 @@ public class SettingsMenu implements EventHandler<ActionEvent> {
 		final File selectedFile = directoryChooser.showDialog(new Stage());
 
 		if (selectedFile != null) {
-			NewSettings.getInstance().getIliasFolderSettings().setLocalIliasFolderPath(selectedFile.getAbsolutePath());
-			NewSettings.getInstance().getFlags().setLocalIliasPathStored(true);
+			Settings.getInstance().getIliasFolderSettings().setLocalIliasFolderPath(selectedFile.getAbsolutePath());
+			Settings.getInstance().getFlags().setLocalIliasPathStored(true);
 			localIliasPath.setText(selectedFile.getAbsolutePath());
 			updateLocalIliasFolderPath();
 		} else if (!localIliasFolderPath.equals(".")) {
 			localIliasPath.setText(localIliasFolderPath);
 		} else {
 			localIliasPath.setText("Ilias Ordner auswählen");
-			NewSettings.getInstance().getFlags().setLocalIliasPathStored(false);
+			Settings.getInstance().getFlags().setLocalIliasPathStored(false);
 		}
 		changeLocalIliasFolderButton();
 	}
@@ -197,13 +197,13 @@ public class SettingsMenu implements EventHandler<ActionEvent> {
 	}
 
 	public static void changeLocalIliasFolderButton() {
-		if (NewSettings.getInstance().getFlags().isLocalIliasPathStored()) {
+		if (Settings.getInstance().getFlags().isLocalIliasPathStored()) {
 			localIliasPath.setStyle("-fx-background-color:linear-gradient(steelblue,royalblue)");
-			localIliasPath.setText(NewSettings.getInstance().getIliasFolderSettings().getLocalIliasFolderPath());
+			localIliasPath.setText(Settings.getInstance().getIliasFolderSettings().getLocalIliasFolderPath());
 			getBlinkyTransition().stop();
 			localIliasPath.setOpacity(1);
 		} else {
-			if (NewSettings.getInstance().getIliasFolderSettings().getLocalIliasFolderPath().equals(".")) {
+			if (Settings.getInstance().getIliasFolderSettings().getLocalIliasFolderPath().equals(".")) {
 				localIliasPath.setText("Ilias Ordner auswählen");
 			}
 			localIliasPath.setStyle("-fx-background-color: linear-gradient(red, darkred)");
@@ -223,7 +223,7 @@ public class SettingsMenu implements EventHandler<ActionEvent> {
 	}
 
 	private void toggleButtonColor(ActionEvent event) {
-		Flags flags = NewSettings.getInstance().getFlags();
+		Flags flags = Settings.getInstance().getFlags();
 		Button button = (Button) event.getSource();
 		if (button.equals(autoLogin)) {
 			if (flags.isAutoLogin()) {

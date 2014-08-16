@@ -9,7 +9,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import model.IliasFile;
 import model.IliasTreeNode;
-import model.IliasTreeProvider;
+import model.persistance.IliasTreeProvider;
 import utils.WinUtils;
 import control.LocalFileStorage;
 

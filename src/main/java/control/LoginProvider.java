@@ -6,7 +6,7 @@ import javafx.event.EventHandler;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
-import model.persistance.NewSettings;
+import model.persistance.Settings;
 import model.persistance.User;
 import view.Dashboard;
 
@@ -41,7 +41,7 @@ public class LoginProvider implements EventHandler<ActionEvent> {
 				toggleDashboardLoginState("Ungültiges Passwort");
 				return;
 			}
-			User user = NewSettings.getInstance().getUser();
+			User user = Settings.getInstance().getUser();
 			if (savePwd.isSelected()) {
 				user.setName(username);
 				user.setPassword(password);

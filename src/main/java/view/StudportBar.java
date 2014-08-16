@@ -12,7 +12,7 @@ import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.scene.layout.GridPane;
 import javafx.util.Duration;
-import model.persistance.NewSettings;
+import model.persistance.Settings;
 import model.persistance.User;
 import studportControl.Studierendenportal;
 import studportControl.Transcript;
@@ -62,7 +62,7 @@ public class StudportBar extends GridPane {
 	}
 
 	private void startDownload(ActionEvent event) {
-		User user = NewSettings.getInstance().getUser();
+		User user = Settings.getInstance().getUser();
 		final String name = user.getName();
 		final String password = user.getPassword();
 

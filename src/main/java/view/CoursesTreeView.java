@@ -30,8 +30,8 @@ import model.IliasFile;
 import model.IliasFolder;
 import model.IliasForum;
 import model.IliasTreeNode;
-import model.IliasTreeProvider;
-import model.persistance.NewSettings;
+import model.persistance.IliasTreeProvider;
+import model.persistance.Settings;
 import utils.DesktopHelper;
 import download.IliasFolderDownloaderTask;
 import download.IliasPdfDownloadCaller;
@@ -73,7 +73,7 @@ public class CoursesTreeView extends TreeView<IliasTreeNode> {
 						openForum();
 						return;
 					} else if (selectedItem.getValue() instanceof IliasFile) {
-						if (NewSettings.getInstance().getFlags().isUserLoggedIn()) {
+						if (Settings.getInstance().getFlags().isUserLoggedIn()) {
 							new Thread(new IliasPdfDownloadCaller(((CoursesTreeView) event.getSource()).getSelectionModel().getSelectedItem()
 									.getValue())).start();
 						}
@@ -327,7 +327,7 @@ public class CoursesTreeView extends TreeView<IliasTreeNode> {
 
 		private void toggleIgnoredState(final IliasTreeNode node) {
 			IliasFile file = (IliasFile)node;
-			NewSettings.getInstance().toggleFileIgnored(file);
+			Settings.getInstance().toggleFileIgnored(file);
 			dashboard.pdfIgnoredStateChanged(file);
 			dashboard.getResultList().pdfIgnoredStateChanged(file);
 			fileStatusChanged(file);

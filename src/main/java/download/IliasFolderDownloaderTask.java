@@ -8,7 +8,7 @@ import javafx.concurrent.Task;
 import model.IliasFile;
 import model.IliasFolder;
 import model.IliasTreeNode;
-import model.persistance.NewSettings;
+import model.persistance.Settings;
 import utils.WinUtils;
 
 /**
@@ -32,7 +32,7 @@ public class IliasFolderDownloaderTask extends Task<Void> {
 
 	@Override
 	protected Void call() throws Exception {
-		String loadLocalIliasFolderPath = NewSettings.getInstance().getIliasFolderSettings().getLocalIliasFolderPath();
+		String loadLocalIliasFolderPath = Settings.getInstance().getIliasFolderSettings().getLocalIliasFolderPath();
 		new Thread(new Downloader(iliasTreeNodes, loadLocalIliasFolderPath)).start();
 		return null;
 	}

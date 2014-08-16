@@ -1,4 +1,4 @@
-package model;
+package model.persistance;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -9,6 +9,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.nio.file.Files;
 import java.util.List;
+
+import model.ActualisationDate;
+import model.IliasFolder;
 
 public class IliasTreeStorage {
 	private static final String ILIAS_STORE_FOLDER = System.getProperty("user.home") + "/" + ".ilias";

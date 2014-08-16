@@ -1,9 +1,9 @@
 package control;
 
 import javafx.application.Platform;
-import model.IliasTreeProvider;
 import model.persistance.Flags;
-import model.persistance.NewSettings;
+import model.persistance.IliasTreeProvider;
+import model.persistance.Settings;
 
 import org.apache.log4j.Logger;
 
@@ -55,13 +55,13 @@ public class IliasStarter {
 				dashboard.setStatusText("Angemeldet als: " + username, false);
 			}
 		});
-		NewSettings.getInstance().getFlags().setLogin(true);
+		Settings.getInstance().getFlags().setLogin(true);
 		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {
 				dashboard.showLoader(false);
 				dashboard.setSignInColor();
-				if (!NewSettings.getInstance().getFlags().autoUpdate()) {
+				if (!Settings.getInstance().getFlags().autoUpdate()) {
 					dashboard.setStatusText("Aktualisiere über den Button in der Menüleiste die Kurse auf deinem Schreibtisch!", false);
 				}
 				dashboard.setSigInTransparent(true);
@@ -80,7 +80,7 @@ public class IliasStarter {
 				LOGGER.warn(e.getStackTrace());
 			}
 		}
-		Flags flags = NewSettings.getInstance().getFlags();
+		Flags flags = Settings.getInstance().getFlags();
 		if (!(flags.updateCanceled())) {
 			IliasTreeProvider.setTree(Scraper.getIliasTree());
 			flags.setUpdateCanceled(false);

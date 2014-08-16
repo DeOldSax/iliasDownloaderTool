@@ -16,7 +16,7 @@ import model.IliasFile;
 import model.IliasFolder;
 import model.IliasForum;
 import model.IliasTreeNode;
-import model.persistance.NewSettings;
+import model.persistance.Settings;
 import utils.DesktopHelper;
 import control.LocalFileStorage;
 import download.DownloadMode;
@@ -92,7 +92,7 @@ public class FileContextMenu {
 			@Override
 			public void handle(ActionEvent event) {
 				final IliasFile file = (IliasFile) selectedIliasTreeNode;
-				NewSettings.getInstance().toggleFileIgnored(file);
+				Settings.getInstance().toggleFileIgnored(file);
 				dashboard.pdfIgnoredStateChanged(file);
 				dashboard.getResultList().pdfIgnoredStateChanged(file);
 			}
@@ -137,7 +137,7 @@ public class FileContextMenu {
 			return createMenu(selectedNodes.get(0), event); 
 		} 
 
-		if (NewSettings.getInstance().getFlags().isUserLoggedIn()) {
+		if (Settings.getInstance().getFlags().isUserLoggedIn()) {
 			boolean selectedNodesContainsFiles = false; 
 			boolean selectedNodesContainsFolder = false; 
 			for (IliasTreeNode iliasTreeNode : selectedNodes) {
@@ -162,7 +162,7 @@ public class FileContextMenu {
 		menu.getItems().clear();
 		this.selectedIliasTreeNode = node;
 		
-		if (node instanceof IliasFolder && NewSettings.getInstance().getFlags().isUserLoggedIn()) {
+		if (node instanceof IliasFolder && Settings.getInstance().getFlags().isUserLoggedIn()) {
 			menu.getItems().add(0, downloadIliasFolderItem); 
 		} else if (node instanceof IliasForum) {
 			menu.getItems().add(openForumItem);
@@ -180,7 +180,7 @@ public class FileContextMenu {
 				menu.getItems().add(openFileItem);
 			}
 		}
-		if (NewSettings.getInstance().getFlags().isUserLoggedIn() && node instanceof IliasFile) {
+		if (Settings.getInstance().getFlags().isUserLoggedIn() && node instanceof IliasFile) {
 			menu.getItems().add(0, downloadIliasFileItem);
 		}
 		return menu;

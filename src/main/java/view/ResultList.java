@@ -20,8 +20,8 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.text.TextAlignment;
 import model.IliasFile;
 import model.IliasTreeNode;
-import model.IliasTreeProvider;
-import model.persistance.NewSettings;
+import model.persistance.IliasTreeProvider;
+import model.persistance.Settings;
 import control.LocalFileStorage;
 import download.IliasPdfDownloadCaller;
 
@@ -63,7 +63,7 @@ public class ResultList extends ListView<IliasTreeNode> {
 		setOnMouseClicked(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
-				if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2 && NewSettings.getInstance().getFlags().isUserLoggedIn()) {
+				if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2 && Settings.getInstance().getFlags().isUserLoggedIn()) {
 					new Thread(new IliasPdfDownloadCaller(((ResultList) event.getSource()).getSelectionModel().getSelectedItem())).start();
 				} else {
 					showContextMenu(event);
@@ -81,14 +81,14 @@ public class ResultList extends ListView<IliasTreeNode> {
 	private void handleKeyEvents(KeyEvent event) {
 		if (event.getCode() == KeyCode.DELETE && listMode.equals(ResultListMode.IGNORE_MODE)) {
 			final IliasFile file = (IliasFile) getSelectionModel().getSelectedItem();
-			NewSettings.getInstance().toggleFileIgnored(file);
+			Settings.getInstance().toggleFileIgnored(file);
 			dashboard.pdfIgnoredStateChanged(file);
 			pdfIgnoredStateChanged(file);
 			getSelectionModel().selectNext();
 		} else if (event.getCode() == KeyCode.UP || event.getCode() == KeyCode.DOWN) {
 			final IliasTreeNode selectedDirectory = ((ResultList) event.getSource()).getSelectionModel().getSelectedItem();
 			dashboard.getCoursesTreeView().selectFile((IliasFile) selectedDirectory);
-		} else if (event.getCode() == KeyCode.ENTER && NewSettings.getInstance().getFlags().isUserLoggedIn()) {
+		} else if (event.getCode() == KeyCode.ENTER && Settings.getInstance().getFlags().isUserLoggedIn()) {
 			new Thread(new IliasPdfDownloadCaller(getSelectionModel().getSelectedItem())).start();
 		}
 	}

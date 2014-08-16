@@ -6,7 +6,7 @@ import java.util.List;
 import model.ActualisationDate;
 import model.IliasFile;
 
-public class NewSettings {
+public class Settings {
 //	old Settings path in registry
 //	myPrefs = prefsRoot.node("DownloaderTool.preferences");
 	
@@ -19,7 +19,7 @@ public class NewSettings {
 //	}
 //}
 	
-	private static NewSettings instance;
+	private static Settings instance;
 	private Storer storer;
 	private List<Storable> storableObjects;
 
@@ -29,28 +29,16 @@ public class NewSettings {
 	private FileStates fileStates;
 	private IliasFolderSettings iliasFolderSettings;
 	
-	private NewSettings() {
-//		OldSettings.removeNode
+	private Settings() {
 		storableObjects = new ArrayList<Storable>();
 		storer = new Storer();
 	}
 
-	public static NewSettings getInstance() {
+	public static Settings getInstance() {
 		if (instance == null) {
-			instance = new NewSettings();
+			instance = new Settings();
 		}
 		return instance;
-	}
-	
-	public ActualisationDate getActulisationDate() {
-		if (actualisationDate == null) {
-			actualisationDate = (ActualisationDate) load(new ActualisationDate());
-			if (actualisationDate == null) {
-				actualisationDate = new ActualisationDate();
-			}
-			storableObjects.add(actualisationDate);
-		}
-		return actualisationDate;
 	}
 	
 	public User getUser() {

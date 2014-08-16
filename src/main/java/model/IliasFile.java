@@ -1,7 +1,7 @@
 package model;
 
 import javafx.scene.image.ImageView;
-import model.persistance.NewSettings;
+import model.persistance.Settings;
 import utils.FileAppearanceManager;
 import control.LocalFileStorage;
 
@@ -24,14 +24,14 @@ public class IliasFile extends IliasTreeNode {
 	}
 	
 	public boolean isIgnored() {
-		return NewSettings.getInstance().getFileStates().isIgnored(createStoreKey()) != -1;
+		return Settings.getInstance().getFileStates().isIgnored(createStoreKey()) != -1;
 	}
 	
 	public void setIgnored(boolean b) {
 		if (b) {
-			NewSettings.getInstance().getFileStates().storeIgnoredFileSize(createStoreKey(), getSize());
+			Settings.getInstance().getFileStates().storeIgnoredFileSize(createStoreKey(), getSize());
 		} else {
-			NewSettings.getInstance().getFileStates().removeIgnoredFileSize(createStoreKey());
+			Settings.getInstance().getFileStates().removeIgnoredFileSize(createStoreKey());
 		}
 	}
 	
