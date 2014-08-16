@@ -37,7 +37,8 @@ import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 import model.IliasFile;
 import model.IliasTreeStorage;
-import model.Settings;
+import model.persistance.NewSettings;
+import model.persistance.User;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -95,8 +96,10 @@ public class Dashboard extends Application {
 		stage.addEventHandler(WindowEvent.WINDOW_CLOSE_REQUEST, new EventHandler<WindowEvent>() {
 			@Override
 			public void handle(WindowEvent event) {
-				Settings.getInstance().setLogIn(false);
-				Settings.getInstance().setUpdateCanceled(false);
+				NewSettings settings = NewSettings.getInstance();
+				settings.getFlags().setLogin(false);
+				settings.getFlags().setUpdateCanceled(false);
+				settings.store();
 				System.exit(0);
 			};
 		});
@@ -120,9 +123,9 @@ public class Dashboard extends Application {
 		TextField username = new TextField();
 		username.setId("userField");
 		username.setPromptText("Benutzererkennung");
-		username.setText(Settings.getInstance().getUsername());
+		username.setText(NewSettings.getInstance().getUser().getName());
 		PasswordField password = new PasswordField();
-		password.setText(Settings.getInstance().getPassword());
+		password.setText(NewSettings.getInstance().getUser().getPassword());
 		password.setId("userField");
 		password.setPromptText("Passwort");
 		RadioButton savePwd = new RadioButton("Speichern");
@@ -199,11 +202,11 @@ public class Dashboard extends Application {
 			@Override
 			public void handle(ActionEvent event) {
 				if (loaderRunning) {
-					Settings.getInstance().setUpdateCanceled(true);
+					NewSettings.getInstance().getFlags().setUpdateCanceled(true);
 					showLoader(false);
 				} else {
 					showLoader(true);
-					if (Settings.getInstance().userIsLoggedIn()) {
+					if (NewSettings.getInstance().getFlags().isUserLoggedIn()) {
 						new Thread(new Runnable() {
 							@Override
 							public void run() {
@@ -307,7 +310,7 @@ public class Dashboard extends Application {
 		iliasTreeReloaded(false);
 		stage.show();
 
-		if (Settings.getInstance().autoLogin()) {
+		if (NewSettings.getInstance().getFlags().isAutoLogin()) {
 			signIn.setMouseTransparent(true);
 			setStatusText("", false);
 			showLoader(true);
@@ -315,10 +318,13 @@ public class Dashboard extends Application {
 			new Thread(new Runnable() {
 				@Override
 				public void run() {
-					final IliasStarter iliasStarter = new IliasStarter(dashboard, Settings.getInstance().getUsername(), Settings
-							.getInstance().getPassword());
+					NewSettings newSettings = NewSettings.getInstance();
+					User user = newSettings.getUser();
+					String name = user.getName();
+					String password = user.getPassword();
+					final IliasStarter iliasStarter = new IliasStarter(dashboard, name, password);
 					final boolean loginSuccessfull = iliasStarter.login();
-					if (loginSuccessfull && Settings.getInstance().autoUpdate()) {
+					if (loginSuccessfull && newSettings.getFlags().autoUpdate()) {
 						Platform.runLater(new Runnable() {
 							@Override
 							public void run() {

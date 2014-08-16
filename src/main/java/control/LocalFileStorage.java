@@ -9,7 +9,7 @@ import java.util.Set;
 import model.IliasFile;
 import model.IliasFolder;
 import model.IliasTreeNode;
-import model.Settings;
+import model.persistance.NewSettings;
 
 /**
  * This class stores all Files. Currently a .zip {@link IliasZip} is treated as a "File" and derives from {@link IliasFile}.
@@ -33,7 +33,7 @@ public class LocalFileStorage {
 	}
 
 	public void refresh() {
-		scanFolders(Settings.getInstance().loadLocalIliasFolderPath());
+		scanFolders(NewSettings.getInstance().getIliasFolderSettings().getLocalIliasFolderPath());
 	}
 
 	public Set<Integer> getAllLocalFileSizes() {
@@ -88,7 +88,7 @@ public class LocalFileStorage {
 				}
 			}
 		}
-		return Settings.getInstance().loadLocalIliasFolderPath();
+		return NewSettings.getInstance().getIliasFolderSettings().getLocalIliasFolderPath();
 	}
 
 	private String getContainingFolder(IliasFile iliasFile) {

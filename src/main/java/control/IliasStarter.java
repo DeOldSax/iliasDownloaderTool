@@ -2,7 +2,8 @@ package control;
 
 import javafx.application.Platform;
 import model.IliasTreeProvider;
-import model.Settings;
+import model.persistance.Flags;
+import model.persistance.NewSettings;
 
 import org.apache.log4j.Logger;
 
@@ -54,13 +55,13 @@ public class IliasStarter {
 				dashboard.setStatusText("Angemeldet als: " + username, false);
 			}
 		});
-		Settings.getInstance().setLogIn(true);
+		NewSettings.getInstance().getFlags().setLogin(true);
 		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {
 				dashboard.showLoader(false);
 				dashboard.setSignInColor();
-				if (!Settings.getInstance().autoUpdate()) {
+				if (!NewSettings.getInstance().getFlags().autoUpdate()) {
 					dashboard.setStatusText("Aktualisiere über den Button in der Menüleiste die Kurse auf deinem Schreibtisch!", false);
 				}
 				dashboard.setSigInTransparent(true);
@@ -79,16 +80,17 @@ public class IliasStarter {
 				LOGGER.warn(e.getStackTrace());
 			}
 		}
-		if (!(Settings.getInstance().updateCanceled())) {
+		Flags flags = NewSettings.getInstance().getFlags();
+		if (!(flags.updateCanceled())) {
 			IliasTreeProvider.setTree(Scraper.getIliasTree());
-			Settings.getInstance().setUpdateCanceled(false);
+			flags.setUpdateCanceled(false);
 		} else {
-			Settings.getInstance().setUpdateCanceled(false);
+			flags.setUpdateCanceled(false);
 			dashboard.setStatusText("Aktualisierung abgebrochen.", false);
 			return;
 		}
 
-		if (Settings.getInstance().localIliasPathIsAlreadySet()) {
+		if (flags.isLocalIliasPathStored()) {
 			Platform.runLater(new Runnable() {
 				@Override
 				public void run() {

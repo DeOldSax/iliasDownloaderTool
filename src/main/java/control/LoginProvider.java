@@ -6,7 +6,8 @@ import javafx.event.EventHandler;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
-import model.Settings;
+import model.persistance.NewSettings;
+import model.persistance.User;
 import view.Dashboard;
 
 public class LoginProvider implements EventHandler<ActionEvent> {
@@ -14,7 +15,6 @@ public class LoginProvider implements EventHandler<ActionEvent> {
 	private final TextField usernameField;
 	private final PasswordField passwordField;
 	private final RadioButton savePwd;
-	private final Settings settings;
 	private final Dashboard dashboard;
 
 	public LoginProvider(Dashboard dashboard, TextField usernameField, PasswordField passwordField, RadioButton savePwd) {
@@ -22,7 +22,6 @@ public class LoginProvider implements EventHandler<ActionEvent> {
 		this.usernameField = usernameField;
 		this.passwordField = passwordField;
 		this.savePwd = savePwd;
-		this.settings = Settings.getInstance();
 	}
 
 	@Override
@@ -42,12 +41,13 @@ public class LoginProvider implements EventHandler<ActionEvent> {
 				toggleDashboardLoginState("Ungültiges Passwort");
 				return;
 			}
+			User user = NewSettings.getInstance().getUser();
 			if (savePwd.isSelected()) {
-				settings.storeUsername(username);
-				settings.storePassword(password);
+				user.setName(username);
+				user.setPassword(password);
 			} else {
-				settings.storeUsername("");
-				settings.storePassword("");
+				user.setName("");
+				user.setPassword("");
 			}
 
 			new Thread(new Runnable() {

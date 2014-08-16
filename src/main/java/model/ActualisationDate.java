@@ -1,13 +1,14 @@
 package model;
 
-import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-public class ActualisationDate implements Serializable {
+import model.persistance.Storable;
+
+public class ActualisationDate implements Storable {
 	private static final long serialVersionUID = -2661614718820065199L;
 	private String time;
-	private final String day;
+	private String day;
 
 	public ActualisationDate() {
 		time = new SimpleDateFormat("EEEE',' HH:mm").format(Calendar.getInstance().getTime());
@@ -32,5 +33,10 @@ public class ActualisationDate implements Serializable {
 			}
 		}
 		return "Letzte Aktualisierung: " + time;
+	}
+
+	@Override
+	public String getStorageFileName() {
+		return "time.ser";
 	}
 }

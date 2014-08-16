@@ -1,6 +1,7 @@
 package control;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -49,8 +50,15 @@ public class IliasConnector {
 		} catch (IOException e) {
 			LOGGER.warn("", e);
 		}
-		Header[] fileSize = response.getHeaders("Content-Length");
-		final int size = Integer.parseInt(fileSize[0].getValue());
+		
+		int size = 0; 
+		if(response.containsHeader("Content-Length")) {
+			Header[] fileSize = response.getHeaders("Content-Length");
+			size = Integer.parseInt(fileSize[0].getValue());
+		} else {
+			LOGGER.warn("Headers: " + Arrays.toString(response.getAllHeaders())); 
+			LOGGER.warn("\nNo Filesize found for URL: " + url);
+		}
 		return size;
 	}
 }

@@ -21,7 +21,8 @@ import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import model.Settings;
+import model.persistance.Flags;
+import model.persistance.NewSettings;
 
 public class SettingsMenu implements EventHandler<ActionEvent> {
 	private static Button localIliasPath;
@@ -108,10 +109,11 @@ public class SettingsMenu implements EventHandler<ActionEvent> {
 		HBox box = new HBox();
 		box.setSpacing(20);
 		box.getChildren().addAll(autoLogin, autoUpdate);
-		if (Settings.getInstance().autoLogin()) {
+		Flags flags = NewSettings.getInstance().getFlags();
+		if (flags.isAutoLogin()) {
 			autoLogin.setStyle("-fx-background-color: linear-gradient(steelblue,royalblue)");
 		}
-		if (Settings.getInstance().autoUpdate()) {
+		if (flags.autoUpdate()) {
 			autoUpdate.setStyle("-fx-background-color: linear-gradient(steelblue,royalblue)");
 		}
 
@@ -146,7 +148,7 @@ public class SettingsMenu implements EventHandler<ActionEvent> {
 		final DirectoryChooser directoryChooser = new DirectoryChooser();
 		directoryChooser.setTitle("Lokaler Ilias Ordner");
 
-		final String localIliasFolderPath = Settings.getInstance().loadLocalIliasFolderPath();
+		final String localIliasFolderPath = NewSettings.getInstance().getIliasFolderSettings().getLocalIliasFolderPath();
 		if (!localIliasFolderPath.equals(".")) {
 			directoryChooser.setInitialDirectory(new File(localIliasFolderPath));
 		}
@@ -154,15 +156,15 @@ public class SettingsMenu implements EventHandler<ActionEvent> {
 		final File selectedFile = directoryChooser.showDialog(new Stage());
 
 		if (selectedFile != null) {
-			Settings.getInstance().storeLocalIliasFolderPath(selectedFile.getAbsolutePath());
-			Settings.getInstance().setLocalIliasPathStored(true);
+			NewSettings.getInstance().getIliasFolderSettings().setLocalIliasFolderPath(selectedFile.getAbsolutePath());
+			NewSettings.getInstance().getFlags().setLocalIliasPathStored(true);
 			localIliasPath.setText(selectedFile.getAbsolutePath());
 			updateLocalIliasFolderPath();
 		} else if (!localIliasFolderPath.equals(".")) {
 			localIliasPath.setText(localIliasFolderPath);
 		} else {
 			localIliasPath.setText("Ilias Ordner auswählen");
-			Settings.getInstance().setLocalIliasPathStored(false);
+			NewSettings.getInstance().getFlags().setLocalIliasPathStored(false);
 		}
 		changeLocalIliasFolderButton();
 	}
@@ -195,13 +197,13 @@ public class SettingsMenu implements EventHandler<ActionEvent> {
 	}
 
 	public static void changeLocalIliasFolderButton() {
-		if (Settings.getInstance().localIliasPathIsAlreadySet()) {
+		if (NewSettings.getInstance().getFlags().isLocalIliasPathStored()) {
 			localIliasPath.setStyle("-fx-background-color:linear-gradient(steelblue,royalblue)");
-			localIliasPath.setText(Settings.getInstance().loadLocalIliasFolderPath());
+			localIliasPath.setText(NewSettings.getInstance().getIliasFolderSettings().getLocalIliasFolderPath());
 			getBlinkyTransition().stop();
 			localIliasPath.setOpacity(1);
 		} else {
-			if (Settings.getInstance().loadLocalIliasFolderPath().equals(".")) {
+			if (NewSettings.getInstance().getIliasFolderSettings().getLocalIliasFolderPath().equals(".")) {
 				localIliasPath.setText("Ilias Ordner auswählen");
 			}
 			localIliasPath.setStyle("-fx-background-color: linear-gradient(red, darkred)");
@@ -221,26 +223,26 @@ public class SettingsMenu implements EventHandler<ActionEvent> {
 	}
 
 	private void toggleButtonColor(ActionEvent event) {
-		Settings settings = Settings.getInstance();
+		Flags flags = NewSettings.getInstance().getFlags();
 		Button button = (Button) event.getSource();
 		if (button.equals(autoLogin)) {
-			if (settings.autoLogin()) {
-				settings.setAutoLogin(false);
+			if (flags.isAutoLogin()) {
+				flags.setAutoLogin(false);
 				button.setStyle(null);
 				button.setId("button");
 			} else {
-				settings.setAutoLogin(true);
+				flags.setAutoLogin(true);
 				button.setStyle("-fx-background-color: 	linear-gradient(steelblue,royalblue)");
 			}
 			return;
 		}
 		if (button.equals(autoUpdate)) {
-			if (settings.autoUpdate()) {
-				settings.setAutoUpdate(false);
+			if (flags.autoUpdate()) {
+				flags.setAutoUpdate(false);
 				button.setStyle(null);
 				button.setId("button");
 			} else {
-				settings.setAutoUpdate(true);
+				flags.setAutoUpdate(true);
 				button.setStyle("-fx-background-color: 	linear-gradient(steelblue,royalblue)");
 			}
 			return;

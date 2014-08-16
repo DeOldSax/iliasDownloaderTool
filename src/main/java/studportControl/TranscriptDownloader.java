@@ -10,7 +10,7 @@ import java.io.InputStream;
 
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
-import model.Settings;
+import model.persistance.NewSettings;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -46,7 +46,7 @@ public class TranscriptDownloader implements Runnable {
 			final HttpGet httpGet = new HttpGet(downloadPdfUrl);
 			response = clonedClient.execute(httpGet, context);
 
-			String saveDirectory = Settings.getInstance().loadLocalIliasFolderPath();
+			String saveDirectory = NewSettings.getInstance().getIliasFolderSettings().getLocalIliasFolderPath();
 			if (saveDirectory == null || !new File(saveDirectory).exists() || saveDirectory.equals(".")) {
 				saveDirectory = openSaveDirectoryDialog();
 				if (saveDirectory == null) {

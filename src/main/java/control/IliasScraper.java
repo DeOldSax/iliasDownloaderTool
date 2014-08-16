@@ -9,7 +9,7 @@ import model.IliasFileMetaInformation;
 import model.IliasFolder;
 import model.IliasForum;
 import model.IliasTreeNode;
-import model.Settings;
+import model.persistance.NewSettings;
 
 import org.apache.log4j.Logger;
 import org.jsoup.Jsoup;
@@ -37,7 +37,7 @@ public class IliasScraper {
 	}
 
 	private void startThread(List<IliasFolder> iliasTree) {
-		if (Settings.getInstance().updateCanceled()) {
+		if (NewSettings.getInstance().getFlags().updateCanceled()) {
 			return;
 		}
 		threadCount.incrementAndGet();
@@ -88,12 +88,12 @@ public class IliasScraper {
 		@Override
 		public void run() {
 			for (IliasFolder parent : courses) {
-				if (Settings.getInstance().updateCanceled()) {
+				if (NewSettings.getInstance().getFlags().updateCanceled()) {
 					break;
 				}
 				List<Element> directory = openFolder(parent);
 				for (Element dir : directory) {
-					if (Settings.getInstance().updateCanceled()) {
+					if (NewSettings.getInstance().getFlags().updateCanceled()) {
 						break;
 					}
 

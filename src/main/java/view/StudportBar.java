@@ -12,7 +12,8 @@ import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.scene.layout.GridPane;
 import javafx.util.Duration;
-import model.Settings;
+import model.persistance.NewSettings;
+import model.persistance.User;
 import studportControl.Studierendenportal;
 import studportControl.Transcript;
 
@@ -61,10 +62,11 @@ public class StudportBar extends GridPane {
 	}
 
 	private void startDownload(ActionEvent event) {
-		final String username = Settings.getInstance().getUsername();
-		final String password = Settings.getInstance().getPassword();
+		User user = NewSettings.getInstance().getUser();
+		final String name = user.getName();
+		final String password = user.getPassword();
 
-		if (username == null || username.isEmpty() || password.isEmpty() || password == null) {
+		if (name == null || name.isEmpty() || password.isEmpty() || password == null) {
 			Platform.runLater(new Runnable() {
 				@Override
 				public void run() {
@@ -75,7 +77,7 @@ public class StudportBar extends GridPane {
 			return;
 		}
 
-		new Thread(new Studierendenportal(dashboard, username, password, (Button) event.getSource(), this)).start();
+		new Thread(new Studierendenportal(dashboard, name, password, (Button) event.getSource(), this)).start();
 		changeButtonstate((Button) event.getSource(), true);
 	}
 

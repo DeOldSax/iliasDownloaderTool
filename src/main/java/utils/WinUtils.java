@@ -1,11 +1,11 @@
 package utils;
 
-import model.Settings;
+import model.persistance.NewSettings;
 
 public class WinUtils {
 	
 	public static String makeDirectoryNameValid(String path) {
-		String loadLocalIliasFolderPath = Settings.getInstance().loadLocalIliasFolderPath();
+		String loadLocalIliasFolderPath = NewSettings.getInstance().getIliasFolderSettings().getLocalIliasFolderPath();
 		String validString = path.replace(loadLocalIliasFolderPath, ""); 
 
 		validString = validString.replace("*", "+")
