@@ -3,35 +3,34 @@ package model.persistance;
 import java.util.ArrayList;
 import java.util.List;
 
-import model.ActualisationDate;
 import model.IliasFile;
 
 public class Settings {
-//	old Settings path in registry
-//	myPrefs = prefsRoot.node("DownloaderTool.preferences");
-	
-//	methode to remove all entries:
-//	public void removeNode() {
-//	try {
-//		myPrefs.removeNode();
-//	} catch (BackingStoreException e) {
-//		e.printStackTrace();
-//	}
-//}
-	
+	// old Settings path in registry
+	// myPrefs = prefsRoot.node("DownloaderTool.preferences");
+
+	// methode to remove all entries:
+	// public void removeNode() {
+	// try {
+	// myPrefs.removeNode();
+	// } catch (BackingStoreException e) {
+	// e.printStackTrace();
+	// }
+	// }
+	private static final String ILIAS_STORE_FOLDER = System.getProperty("user.home") + "/"
+			+ ".ilias";
 	private static Settings instance;
 	private Storer storer;
 	private List<Storable> storableObjects;
 
 	private User user;
-	private ActualisationDate actualisationDate; 
 	private Flags flags;
 	private FileStates fileStates;
 	private IliasFolderSettings iliasFolderSettings;
-	
+
 	private Settings() {
 		storableObjects = new ArrayList<Storable>();
-		storer = new Storer();
+		storer = new Storer(ILIAS_STORE_FOLDER);
 	}
 
 	public static Settings getInstance() {
@@ -40,7 +39,7 @@ public class Settings {
 		}
 		return instance;
 	}
-	
+
 	public User getUser() {
 		if (user == null) {
 			user = (User) load(new User());
@@ -65,7 +64,7 @@ public class Settings {
 	}
 
 	public FileStates getFileStates() {
-		if(fileStates == null) {
+		if (fileStates == null) {
 			fileStates = (FileStates) load(new FileStates());
 			if (fileStates == null) {
 				fileStates = new FileStates();
@@ -74,7 +73,7 @@ public class Settings {
 		}
 		return fileStates;
 	}
-	
+
 	public IliasFolderSettings getIliasFolderSettings() {
 		if (iliasFolderSettings == null) {
 			iliasFolderSettings = (IliasFolderSettings) load(new IliasFolderSettings());
@@ -85,7 +84,7 @@ public class Settings {
 		}
 		return iliasFolderSettings;
 	}
-	
+
 	public void toggleFileIgnored(IliasFile file) {
 		if (file.isIgnored()) {
 			file.setIgnored(false);
@@ -93,7 +92,7 @@ public class Settings {
 			file.setIgnored(true);
 		}
 	}
-	
+
 	private Storable load(Storable storeable) {
 		storeable = storer.load(storeable);
 		return storeable;
@@ -104,9 +103,5 @@ public class Settings {
 			storer.store(storableObject);
 		}
 	}
-
-	
-	
-
 
 }

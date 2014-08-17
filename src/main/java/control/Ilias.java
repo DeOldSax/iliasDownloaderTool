@@ -30,7 +30,8 @@ import org.jsoup.nodes.Element;
 
 public class Ilias {
 
-	private final String urlKitAnmeldung = "https://ilias.studium.kit.edu/login.php?target=&soap_pw=&ext_uid=&cookies=nocookies&client_id=produktiv&lang=de";
+	private final String urlKitAnmeldung = "https://ilias.studium.kit.edu/login.php?target=&soap_pw"
+			+ "=&ext_uid=&cookies=nocookies&client_id=produktiv&lang=de";
 	private final String urlLoginDialog = "https://ilias.studium.kit.edu/Shibboleth.sso/Login";
 	private final String urlAuthnExtUp = "https://idp.scc.kit.edu/idp/Authn/ExtUP";
 	private final String urlRedirect = "https://ilias.studium.kit.edu/Shibboleth.sso/SAML2/POST";
@@ -38,22 +39,19 @@ public class Ilias {
 	private static DefaultHttpClient client;
 	private final BasicHttpContext context;
 	private final RedirectStrategy strategy;
-	private HttpGet request1;
-	private HttpPost request2, request3, request4;
-	private HttpResponse response3, response4;
+	private HttpGet getRequest;
+	private HttpPost postRequest;
+	private HttpResponse response;
 	private HttpEntity entity;
 	private Logger LOGGER = Logger.getLogger(getClass());
 
 	public Ilias() {
 
 		SchemeRegistry schemeRegistry = new SchemeRegistry();
-		schemeRegistry.register(new Scheme("https", 80, PlainSocketFactory
-				.getSocketFactory()));
-		schemeRegistry.register(new Scheme("https", 443, SSLSocketFactory
-				.getSocketFactory()));
+		schemeRegistry.register(new Scheme("https", 80, PlainSocketFactory.getSocketFactory()));
+		schemeRegistry.register(new Scheme("https", 443, SSLSocketFactory.getSocketFactory()));
 
-		PoolingClientConnectionManager cm = new PoolingClientConnectionManager(
-				schemeRegistry);
+		PoolingClientConnectionManager cm = new PoolingClientConnectionManager(schemeRegistry);
 
 		client = new DefaultHttpClient(cm);
 
@@ -66,52 +64,50 @@ public class Ilias {
 	public String login(String username, String password) {
 		String htmlStartpage = null;
 
-		request1 = new HttpGet(urlKitAnmeldung);
+		getRequest = new HttpGet(urlKitAnmeldung);
 
 		try {
-			client.execute(request1, context);
+			client.execute(getRequest, context);
 		} catch (IOException e1) {
 			shutdown();
 			return "1";
 		} finally {
-			request1.releaseConnection();
+			getRequest.releaseConnection();
 		}
 
-		request2 = new HttpPost(urlLoginDialog);
+		postRequest = new HttpPost(urlLoginDialog);
 
 		List<NameValuePair> nvps = new ArrayList<NameValuePair>();
 		nvps.add(new BasicNameValuePair("sendLogin", "1"));
-		nvps.add(new BasicNameValuePair("idp_selection",
-				"https://idp.scc.kit.edu/idp/shibboleth"));
+		nvps.add(new BasicNameValuePair("idp_selection", "https://idp.scc.kit.edu/idp/shibboleth"));
 		nvps.add(new BasicNameValuePair("target",
 				"https://ilias.studium.kit.edu/shib_login.php?target="));
-		nvps.add(new BasicNameValuePair("home_organization_selection",
-				"Mit KIT-Account anmelden"));
+		nvps.add(new BasicNameValuePair("home_organization_selection", "Mit KIT-Account anmelden"));
 
-		request2.setEntity(new UrlEncodedFormEntity(nvps, Consts.UTF_8));
+		postRequest.setEntity(new UrlEncodedFormEntity(nvps, Consts.UTF_8));
 
 		try {
-			client.execute(request2, context);
+			client.execute(postRequest, context);
 		} catch (IOException e) {
 			LOGGER.warn(e.getStackTrace());
 		} finally {
-			request2.releaseConnection();
+			postRequest.releaseConnection();
 		}
 
-		request3 = new HttpPost(urlAuthnExtUp);
+		postRequest = new HttpPost(urlAuthnExtUp);
 
 		List<NameValuePair> nvps2 = new ArrayList<NameValuePair>();
 		nvps2.add(new BasicNameValuePair("j_username", username));
 		nvps2.add(new BasicNameValuePair("j_password", password));
 
-		request3.setEntity(new UrlEncodedFormEntity(nvps2, Consts.UTF_8));
+		postRequest.setEntity(new UrlEncodedFormEntity(nvps2, Consts.UTF_8));
 
 		try {
-			response3 = client.execute(request3, context);
+			response = client.execute(postRequest, context);
 		} catch (IOException e) {
 			LOGGER.warn(e.getStackTrace());
 		} finally {
-			entity = response3.getEntity();
+			entity = response.getEntity();
 		}
 
 		String html = null;
@@ -122,7 +118,7 @@ public class Ilias {
 		} catch (IOException e) {
 			LOGGER.warn(e.getStackTrace());
 		} finally {
-			request3.releaseConnection();
+			postRequest.releaseConnection();
 		}
 
 		Document doc = Jsoup.parse(html);
@@ -138,32 +134,32 @@ public class Ilias {
 		String v1 = value1.attr("value");
 		String v2 = value2.attr("value");
 
-		request3.releaseConnection();
+		postRequest.releaseConnection();
 
-		request4 = new HttpPost(urlRedirect);
+		postRequest = new HttpPost(urlRedirect);
 
 		List<NameValuePair> nvps3 = new ArrayList<NameValuePair>();
 		nvps3.add(new BasicNameValuePair("RelayState", v1));
 		nvps3.add(new BasicNameValuePair("SAMLResponse", v2));
 
-		request4.setEntity(new UrlEncodedFormEntity(nvps3, Consts.UTF_8));
+		postRequest.setEntity(new UrlEncodedFormEntity(nvps3, Consts.UTF_8));
 
 		try {
-			response4 = client.execute(request4, context);
+			response = client.execute(postRequest, context);
 		} catch (IOException e) {
 			LOGGER.warn(e.getStackTrace());
 		}
 
-		final HttpEntity entityX = response4.getEntity();
+		final HttpEntity entityX = response.getEntity();
 		try {
 			htmlStartpage = EntityUtils.toString(entityX);
 		} catch (ParseException | IOException e) {
 			LOGGER.warn(e.getStackTrace());
 		} finally {
-			request4.releaseConnection();
+			postRequest.releaseConnection();
 		}
 
-		request4.releaseConnection();
+		postRequest.releaseConnection();
 		return htmlStartpage;
 	}
 

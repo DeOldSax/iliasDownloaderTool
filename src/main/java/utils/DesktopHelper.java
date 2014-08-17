@@ -8,7 +8,7 @@ import model.IliasFile;
 import control.LocalFileStorage;
 
 public class DesktopHelper {
-	
+
 	public static void print(IliasFile iliasFile) {
 		final File file = LocalFileStorage.getInstance().getFile(iliasFile);
 		if (file != null && file.exists()) {
@@ -21,7 +21,7 @@ public class DesktopHelper {
 			// showErrorMessage();
 		}
 	}
-	
+
 	public static void openFile(IliasFile iliasFile) {
 		final File file = LocalFileStorage.getInstance().getFile(iliasFile);
 		if (file != null && file.exists()) {
@@ -51,5 +51,5 @@ public class DesktopHelper {
 			// showErrorMessage();
 		}
 	}
-	
+
 }

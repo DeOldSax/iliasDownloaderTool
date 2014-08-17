@@ -10,24 +10,29 @@ import java.io.ObjectOutputStream;
 import java.nio.file.Files;
 
 public class Storer {
-	private static final String ILIAS_STORE_FOLDER = System.getProperty("user.home") + "/" + ".ilias";
-	
+
+	private String storePath;
+
+	public Storer(String storePath) {
+		this.storePath = storePath;
+	}
+
 	protected void store(Storable storableObject) {
 		createStorageFolder();
 		String thisStorePath = createStorePath(storableObject);
 		// TODO check if file already exists and throw exception!
-		serialize(storableObject, thisStorePath); 
+		serialize(storableObject, thisStorePath);
 	}
-	
+
 	protected Storable load(Storable storableObject) {
 		return (Storable) deserialize(createStorePath(storableObject));
 	}
 
 	private String createStorePath(Storable storableObject) {
-		String thisStorePath = ILIAS_STORE_FOLDER + "/" + storableObject.getStorageFileName();
+		String thisStorePath = storePath + "/" + storableObject.getStorageFileName();
 		return thisStorePath;
 	}
-	
+
 	private static void serialize(Object object, String path) {
 		ObjectOutputStream out = null;
 		try {
@@ -41,7 +46,7 @@ public class Storer {
 			e.printStackTrace();
 		}
 	}
-	
+
 	private static Object deserialize(String path) {
 		Object object = null;
 		try {
@@ -59,9 +64,9 @@ public class Storer {
 		}
 		return object;
 	}
-	
-	private static void createStorageFolder() {
-		File file = new File(ILIAS_STORE_FOLDER);
+
+	private void createStorageFolder() {
+		File file = new File(storePath);
 		if (!file.exists()) {
 			file.mkdir();
 		}
