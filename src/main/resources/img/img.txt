@@ -1,5 +1,3 @@
-#settings 	http://findicons.com/icon/68728/run#
-
 #folder 	http://www.iconarchive.com/show/refresh-cl-icons-by-tpdkdesign.net/folder-blue-mydocuments-icon.html
 
 #delete 	http://www.iconarchive.com/show/refresh-cl-icons-by-tpdkdesign.net/Symbols-Delete-icon.html

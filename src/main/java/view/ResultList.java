@@ -43,13 +43,13 @@ public class ResultList extends ListView<IliasTreeNode> {
 		this.dashboard = dashboard;
 		setMinWidth(260);
 		listHeader = new Label();
-		listHeader.setId("listHeaderText");
+		listHeader.setId("listHeaderTextNormal");
 		listHeader.setTextAlignment(TextAlignment.CENTER);
 
 		headerPane = new GridPane();
 		listPane = new BorderPane();
 
-		headerPane.setId("listHeader");
+		headerPane.setId("listHeaderNormal");
 		listPane.setCenter(this);
 
 		listPane.setTop(headerPane);
@@ -63,8 +63,10 @@ public class ResultList extends ListView<IliasTreeNode> {
 		setOnMouseClicked(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
-				if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2 && Settings.getInstance().getFlags().isUserLoggedIn()) {
-					new Thread(new IliasPdfDownloadCaller(((ResultList) event.getSource()).getSelectionModel().getSelectedItem())).start();
+				if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2
+						&& Settings.getInstance().getFlags().isUserLoggedIn()) {
+					new Thread(new IliasPdfDownloadCaller(((ResultList) event.getSource())
+							.getSelectionModel().getSelectedItem())).start();
 				} else {
 					showContextMenu(event);
 				}
@@ -86,23 +88,26 @@ public class ResultList extends ListView<IliasTreeNode> {
 			pdfIgnoredStateChanged(file);
 			getSelectionModel().selectNext();
 		} else if (event.getCode() == KeyCode.UP || event.getCode() == KeyCode.DOWN) {
-			final IliasTreeNode selectedDirectory = ((ResultList) event.getSource()).getSelectionModel().getSelectedItem();
+			final IliasTreeNode selectedDirectory = ((ResultList) event.getSource())
+					.getSelectionModel().getSelectedItem();
 			dashboard.getCoursesTreeView().selectFile((IliasFile) selectedDirectory);
-		} else if (event.getCode() == KeyCode.ENTER && Settings.getInstance().getFlags().isUserLoggedIn()) {
+		} else if (event.getCode() == KeyCode.ENTER
+				&& Settings.getInstance().getFlags().isUserLoggedIn()) {
 			new Thread(new IliasPdfDownloadCaller(getSelectionModel().getSelectedItem())).start();
 		}
 	}
 
 	private void showContextMenu(MouseEvent event) {
 		menu.hide();
-		final List<IliasTreeNode> selectedNodes = ((ResultList) event.getSource()).getSelectionModel().getSelectedItems();
+		final List<IliasTreeNode> selectedNodes = ((ResultList) event.getSource())
+				.getSelectionModel().getSelectedItems();
 		if (selectedNodes.isEmpty() || selectedNodes == null) {
 			return;
 		}
 		if (selectedNodes.size() == 1) {
 			dashboard.getCoursesTreeView().selectFile((IliasFile) selectedNodes.get(0));
 		}
-		
+
 		if (event.getButton() == MouseButton.SECONDARY) {
 			menu = new FileContextMenu(dashboard).createMenu(selectedNodes, event);
 			menu.show(this, event.getScreenX(), event.getScreenY());
@@ -153,7 +158,8 @@ public class ResultList extends ListView<IliasTreeNode> {
 		for (IliasFile pdf : ignoredPdf) {
 			items.add(pdf);
 		}
-		dashboard.setStatusText(ignoredPdf.size() + " ignorierte Dateien in Ignorieren-Liste.", false);
+		dashboard.setStatusText(ignoredPdf.size() + " ignorierte Dateien in Ignorieren-Liste.",
+				false);
 		dashboard.setNumberofIngoredPdfs(ignoredPdf.size());
 	}
 
@@ -173,7 +179,8 @@ public class ResultList extends ListView<IliasTreeNode> {
 		final List<IliasFile> allFiles = IliasTreeProvider.getAllIliasFiles();
 		final List<IliasFile> unsynchronizedFiles = new ArrayList<IliasFile>();
 
-		final Set<Integer> allLocalFileSizes = LocalFileStorage.getInstance().getAllLocalFileSizes();
+		final Set<Integer> allLocalFileSizes = LocalFileStorage.getInstance()
+				.getAllLocalFileSizes();
 		for (IliasFile file : allFiles) {
 			if (file.isIgnored()) {
 				continue;
@@ -182,8 +189,8 @@ public class ResultList extends ListView<IliasTreeNode> {
 				unsynchronizedFiles.add(file);
 			}
 		}
-		dashboard.setStatusText("Gesamt: " + allFiles.size() + ", davon sind " + unsynchronizedFiles.size()
-				+ " noch nicht im Ilias Ordner.", false);
+		dashboard.setStatusText("Gesamt: " + allFiles.size() + ", davon sind "
+				+ unsynchronizedFiles.size() + " noch nicht im Ilias Ordner.", false);
 		setListHeader(" Lokal nicht vorhandene Dateien ", "");
 		dashboard.setNumberOfUnsynchronizedPdfs(unsynchronizedFiles.size());
 		items.clear();
@@ -237,21 +244,26 @@ public class ResultList extends ListView<IliasTreeNode> {
 				splitedStrings[i] = (splitedStrings[i] + " ").toLowerCase();
 			}
 			for (int i = 0; i < splitedStrings.length; i++) {
-				if (splitedStrings[i].startsWith(inputString.toLowerCase()) && !alreadyAddedFile.contains(file)) {
-					alreadyAddedFile.add(file);
-					continue;
-				}
-				if (inputString.contains(" ") && file.getName().toLowerCase().contains(inputString.toLowerCase())
+				if (splitedStrings[i].startsWith(inputString.toLowerCase())
 						&& !alreadyAddedFile.contains(file)) {
 					alreadyAddedFile.add(file);
 					continue;
 				}
-				if (splitedStrings[i].toLowerCase().contains(inputString.toLowerCase()) && !alreadyAddedFile.contains(file)) {
+				if (inputString.contains(" ")
+						&& file.getName().toLowerCase().contains(inputString.toLowerCase())
+						&& !alreadyAddedFile.contains(file)) {
+					alreadyAddedFile.add(file);
+					continue;
+				}
+				if (splitedStrings[i].toLowerCase().contains(inputString.toLowerCase())
+						&& !alreadyAddedFile.contains(file)) {
 					alreadyAddedFile.add(file);
 					continue;
 				}
 				if (file.getParentFolder() != null) {
-					if (inputString.length() > 3 && file.getParentFolder().getName().toLowerCase().contains(inputString.toLowerCase())
+					if (inputString.length() > 3
+							&& file.getParentFolder().getName().toLowerCase()
+									.contains(inputString.toLowerCase())
 							&& !alreadyAddedFile.contains(file)) {
 						alreadyAddedFile.add(file);
 					}
@@ -259,7 +271,8 @@ public class ResultList extends ListView<IliasTreeNode> {
 				}
 				if (file.getParentFolder().getParentFolder() != null) {
 					if (inputString.length() > 3
-							&& file.getParentFolder().getParentFolder().getName().toLowerCase().contains(inputString.toLowerCase())
+							&& file.getParentFolder().getParentFolder().getName().toLowerCase()
+									.contains(inputString.toLowerCase())
 							&& !alreadyAddedFile.contains(file)) {
 						alreadyAddedFile.add(file);
 					}
@@ -267,7 +280,8 @@ public class ResultList extends ListView<IliasTreeNode> {
 				}
 			}
 		}
-		setListHeader(" Gefundene Dateien " + "(" + String.valueOf(alreadyAddedFile.size()) + ")", "green");
+		setListHeader(" Gefundene Dateien " + "(" + String.valueOf(alreadyAddedFile.size()) + ")",
+				"green");
 		if (alreadyAddedFile.isEmpty()) {
 			dashboard.setStatusText("Keine Datei gefunden.");
 		} else {
@@ -278,19 +292,17 @@ public class ResultList extends ListView<IliasTreeNode> {
 	}
 
 	private void setListHeader(String text, String color) {
-		String textColor = "-fx-text-fill: #3d3d3d";
 		listHeader.setText(text);
 		if (color.equals("red")) {
-			color = "-fx-background-color: linear-gradient(red, darkred)";
-			textColor = "-fx-text-fill: white";
+			headerPane.setId("listHeaderIgnored");
+			listHeader.setId("listHeaderTextIgnored");
 		} else if (color.equals("green")) {
-			color = "-fx-background-color: linear-gradient(lime, limegreen)";
-			textColor = "-fx-text-fill: white";
+			headerPane.setId("listHeaderSearch");
+			listHeader.setId("listHeaderTextSearch");
 		} else {
-			color = "-fx-background-color: 	#c3c4c4,linear-gradient(#d6d6d6 50%, white 100%),radial-gradient(center 50% -40%, radius 200%, #e6e6e6 45%, rgba(230,230,230,0) 50%);";
+			headerPane.setId("listHeaderNormal");
+			listHeader.setId("listHeaderTextNormal");
 		}
-		headerPane.setStyle(color);
-		listHeader.setStyle(textColor);
 	}
 
 	protected BorderPane getPane() {

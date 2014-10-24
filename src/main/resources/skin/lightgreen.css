@@ -1,0 +1,391 @@
+* {
+	/* red */
+	-fx-red: 				rgba(178, 32, 39, 0.9);
+	-fx-redgradient:		linear-gradient(rgba(178, 32, 39, 1), rgba(178, 32, 39, 0.8));
+	
+	/* green */
+	-fx-green:				rgba(32, 178, 170, 1);
+	-fx-greentransparent:	rgba(32, 178, 170, 0.5);
+	
+	/* blue */
+	-fx-bluegradient:		linear-gradient(rgba(65,105,200,1), rgba(65,105,225,0.8));
+	
+}
+
+.root {
+	
+	/*-fx-background-color:	linear-gradient(rgba(163,163,163, 0.1), rgba(217,206,206, 0.3), whitesmoke);*/
+	-fx-background-color:	linear-gradient(rgba(220, 220, 220, 0.1), whitesmoke);
+	-fx-background-radius: 	2;
+}
+/* @see http://stackoverflow.com/questions/25336796/tooltip-background-with-javafx-css */
+.main-root {
+	-fx-background-color: 	transparent;
+	-fx-background-radius: 	2;
+}
+
+.context-menu {
+	-fx-background-color:	rgba(0,98,255, 0.3);
+}
+
+.menu-item .label {
+	-fx-text-fill:			white;			
+}
+
+.menu-item:hover .label {
+	-fx-text-fill:			royalblue;
+}
+
+.menu-item:hover {
+	-fx-text-fill:			rgba(0,98,255, 0.3);
+	-fx-background-color:	white;
+}
+
+.label {
+	-fx-text-fill: 			#333; 
+    -fx-font-size: 			16;
+    -fx-font-weight: 		bold;
+}
+
+/******************** 
+ * 					*
+ *		Button		*
+ *					*
+ ********************/
+
+.button {
+	-fx-cursor:				hand;
+	-fx-background-color: 	linear-gradient(whitesmoke, white);
+	-fx-background-radius:	2; 
+	-fx-text-fill: 			black; 
+    -fx-font-size: 			14;
+    -fx-font-weight: 		bold;
+    -fx-effect: 			dropshadow( three-pass-box , rgba(0,0,0,0.5) , 2, 0.0 , 0 , 1 );
+}
+
+.button:hover {
+	-fx-background-color: 	royalblue; 
+	-fx-text-fill:			white; 
+	-fx-effect: 			null;
+}
+
+.button:pressed {
+	-fx-effect: 			innershadow( three-pass-box , rgba(0,0,0,0.4), 6, 0.0 , 0 , 1 );
+}
+
+#loginButton {
+	-fx-cursor:				hand;
+	-fx-background-color: 	linear-gradient(whitesmoke, white);
+	-fx-background-radius:	2; 
+	-fx-text-fill: 			royalblue; 
+    -fx-font-size: 			14;
+    -fx-font-weight: 		bold;
+    -fx-padding:			8 0 8 0;
+    -fx-effect: 			dropshadow( three-pass-box , rgba(0,0,0,0.5) , 2, 0.0 , 0 , 1 );
+}
+
+#loginButton:hover {
+	-fx-background-color: 	royalblue;
+	-fx-text-fill:			white;
+}
+
+#loginButtonActive {
+	-fx-background-color: 	rgba(32,178,170,0.5); 
+	-fx-background-radius:	2; 
+	-fx-text-fill: 			black; 
+    -fx-font-size: 			14;
+    -fx-font-weight: 		bold;
+    -fx-padding:			8 0 8 0;
+    -fx-graphic:			url(../img/check_black.png);
+	-fx-content-display:	right;
+	-fx-effect: 			innershadow( three-pass-box , rgba(0,0,0,0.8), 5, 0.0 , 0 , 1 );
+}
+
+#loginButtonGO {
+	-fx-background-color:	linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.8));
+	-fx-text-fill:			white;
+	-fx-effect: 			dropshadow( three-pass-box , rgba(0,0,0,0.4) , 4, 0.0 , 0 , 1 );
+    -fx-graphic:			url(../img/login_arrow.png);
+}
+
+#loginButtonGO:hover {
+	-fx-background-color:	linear-gradient(rgba(65,105,200,1), rgba(65,105,225,0.8));
+	-fx-effect: 			null;
+}
+
+#loginButtonGO:pressed {
+	-fx-effect: 			innershadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );
+}
+
+#loginButtonCancel {
+	-fx-background-color:	linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.8));
+	-fx-background-radius:	2;
+    -fx-graphic:			url(../img/cross_black.png);
+	-fx-effect: 			dropshadow( three-pass-box , rgba(0,0,0,0.4) , 4, 0.0 , 0 , 1 );
+}
+
+#loginButtonCancel:hover {
+	-fx-background-color: 	-fx-redgradient;
+	-fx-effect: 			null;
+}
+
+#loginButtonCancel:pressed {
+    -fx-effect: 			innershadow( three-pass-box , rgba(0,0,0,0.4), 6, 0.0 , 0 , 1 );
+}
+
+#greenButton {
+	-fx-background-color: 	-fx-green; 
+	-fx-text-fill: 			white; 
+    -fx-font-size: 			14;
+    -fx-font-weight: 		bold;
+	-fx-effect: 			dropshadow( three-pass-box , rgba(0,0,0,0.5) , 1.5, 0.0 , 0 , 2 );
+}
+
+#greenButton:hover {
+}
+
+#greenButton:pressed {
+   	-fx-effect: 			innershadow( three-pass-box , rgba(0,0,0,0.4), 6, 0.0 , 0 , 1 );
+}
+
+/* doButton */
+.doButton {
+	-fx-background-color:	transparent;
+	-fx-effect:				null;
+	-fx-content-display:	center;
+}
+
+.doButton:hover {
+	-fx-background-color:	rgba(255,255,225,0.5);
+	-fx-effect: 			innershadow( three-pass-box , rgba(0,0,0,0.1), 6, 0.0 , 0 , 1 );
+}
+
+.doButton:pressed {
+ 	-fx-effect: 			innershadow( three-pass-box , rgba(0,0,0,0.4), 6, 0.0 , 0 , 1 );
+}
+
+#settingsButton {
+	-fx-graphic:			url(../img/menu_icon.png);
+}
+
+#settingsButton:hover {
+	-fx-graphic:			url(../img/menu_icon_hover.png);
+}
+
+#collapseButton {
+	-fx-graphic:			url(../img/collapse_icon.png);
+}
+
+#collapseButton:hover {
+	/*-fx-graphic:			url(../img/collapse_icon_hover.png);*/
+}
+
+#loaderButton {
+	-fx-graphic:			url(../img/loader_icon.png);
+}
+
+#loaderButton:hover, #loaderButtonActive {
+	-fx-background-color:	transparent;
+	-fx-graphic:			url(../img/loader_icon_hover.png);
+	-fx-content-display:	center;
+}
+/*  */
+
+/* actionButton */
+.actionButton {
+	-fx-background-color:	linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.8));
+	-fx-text-fill:			white;
+	-fx-padding:			8 0 8 0;
+	-fx-effect: 			dropshadow( three-pass-box , rgba(0,0,0,0.4) , 4, 0.0 , 0 , 1 );
+}
+
+.actionButton:hover {
+	-fx-background-color:	linear-gradient(rgba(65,105,200,1), rgba(65,105,225,0.8));
+	-fx-effect: 			null;
+}
+
+.actionButton:pressed {
+	-fx-effect: 			innershadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );
+}
+/*  */
+
+/******************** 
+ * 					*
+ *	    Label	    *
+ *					*
+ ********************/
+
+#lastUpdateTimeLabel {
+	-fx-font-size: 			12;
+	-fx-text-fill: 			-fx-greentransparent;
+}
+
+/******************** 
+ * 					*
+ *	  TextField	    *
+ *					*
+ ********************/
+
+#textField {
+	-fx-background-color: 	-fx-greentransparent; 
+	-fx-text-fill: 			white;
+	-fx-font-size: 			14;
+	-fx-prompt-text-fill: 	white;
+	-fx-font-weight: 		bold;
+	-fx-padding:			8 8 8 8;
+}
+
+#textField:hover {
+	-fx-background-color:	white;
+	-fx-prompt-text-fill:	rgba(65,105,225,0.5); 
+	-fx-text-fill: 			royalblue;
+	-fx-effect: 			innershadow( three-pass-box , rgba(0,0,0,0.3), 3, 0.0 , 0 , 1 );
+}
+
+#textField:focused {
+	-fx-background-color:	white;
+	-fx-prompt-text-fill:	rgba(65,105,225,0.5);
+	-fx-text-fill: 			royalblue;
+	-fx-effect: 			innershadow( three-pass-box , rgba(0,0,0,0.4), 3, 0.0 , 0 , 1 );
+}
+/****************************************************** */
+
+/******************** 
+ * 					*
+ *	  RadioButton   *
+ *					*
+ ********************/
+.radio-button .dot{
+	-fx-text-fill: 			-fx-blue; 
+}
+.radio-button {
+	-fx-text-fill: 			black; 
+}
+
+.tooltip {
+	-fx-text-fill: 			white;
+    -fx-font-size: 			14;
+	-fx-background-color: 	#4d4d4d;
+	-fx-effect: 			dropshadow( three-pass-box , rgba(0,0,0,0.6) , 3, 0.0 , 0 , 1 );
+}
+
+#localIliasPath {
+	-fx-text-fill: 			royalblue;
+	-fx-effect: 			innershadow( three-pass-box , rgba(0,0,0,0.4), 6, 0.0 , 0 , 1 );
+	-fx-background-color:	white;
+}
+
+#localIliasPath:hover {
+	-fx-text-fill: 			white;
+	-fx-background-color: 	royalblue;
+	-fx-effect: 			null;
+}
+
+#localIliasPath:pressed {
+	-fx-effect: 			innershadow( three-pass-box , rgba(0,0,0,0.4), 6, 0.0 , 0 , 1 );
+}
+
+#localIliasPathNotSelected {
+	-fx-background-color:	linear-gradient(red, darkred);
+	-fx-text-fill:			white;
+}
+
+#localIliasPathNotSelected:hover {
+	-fx-effect:				null;
+}
+
+#autoButtonActive {
+	-fx-background-color: 	royalblue;
+	-fx-text-fill: 			white;
+	-fx-effect: 			innershadow( three-pass-box , rgba(0,0,0,0.5), 6, 0.0 , 0 , 1 );
+	-fx-graphic:			url(../img/check_white.png);
+	-fx-content-display:	right;
+}
+
+#autoButtonActive:hover {
+	-fx-background-color: 	royalblue;
+	-fx-text-fill: 			white;
+	-fx-effect: 			null;
+}
+
+/******************** 
+ * 					*
+ *	  ResultList    *
+ *					*
+ ********************/
+
+
+#listHeaderNormal {
+	-fx-background-color: 	#c3c4c4,
+					        linear-gradient(#d6d6d6 50%, white 100%),
+					        radial-gradient(center 50% -40%, radius 200%, #e6e6e6 45%, rgba(230,230,230,0) 50%);
+	-fx-background-radius:	0;
+	-fx-effect: 			dropshadow( three-pass-box , rgba(0,0,0,0.6) , 3, 0.0 , 0 , 1 );
+}
+
+#listHeaderTextNormal {
+    -fx-font-size: 			14;
+	-fx-text-fill:			royalblue; 
+	-fx-font-weight: 		bold;
+	-fx-padding:			5;
+}
+
+#listHeaderIgnored {
+	/*
+	-fx-background-color: 	 linear-gradient(rgba(255, 0, 0, 0.6), rgba(139, 0, 0, 0.6));
+	*/
+	-fx-background-color: 	#c3c4c4,
+					        linear-gradient(#d6d6d6 50%, white 100%),
+					        radial-gradient(center 50% -40%, radius 200%, #e6e6e6 45%, rgba(230,230,230,0) 50%);
+	-fx-background-radius:   0;
+	-fx-effect: 			 dropshadow( three-pass-box , rgba(0,0,0,0.6) , 3, 0.0 , 0 , 1 );
+}
+
+#listHeaderTextIgnored {
+	-fx-font-size: 			14;
+	-fx-text-fill:			-fx-red; 
+	-fx-font-weight: 		bold;
+	-fx-padding:			5;
+}
+
+#listHeaderSearch {
+	-fx-background-color: 	#c3c4c4,
+					        linear-gradient(#d6d6d6 50%, white 100%),
+					        radial-gradient(center 50% -40%, radius 200%, #e6e6e6 45%, rgba(230,230,230,0) 50%);
+	-fx-background-radius:   0;
+	-fx-effect: 			 dropshadow( three-pass-box , rgba(0,0,0,0.6) , 3, 0.0 , 0 , 1 );
+}
+
+#listHeaderTextSearch {
+	-fx-font-size: 			14;
+	-fx-text-fill:			lightseagreen; 
+	-fx-font-weight: 		bold;
+	-fx-padding:			5;
+}
+
+.tree-cell {
+	-fx-font-size: 			15;
+	-fx-font-family: 		calibri;
+}
+
+#statusFooterText {
+	-fx-text-fill:			#333; 
+	-fx-font-size: 			14;
+    -fx-font-weight: 		bold;
+}
+
+#statusFooterAlertText {
+	-fx-text-fill:			-fx-red; 
+	-fx-font-size: 			14;
+    -fx-font-weight: 		bold;
+}
+
+/* 
+#loupe {
+	-fx-image:			url(../img/loupe.png);	
+}
+
+#loupeHover {
+	-fx-image:			url(../img/loupe_hover.png);	
+}
+*/

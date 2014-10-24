@@ -8,19 +8,18 @@ import model.persistance.Settings;
 import org.apache.log4j.Logger;
 
 import view.Dashboard;
-import view.SettingsMenu;
 
 public class IliasStarter {
 	private static String loginStatusMessage;
 	private String username = null;
 	private String password = null;
 	private Logger LOGGER = Logger.getLogger(getClass());
-	private Dashboard dashboard; 
-	
+	private Dashboard dashboard;
+
 	public IliasStarter(Dashboard dashboard) {
 		this.dashboard = dashboard;
 	}
-	
+
 	public IliasStarter(Dashboard dashboard, String username, String password) {
 		this.dashboard = dashboard;
 		this.username = username;
@@ -62,7 +61,10 @@ public class IliasStarter {
 				dashboard.showLoader(false);
 				dashboard.setSignInColor();
 				if (!Settings.getInstance().getFlags().autoUpdate()) {
-					dashboard.setStatusText("Aktualisiere über den Button in der Menüleiste die Kurse auf deinem Schreibtisch!", false);
+					dashboard
+							.setStatusText(
+									"Aktualisiere über den Button in der Menüleiste die Kurse auf deinem Schreibtisch!",
+									false);
 				}
 				dashboard.setSigInTransparent(true);
 			}
@@ -103,8 +105,7 @@ public class IliasStarter {
 		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {
-				SettingsMenu.show();
-				SettingsMenu.activatePromptUpdater();
+				dashboard.showSettingsPrompt();
 			}
 		});
 		dashboard.showLoader(false);
