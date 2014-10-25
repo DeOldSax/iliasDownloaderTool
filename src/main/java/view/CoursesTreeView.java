@@ -53,13 +53,13 @@ public class CoursesTreeView extends TreeView<IliasTreeNode> {
 		getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 		menu = new ContextMenu();
 		setCellFactory(new Callback<TreeView<IliasTreeNode>, TreeCell<IliasTreeNode>>() {
-			
+
 			@Override
 			public TreeCell<IliasTreeNode> call(TreeView<IliasTreeNode> arg0) {
 				return new IliasTreeCell();
 			}
 		});
-		
+
 		setOnMouseClicked(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
@@ -74,8 +74,9 @@ public class CoursesTreeView extends TreeView<IliasTreeNode> {
 						return;
 					} else if (selectedItem.getValue() instanceof IliasFile) {
 						if (Settings.getInstance().getFlags().isUserLoggedIn()) {
-							new Thread(new IliasPdfDownloadCaller(((CoursesTreeView) event.getSource()).getSelectionModel().getSelectedItem()
-									.getValue())).start();
+							new Thread(new IliasPdfDownloadCaller(
+									((CoursesTreeView) event.getSource()).getSelectionModel()
+											.getSelectedItem().getValue())).start();
 						}
 					}
 				} else if (event.getButton() == MouseButton.SECONDARY) {
@@ -98,14 +99,15 @@ public class CoursesTreeView extends TreeView<IliasTreeNode> {
 		}
 	}
 
-	private void showContextMenu(ObservableList<TreeItem<IliasTreeNode>> selectedItems, MouseEvent event) {
+	private void showContextMenu(ObservableList<TreeItem<IliasTreeNode>> selectedItems,
+			MouseEvent event) {
 		menu.getItems().clear();
 
-		List<IliasTreeNode> selectedIliasTreeNodes = new ArrayList<IliasTreeNode>(); 
+		List<IliasTreeNode> selectedIliasTreeNodes = new ArrayList<IliasTreeNode>();
 		for (TreeItem<IliasTreeNode> treeItem : selectedItems) {
-			selectedIliasTreeNodes.add(treeItem.getValue()); 					
+			selectedIliasTreeNodes.add(treeItem.getValue());
 		}
-		
+
 		menu = new FileContextMenu(dashboard).createMenu(selectedIliasTreeNodes, event);
 		menu.show(this, event.getScreenX(), event.getScreenY());
 	}
@@ -128,7 +130,7 @@ public class CoursesTreeView extends TreeView<IliasTreeNode> {
 				item.setGraphic(node.getGraphic());
 			} else if (node instanceof IliasForum) {
 				item.setGraphic(node.getGraphic());
-			} 
+			}
 		}
 	}
 
@@ -172,7 +174,7 @@ public class CoursesTreeView extends TreeView<IliasTreeNode> {
 
 	public void fileStatusChanged(IliasFile iliasFile) {
 		TreeItem<IliasTreeNode> treeItem = getItem(iliasFile);
-		setGraphic(treeItem, iliasFile.getGraphic()); 
+		setGraphic(treeItem, iliasFile.getGraphic());
 		while (treeItem.getParent() != null) {
 			treeItem = treeItem.getParent();
 			IliasFolder folder = (IliasFolder) treeItem.getValue();
@@ -190,50 +192,117 @@ public class CoursesTreeView extends TreeView<IliasTreeNode> {
 			}
 		});
 	}
-	
+
 	/**
 	 * This class draws the ListCells.
+	 * http://stackoverflow.com/questions/23137131
+	 * /javafx-listview-with-button-in-each-cell
 	 * 
 	 * @author deoldsax
 	 *
 	 */
 	private class IliasTreeCell extends TreeCell<IliasTreeNode> {
-		
-		private IliasTreeNode node; 
-		
+
+		private IliasTreeNode node;
+		private int i = 0;
+		private BorderPane pane;
+		private Label box;
+		private Button downloadButton;
+		private Button ignoreButton;
+		private Button openerButton;
+		private Button printerButton;
+		private HBox actions;
+		private boolean calledfirsttime = true;
+
 		public IliasTreeCell() {
+			pane = buildCell();
 			EventHandler<MouseEvent> mouseHandler = new EventHandler<MouseEvent>() {
 				@Override
 				public void handle(MouseEvent arg0) {
 					if (node != null) {
-						redraw();
+						// redraw();
+						update();
 					}
 				}
 			};
-			setOnMouseEntered(mouseHandler);
-			setOnMouseExited(mouseHandler);
+			// setOnMouseEntered(mouseHandler);
+			// setOnMouseExited(mouseHandler);
 		}
-		
 
 		@Override
 		protected void updateItem(final IliasTreeNode node, final boolean empty) {
 			super.updateItem(node, empty);
-			
-			if (empty) {
-				this.node = null; 
+			System.out.println("update item = " + node + "empty = " + empty);
+
+			if (empty || (node == null)) {
+				// this.node = null;
+				setGraphic(null);
 			} else {
-				this.node = node; 
+				this.node = node;
+				update();
+				setGraphic(pane);
 			}
-			redraw(); 
+			// redraw();
+		}
+
+		private BorderPane buildCell() {
+			final BorderPane pane = new BorderPane();
+			box = new Label();
+			box.setAlignment(Pos.TOP_LEFT);
+
+			pane.setLeft(box);
+			createAndAddActions(pane);
+			// setGraphic(pane);
+			createToolTip();
+			return pane;
+		}
+
+		private void update() {
+
+			if (node instanceof IliasFolder) {
+				IliasFolder folder = (IliasFolder) node;
+				box.setGraphic(folder.getGraphic());
+			} else if (node instanceof IliasFile) {
+				IliasFile file = (IliasFile) node;
+				box.setGraphic(file.getGraphic());
+			} else if (node instanceof IliasForum) {
+				box.setGraphic(new ImageView("img/forum.png"));
+			}
+
+			box.setText(node.toString());
+
+			actions.getChildren().clear();
+			if (!(node instanceof IliasForum)) {
+				actions.getChildren().add(downloadButton);
+			}
+			if (node instanceof IliasFile) {
+				if (((IliasFile) node).isIgnored()) {
+					ignoreButton.setGraphic(new ImageView("img/check.png"));
+				} else {
+					ignoreButton.setGraphic(new ImageView("img/ignore.png"));
+				}
+				actions.getChildren().add(ignoreButton);
+				actions.getChildren().add(openerButton);
+				actions.getChildren().add(printerButton);
+			}
+
+			downloadButton.visibleProperty().bind(hoverProperty());
+			downloadButton.mouseTransparentProperty().bind(hoverProperty().not());
+			ignoreButton.visibleProperty().bind(hoverProperty());
+			ignoreButton.mouseTransparentProperty().bind(hoverProperty().not());
+			openerButton.visibleProperty().bind(hoverProperty());
+			openerButton.mouseTransparentProperty().bind(hoverProperty().not());
+			printerButton.visibleProperty().bind(hoverProperty());
+			printerButton.mouseTransparentProperty().bind(hoverProperty().not());
 		}
 
 		private void redraw() {
 			if (node == null) {
 				setGraphic(null);
-				return; 
+				return;
 			}
 
-			final BorderPane pane = new BorderPane(); 
+			final BorderPane pane = new BorderPane();
 			final Label box = new Label();
 			box.setAlignment(Pos.TOP_LEFT);
 
@@ -246,87 +315,92 @@ public class CoursesTreeView extends TreeView<IliasTreeNode> {
 			} else if (node instanceof IliasForum) {
 				box.setGraphic(new ImageView("img/forum.png"));
 			}
-			
+
 			box.setText(node.toString());
 			pane.setLeft(box);
-			createAndAddActions(node, pane);
+			createAndAddActions(pane);
 			setGraphic(pane);
-			createToolTip(); 
+			createToolTip();
 		}
 
 		private void createToolTip() {
 			if (node instanceof IliasFile) {
 				Tooltip tooltip = new Tooltip();
-				String fileExtension = ((IliasFile) this.node).getExtension(); 
-				String fileSizeLabel = ((IliasFile) this.node).getSizeLabel(); 
+				String fileExtension = ((IliasFile) this.node).getExtension();
+				String fileSizeLabel = ((IliasFile) this.node).getSizeLabel();
 				tooltip.setText("Elementtyp: " + fileExtension + "\n" + "Größe: " + fileSizeLabel);
 				this.setTooltip(tooltip);
 			}
 		}
 
-		private void createAndAddActions(final IliasTreeNode node, final BorderPane pane) {
-			Button downloadButton = new Button(); 
+		private void createAndAddActions(final BorderPane pane) {
+			System.out.println("craete aciont");
+			downloadButton = new Button();
 			downloadButton.setGraphic(new ImageView("img/downloadArrow.png"));
 			downloadButton.setOnAction(new EventHandler<ActionEvent>() {
 				@Override
 				public void handle(ActionEvent arg0) {
-					download(node); 
+					System.out.println("download and node is:" + node);
+					download(node);
 				}
 			});
-			Button ignoreButton = new Button(); 
+			ignoreButton = new Button();
 			ignoreButton.setOnAction(new EventHandler<ActionEvent>() {
 				@Override
 				public void handle(ActionEvent event) {
+					if (node == null) {
+						System.out.println("problem!!! node is null");
+					}
 					toggleIgnoredState(node);
 				}
 			});
-			Button openerButton = new Button(); 
+			openerButton = new Button();
 			openerButton.setGraphic(new ImageView("img/folder_small.png"));
 			openerButton.setOnAction(new EventHandler<ActionEvent>() {
 				@Override
 				public void handle(ActionEvent event) {
-					DesktopHelper.openFile((IliasFile)node);
+					DesktopHelper.openFile((IliasFile) node);
 				}
 			});
-			Button printerButton = new Button(); 
+			printerButton = new Button();
 			printerButton.setGraphic(new ImageView("img/printer.png"));
 			printerButton.setOnAction(new EventHandler<ActionEvent>() {
 				@Override
 				public void handle(ActionEvent event) {
-					DesktopHelper.print((IliasFile)node);
+					DesktopHelper.print((IliasFile) node);
 				}
 			});
-			
-			HBox actions = new HBox(); 
+
+			actions = new HBox();
 			actions.setId("actionBar");
 			actions.setSpacing(10);
-			
+
 			if (!(node instanceof IliasForum)) {
-				actions.getChildren().add(downloadButton); 
+				actions.getChildren().add(downloadButton);
 			}
 			if (node instanceof IliasFile) {
-				if (((IliasFile)node).isIgnored()) {
+				if (((IliasFile) node).isIgnored()) {
 					ignoreButton.setGraphic(new ImageView("img/check.png"));
 				} else {
 					ignoreButton.setGraphic(new ImageView("img/ignore.png"));
 				}
-				actions.getChildren().add(ignoreButton); 
-				actions.getChildren().add(openerButton); 
-				actions.getChildren().add(printerButton); 
+				actions.getChildren().add(ignoreButton);
+				actions.getChildren().add(openerButton);
+				actions.getChildren().add(printerButton);
 			}
 			pane.setRight(actions);
 		}
-		
+
 		private void download(IliasTreeNode node) {
 			if (node instanceof IliasFile) {
-				new Thread(new IliasPdfDownloadCaller(node)).start(); 
+				new Thread(new IliasPdfDownloadCaller(node)).start();
 			} else if (node instanceof IliasFolder) {
 				new Thread(new IliasFolderDownloaderTask(node)).start();
 			}
 		}
 
 		private void toggleIgnoredState(final IliasTreeNode node) {
-			IliasFile file = (IliasFile)node;
+			IliasFile file = (IliasFile) node;
 			Settings.getInstance().toggleFileIgnored(file);
 			dashboard.pdfIgnoredStateChanged(file);
 			dashboard.getResultList().pdfIgnoredStateChanged(file);
