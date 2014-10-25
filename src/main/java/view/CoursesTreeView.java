@@ -232,7 +232,6 @@ public class CoursesTreeView extends TreeView<IliasTreeNode> {
 		@Override
 		protected void updateItem(final IliasTreeNode node, final boolean empty) {
 			super.updateItem(node, empty);
-			System.out.println("update item = " + node + "empty = " + empty);
 
 			if (empty || (node == null)) {
 				// this.node = null;
@@ -334,13 +333,11 @@ public class CoursesTreeView extends TreeView<IliasTreeNode> {
 		}
 
 		private void createAndAddActions(final BorderPane pane) {
-			System.out.println("craete aciont");
 			downloadButton = new Button();
 			downloadButton.setGraphic(new ImageView("img/downloadArrow.png"));
 			downloadButton.setOnAction(new EventHandler<ActionEvent>() {
 				@Override
 				public void handle(ActionEvent arg0) {
-					System.out.println("download and node is:" + node);
 					download(node);
 				}
 			});
@@ -348,9 +345,6 @@ public class CoursesTreeView extends TreeView<IliasTreeNode> {
 			ignoreButton.setOnAction(new EventHandler<ActionEvent>() {
 				@Override
 				public void handle(ActionEvent event) {
-					if (node == null) {
-						System.out.println("problem!!! node is null");
-					}
 					toggleIgnoredState(node);
 				}
 			});
