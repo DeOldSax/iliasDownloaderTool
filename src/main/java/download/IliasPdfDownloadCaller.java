@@ -10,12 +10,12 @@ import javafx.stage.Stage;
 import model.IliasFile;
 import model.IliasTreeNode;
 import model.persistance.IliasTreeProvider;
-import utils.WinUtils;
+import utils.DirectoryUtils;
 import control.LocalFileStorage;
 
 /**
- * This class provides the option to ask the User for a position to store the file and 
- * calls {@link IliasFileDownloaderTask}.
+ * This class provides the option to ask the User for a position to store the
+ * file and calls {@link IliasFileDownloaderTask}.
  * 
  * @author deoldsax
  *
@@ -50,7 +50,7 @@ public class IliasPdfDownloadCaller extends Task<Void> {
 
 	private void download(IliasFile file) {
 		String targetPath = LocalFileStorage.getInstance().suggestDownloadPath(file);
-		String name = WinUtils.makeFileNameValid(file.getName()); 
+		String name = DirectoryUtils.getInstance().makeDirectoryNameValid(file.getName());
 
 		switch (mode) {
 		case AUTO:

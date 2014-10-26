@@ -9,7 +9,7 @@ import model.IliasFile;
 import model.IliasFolder;
 import model.IliasTreeNode;
 import model.persistance.Settings;
-import utils.WinUtils;
+import utils.DirectoryUtils;
 
 /**
  * This task recursively downloads the complete structure of all passed
@@ -32,8 +32,9 @@ public class IliasFolderDownloaderTask extends Task<Void> {
 
 	@Override
 	protected Void call() throws Exception {
-		String loadLocalIliasFolderPath = Settings.getInstance().getIliasFolderSettings().getLocalIliasFolderPath();
-		new Thread(new Downloader(iliasTreeNodes, loadLocalIliasFolderPath)).start();
+		String localIliasFolderPath = Settings.getInstance().getIliasFolderSettings()
+				.getLocalIliasFolderPath();
+		new Thread(new Downloader(iliasTreeNodes, localIliasFolderPath)).start();
 		return null;
 	}
 
@@ -51,28 +52,36 @@ public class IliasFolderDownloaderTask extends Task<Void> {
 			for (IliasTreeNode node : iliasTreeNodes) {
 				if (node instanceof IliasFolder) {
 					createFolder(node);
-					String newDownloadPath = WinUtils.makeDirectoryNameValid(currentLevelDownloadPath + "/" + node.getName());
-					new Thread(new Downloader(((IliasFolder) node).getChildNodes(), newDownloadPath)).start();
+					String newDownloadPath = appendDownloadPath(node);
+					new Thread(
+							new Downloader(((IliasFolder) node).getChildNodes(), newDownloadPath))
+							.start();
 				} else if (node instanceof IliasFile) {
-					downloadFile((IliasFile)node);
+					downloadFile((IliasFile) node);
 				}
 			}
 		}
 
 		private void createFolder(IliasTreeNode node) {
-			String path = WinUtils.makeDirectoryNameValid(currentLevelDownloadPath + "/" + node.getName());
-			File file = new File(path); 
+			String newDownloadPath = appendDownloadPath(node);
+			File file = new File(newDownloadPath);
 			if (!file.exists()) {
 				file.mkdir();
 			}
 		}
 
 		private void downloadFile(IliasFile node) {
-			IliasFile file = (IliasFile) node;
-			String validName = WinUtils.makeFileNameValid(file.getName());
-			String path = WinUtils.makeDirectoryNameValid(currentLevelDownloadPath); 
-			path += "/" + validName + "." + node.getExtension();
+			IliasFile file = node;
+			String validName = DirectoryUtils.getInstance().makeDirectoryNameValid(file.getName());
+			String path = currentLevelDownloadPath + "/" + validName + "." + node.getExtension();
 			new Thread(new IliasFileDownloaderTask(file, path)).start();
+		}
+
+		private String appendDownloadPath(IliasTreeNode node) {
+			String validDirectoryString = DirectoryUtils.getInstance().makeDirectoryNameValid(
+					node.getName());
+			String newDownloadPath = currentLevelDownloadPath + "/" + validDirectoryString;
+			return newDownloadPath;
 		}
 	}
 }
