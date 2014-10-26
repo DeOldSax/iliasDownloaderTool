@@ -8,6 +8,8 @@
 	-fx-greentransparent:	rgba(32, 178, 170, 0.5);
 	
 	/* blue */
+	-fx-blue:				rgba(65,105,225,0.8);
+	-fx-bluetransparent:	rgba(65,105,225,0.5);
 	-fx-bluegradient:		linear-gradient(rgba(65,105,200,1), rgba(65,105,225,0.8));
 	
 }
@@ -363,11 +365,6 @@
 	-fx-padding:			5;
 }
 
-.tree-cell {
-	-fx-font-size: 			15;
-	-fx-font-family: 		calibri;
-}
-
 #statusFooterText {
 	-fx-text-fill:			#333; 
 	-fx-font-size: 			14;
@@ -379,6 +376,48 @@
 	-fx-font-size: 			14;
     -fx-font-weight: 		bold;
 }
+
+/******************** 
+ * 					*
+ *	  TreeView	    *
+ *					*
+ ********************/
+
+.cell {
+	-fx-font-size: 			15;
+	-fx-font-family: 		calibri;
+}
+
+.cell .label, .cell {
+	-fx-text-fill:			#333;
+}
+
+.cell:hover {
+	-fx-background-color:	-fx-bluetransparent;
+}
+
+.cell:hover .label, .cell:hover{
+	-fx-text-fill:			white;
+}
+
+.cell:focused {
+	-fx-background-color:	-fx-blue;
+	-fx-text-fill:			white;
+}
+/*
+.tree-cell .tree-disclosure-node .arrow {
+    -fx-shape: null;
+    -fx-background-color: transparent;
+    -fx-background-image: url("../img/tree_arrow_normal.png");
+}
+
+.tree-cell:expanded .tree-disclosure-node .arrow {
+    -fx-shape: null;
+    -fx-background-color: null;
+    -fx-background-image: url("minus-arrow.png");
+}
+*/
+/* */
 
 /* 
 #loupe {
