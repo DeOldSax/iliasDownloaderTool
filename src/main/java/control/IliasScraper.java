@@ -17,6 +17,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import utils.IliasCourseFormatter;
 import view.Dashboard;
 
 public class IliasScraper {
@@ -64,11 +65,7 @@ public class IliasScraper {
 		for (Element x : temp) {
 			String url = x.attr("abs:href");
 			if (url.contains("goto_produktiv_crs_")) {
-				String name = x.text();
-				if (name.contains("]")) {
-					int index = x.text().indexOf("]");
-					name = name.substring(index + 2);
-				}
+				String name = IliasCourseFormatter.formatCourseName(x.text());
 				courses.add(new IliasFolder(name, url, null));
 			}
 		}
@@ -101,9 +98,9 @@ public class IliasScraper {
 					final boolean linkToFolder = dir.attr("href").contains("goto_produktiv_fold_")
 							|| dir.attr("href").contains("goto_produktiv_grp_");
 					final boolean linkToForum = dir.attr("href").contains("goto_produktiv_frm_");
-					final boolean linkToHyperlink = false; 
+					final boolean linkToHyperlink = false;
 
-					int size = 0; 
+					int size = 0;
 
 					if (linkToFile) {
 						updateStatusText();
@@ -112,7 +109,7 @@ public class IliasScraper {
 						size = new IliasConnector().getFileSize(attr);
 						createFile(parent, dir, size);
 					} else if (linkToHyperlink) {
-						//TODO implement
+						// TODO implement
 					} else if (linkToForum) {
 						createForum(parent, dir);
 					} else if (linkToFolder) {
@@ -145,15 +142,15 @@ public class IliasScraper {
 			final IliasFolder folder = new IliasFolder(name, downloadLink, kurs);
 			return folder;
 		}
-		
-		private IliasFile createFile (IliasFolder parentFolder, Element dir, int size) {
+
+		private IliasFile createFile(IliasFolder parentFolder, Element dir, int size) {
 			fileCounter.incrementAndGet();
 			dir.setBaseUri(BASE_URI);
 			final String name = dir.text();
 			final String downloadLink = dir.attr("abs:href");
-			final IliasFileMetaInformation metaInf = suggestMetaInformation(dir); 
-			final IliasFile iliasFile = new IliasFile(name, downloadLink, parentFolder, size, 
-													  metaInf.getSizeLabel(), metaInf.getFileExtension());
+			final IliasFileMetaInformation metaInf = suggestMetaInformation(dir);
+			final IliasFile iliasFile = new IliasFile(name, downloadLink, parentFolder, size,
+					metaInf.getSizeLabel(), metaInf.getFileExtension());
 			return iliasFile;
 		}
 
@@ -164,26 +161,26 @@ public class IliasScraper {
 			directory = doc.select("h4").select("a");
 			return directory;
 		}
-		
+
 		private IliasFileMetaInformation suggestMetaInformation(Element dir) {
-			String sizeLabel = "unknown"; 
-			String fileExtension = "unknown"; 
+			String sizeLabel = "unknown";
+			String fileExtension = "unknown";
 			Elements siblingElements = dir.parent().parent().siblingElements();
 			for (Element element : siblingElements) {
 				if (element.attr("class").equals("il_ItemProperties")) {
-					Elements children = element.children(); 
+					Elements children = element.children();
 					for (int i = 0; i < children.size(); i++) {
 						String text = children.get(i).text().replace("\u00a0", "").trim();
 						if (text.matches("(\\d)(.*)(B|b)(.*)")) {
-							sizeLabel = text; 
-							fileExtension = children.get(i-1).text().replace("\u00a0", "").trim(); 
-							return new IliasFileMetaInformation(sizeLabel, fileExtension); 
+							sizeLabel = text;
+							fileExtension = children.get(i - 1).text().replace("\u00a0", "").trim();
+							return new IliasFileMetaInformation(sizeLabel, fileExtension);
 						}
 					}
 				}
 			}
 			Logger.getLogger(getClass()).warn("ERROR: File Extension could not be found");
-			return new IliasFileMetaInformation(sizeLabel, fileExtension); 
-		}	
+			return new IliasFileMetaInformation(sizeLabel, fileExtension);
+		}
 	}
 }
