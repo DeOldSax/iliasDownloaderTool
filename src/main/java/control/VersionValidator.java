@@ -57,12 +57,12 @@ public class VersionValidator {
 		if (answer == YES) {
 			if (Desktop.isDesktopSupported()) {
 				try {
-					Desktop.getDesktop().browse(new URI("https://github.com/DeOldSax/iliasDownloaderTool/releases/latest"));
+					Desktop.getDesktop().browse(new URI("www.iliasdownloadertool.de"));
 				} catch (IOException | URISyntaxException e) {
 					LOGGER.warn(e.getMessage(), e);
 				}
 			} else {
-				JOptionPane.showMessageDialog(null, "https://github.com/DeOldSax/iliasDownloaderTool/releases/latest", "follow link",
+				JOptionPane.showMessageDialog(null, "www.iliasdownloadertool.de", "follow link",
 						JOptionPane.INFORMATION_MESSAGE);
 			}
 			return true;
