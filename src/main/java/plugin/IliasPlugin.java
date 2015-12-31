@@ -17,18 +17,14 @@ public abstract class IliasPlugin {
 	private final RedirectStrategy strategy;
 
 	public IliasPlugin() {
-
 		SchemeRegistry schemeRegistry = new SchemeRegistry();
 		schemeRegistry.register(new Scheme("https", 80, PlainSocketFactory.getSocketFactory()));
 		schemeRegistry.register(new Scheme("https", 443, SSLSocketFactory.getSocketFactory()));
-
 		PoolingClientConnectionManager cm = new PoolingClientConnectionManager(schemeRegistry);
 
 		client = new DefaultHttpClient(cm);
-
 		strategy = new LaxRedirectStrategy();
 		client.setRedirectStrategy(strategy);
-
 	}
 
 	public final DefaultHttpClient getClient() {
