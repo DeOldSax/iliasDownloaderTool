@@ -1,24 +1,18 @@
 package control;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.*;
+import java.util.concurrent.atomic.*;
 
-import model.IliasFile;
-import model.IliasFileMetaInformation;
-import model.IliasFolder;
-import model.IliasForum;
-import model.IliasTreeNode;
-import model.persistance.Settings;
+import model.*;
+import model.persistance.*;
 
-import org.apache.log4j.Logger;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
+import org.apache.log4j.*;
+import org.jsoup.*;
+import org.jsoup.nodes.*;
+import org.jsoup.select.*;
 
-import utils.IliasCourseFormatter;
-import view.Dashboard;
+import utils.*;
+import view.*;
 
 public class IliasScraper {
 	public AtomicInteger threadCount;
@@ -73,7 +67,7 @@ public class IliasScraper {
 	}
 
 	private class IliasScraperThread implements Runnable {
-		String BASE_URI = "https://ilias.studium.kit.edu/";
+		String BASE_URI = IliasManager.getInstance().getBaseUri();
 		private final IliasScraper iliasScraper;
 		private final List<IliasFolder> courses;
 

@@ -1,79 +1,35 @@
-package control;
+package plugin;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.*;
+import java.util.*;
 
-import org.apache.http.Consts;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.ParseException;
-import org.apache.http.client.RedirectStrategy;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.conn.scheme.PlainSocketFactory;
-import org.apache.http.conn.scheme.Scheme;
-import org.apache.http.conn.scheme.SchemeRegistry;
-import org.apache.http.conn.ssl.SSLSocketFactory;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.client.LaxRedirectStrategy;
-import org.apache.http.impl.conn.PoolingClientConnectionManager;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.protocol.BasicHttpContext;
-import org.apache.http.util.EntityUtils;
-import org.apache.log4j.Logger;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
+import org.apache.http.*;
+import org.apache.http.client.entity.*;
+import org.apache.http.client.methods.*;
+import org.apache.http.message.*;
+import org.apache.http.protocol.*;
+import org.apache.http.util.*;
+import org.apache.log4j.*;
+import org.jsoup.*;
+import org.jsoup.nodes.*;
 
-public class Ilias {
+public class KITIlias extends IliasPlugin {
 
-	private final String urlKitAnmeldung = "https://ilias.studium.kit.edu/login.php?target=&soap_pw"
-			+ "=&ext_uid=&cookies=nocookies&client_id=produktiv&lang=de";
 	private final String urlLoginDialog = "https://ilias.studium.kit.edu/Shibboleth.sso/Login";
 	private final String urlAuthnExtUp = "https://idp.scc.kit.edu/idp/Authn/ExtUP";
 	private final String urlRedirect = "https://ilias.studium.kit.edu/Shibboleth.sso/SAML2/POST";
 
-	private static DefaultHttpClient client;
-	private final BasicHttpContext context;
-	private final RedirectStrategy strategy;
-	private HttpGet getRequest;
 	private HttpPost postRequest;
 	private HttpResponse response;
 	private HttpEntity entity;
 	private Logger LOGGER = Logger.getLogger(getClass());
+	private String dashboardHTML;
+	private BasicHttpContext context;
 
-	public Ilias() {
-
-		SchemeRegistry schemeRegistry = new SchemeRegistry();
-		schemeRegistry.register(new Scheme("https", 80, PlainSocketFactory.getSocketFactory()));
-		schemeRegistry.register(new Scheme("https", 443, SSLSocketFactory.getSocketFactory()));
-
-		PoolingClientConnectionManager cm = new PoolingClientConnectionManager(schemeRegistry);
-
-		client = new DefaultHttpClient(cm);
-
-		strategy = new LaxRedirectStrategy();
-		client.setRedirectStrategy(strategy);
-
+	@Override
+	public LoginStatus login(String username, String password) {
+		LoginStatus loginStatus = LoginStatus.CONNECTION_FAILED;
 		context = new BasicHttpContext();
-	}
-
-	public String login(String username, String password) {
-		String htmlStartpage = null;
-
-		getRequest = new HttpGet(urlKitAnmeldung);
-
-		try {
-			client.execute(getRequest, context);
-		} catch (IOException e1) {
-			shutdown();
-			return "1";
-		} finally {
-			getRequest.releaseConnection();
-		}
 
 		postRequest = new HttpPost(urlLoginDialog);
 
@@ -128,7 +84,7 @@ public class Ilias {
 		// if password or username is wrong, value1 will be null
 		if (value1 == null) {
 			shutdown();
-			return "0";
+			return LoginStatus.WRONG_PASSWORD;
 		}
 
 		String v1 = value1.attr("value");
@@ -152,7 +108,13 @@ public class Ilias {
 
 		final HttpEntity entityX = response.getEntity();
 		try {
-			htmlStartpage = EntityUtils.toString(entityX);
+			String htmlStartpage = EntityUtils.toString(entityX);
+			if (htmlStartpage.equals("1")) {
+				loginStatus = LoginStatus.CONNECTION_FAILED;
+			} else {
+				loginStatus = LoginStatus.SUCCESS;
+				this.dashboardHTML = htmlStartpage;
+			}
 		} catch (ParseException | IOException e) {
 			LOGGER.warn(e.getStackTrace());
 		} finally {
@@ -160,15 +122,17 @@ public class Ilias {
 		}
 
 		postRequest.releaseConnection();
-		return htmlStartpage;
+		return loginStatus;
 	}
 
-	public void shutdown() {
-		client.getConnectionManager().shutdown();
+	@Override
+	public String getBaseUri() {
+		return "https://ilias.studium.kit.edu/";
 	}
 
-	public static DefaultHttpClient getClient() {
-		DefaultHttpClient clientCloned = IliasClientCloner.cloneClient(client);
-		return clientCloned;
+	@Override
+	public String getDashboardHTML() {
+		return this.dashboardHTML;
 	}
+
 }
