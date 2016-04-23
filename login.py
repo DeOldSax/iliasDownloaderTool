@@ -3,6 +3,8 @@ import requests
 import bs4
 import re
 
+import pprint
+
 
 class Session():
     def __init__(self, username, password):
@@ -10,18 +12,23 @@ class Session():
         self.dashboard_soup = self.login(username, password)
 
     def login(self, username, password):
-        # fetch cookies
         payload = {"sendLogin": 1,
                    "idp_selection": "https://idp.scc.kit.edu/idp/shibboleth",
                    "target": "https://ilias.studium.kit.edu/shib_login.php",
                    "home_organization_selection": "Mit KIT-Account anmelden"}
-        self.session.post(
+        response = self.session.post(
             "https://ilias.studium.kit.edu/Shibboleth.sso/Login",
             data=payload)
 
+        soup = bs4.BeautifulSoup(response.text, 'html.parser')
+        form = soup.find('form', attrs={'class': 'form2', 'method': 'post'})
+        action = form['action']
+
         # parse and login
-        credentials = {"j_username": username, "j_password": password}
-        response = self.session.post("https://idp.scc.kit.edu/idp/Authn/ExtUP", data=credentials)
+        credentials = {"_eventId_proceed" : "", "j_username": username, "j_password": password}
+        url = "https://idp.scc.kit.edu" + action
+
+        response = self.session.post(url, data=credentials)
 
         html_doc = response.text
 
@@ -80,10 +87,11 @@ def parse(username, password):
 
 if __name__ == "__main__":
     import sys
+    import pprint
     username = sys.argv[1]
     password = sys.argv[2]
 
     session = Session(username, password)
     courses = session.get_courses()
 
-    print(session.format(courses))
+    pprint.pprint(courses)
