@@ -1,15 +1,14 @@
 package control;
 
-import java.io.IOException;
-import java.util.List;
+import java.io.*;
+import java.util.*;
 
-import org.apache.http.Header;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.cookie.Cookie;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.protocol.BasicHttpContext;
+import org.apache.http.*;
+import org.apache.http.client.*;
+import org.apache.http.client.methods.*;
+import org.apache.http.cookie.*;
+import org.apache.http.impl.client.*;
+import org.apache.http.protocol.*;
 
 public class IliasSessionUtils {
 	public void printCookies(DefaultHttpClient client) {
@@ -48,7 +47,7 @@ public class IliasSessionUtils {
 		@SuppressWarnings("unused")
 		HttpResponse response = null;
 		try {
-			response = Ilias.getClient().execute(request, context);
+			response = IliasManager.getInstance().getIliasClient().execute(request, context);
 		} catch (ClientProtocolException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -59,7 +58,7 @@ public class IliasSessionUtils {
 
 		request = new HttpGet(urlLogoutIdp);
 		try {
-			response = Ilias.getClient().execute(request, context);
+			response = IliasManager.getInstance().getIliasClient().execute(request, context);
 		} catch (ClientProtocolException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -67,6 +66,6 @@ public class IliasSessionUtils {
 		}
 		request.releaseConnection();
 
-		Ilias.getClient().getConnectionManager().shutdown();
+		IliasManager.getInstance().getIliasClient().getConnectionManager().shutdown();
 	}
 }
