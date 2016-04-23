@@ -42,13 +42,6 @@ public class KITIlias extends IliasPlugin {
 
 			executePost();
 
-			post = new HttpPost("https://idp.scc.kit.edu/idp/Authn/ExtUP");
-			nvps.add(new BasicNameValuePair("j_username", username));
-			nvps.add(new BasicNameValuePair("j_password", password));
-			post.setEntity(new UrlEncodedFormEntity(nvps, Consts.UTF_8));
-
-			executePost();
-
 			String html = null;
 			try {
 				html = EntityUtils.toString(entity);
@@ -57,6 +50,23 @@ public class KITIlias extends IliasPlugin {
 			}
 
 			Document doc = Jsoup.parse(html);
+			Element form = doc.select("form[action*=idp").first();
+
+			post = new HttpPost("https://idp.scc.kit.edu" + form.attr("action"));
+			nvps.add(new BasicNameValuePair("_eventId_proceed", ""));
+			nvps.add(new BasicNameValuePair("j_username", username));
+			nvps.add(new BasicNameValuePair("j_password", password));
+			post.setEntity(new UrlEncodedFormEntity(nvps, Consts.UTF_8));
+
+			executePost();
+
+			try {
+				html = EntityUtils.toString(entity);
+			} catch (IOException | ParseException e) {
+				LOGGER.warn(e.getStackTrace());
+			}
+
+			doc = Jsoup.parse(html);
 			Element relayState = doc.select("input[name=RelayState]").first();
 			Element samlResponse = doc.select("input[name=SAMLResponse]").first();
 
