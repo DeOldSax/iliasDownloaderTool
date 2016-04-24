@@ -1,32 +1,31 @@
 package control;
 
-import java.awt.Desktop;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.awt.*;
+import java.io.*;
+import java.net.*;
 
-import javax.swing.JOptionPane;
+import javax.swing.*;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.util.EntityUtils;
-import org.apache.log4j.Logger;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
+import org.apache.http.*;
+import org.apache.http.client.methods.*;
+import org.apache.http.impl.client.*;
+import org.apache.http.util.*;
+import org.apache.log4j.*;
+import org.jsoup.*;
+import org.jsoup.nodes.*;
+import org.jsoup.select.*;
 
 public class VersionValidator {
 	private final int YES = 0;
-	private final String VERSION = "v0.5.0";
+	private final String VERSION = "v1.0.0";
 	private String LATEST_VERSION;
 	private Logger LOGGER = Logger.getLogger(getClass());
 
 	public boolean validate() {
 
 		DefaultHttpClient client = new DefaultHttpClient();
-		final HttpGet request = new HttpGet("https://github.com/DeOldSax/iliasDownloaderTool/releases/latest");
+		final HttpGet request = new HttpGet(
+				"https://github.com/DeOldSax/iliasDownloaderTool/releases/latest");
 		HttpResponse response = null;
 		try {
 			response = client.execute(request);
@@ -52,7 +51,8 @@ public class VersionValidator {
 			return false;
 		}
 
-		int answer = JOptionPane.showOptionDialog(null, "    Version Herunterladen?", "Neue Version Verfügbar!", JOptionPane.YES_NO_OPTION,
+		int answer = JOptionPane.showOptionDialog(null, "    Version Herunterladen?",
+				"Neue Version Verfügbar!", JOptionPane.YES_NO_OPTION,
 				JOptionPane.INFORMATION_MESSAGE, null, new Object[] { "Ja", "Später" }, null);
 		if (answer == YES) {
 			if (Desktop.isDesktopSupported()) {
