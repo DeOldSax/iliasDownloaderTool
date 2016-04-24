@@ -1,18 +1,14 @@
 package control;
 
-import java.io.IOException;
-import java.util.Arrays;
+import java.io.*;
+import java.util.*;
 
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpHead;
-import org.apache.http.protocol.BasicHttpContext;
-import org.apache.http.util.EntityUtils;
-import org.apache.log4j.Logger;
+import org.apache.http.*;
+import org.apache.http.client.*;
+import org.apache.http.client.methods.*;
+import org.apache.http.protocol.*;
+import org.apache.http.util.*;
+import org.apache.log4j.*;
 
 public class IliasConnector {
 	private HttpGet request;
@@ -27,7 +23,7 @@ public class IliasConnector {
 		try {
 			request = new HttpGet(url);
 
-			final HttpClient client = Ilias.getClient();
+			final HttpClient client = IliasManager.getInstance().getIliasClient();
 			response = client.execute(request, context);
 			entity = response.getEntity();
 
@@ -44,19 +40,19 @@ public class IliasConnector {
 		context = new BasicHttpContext();
 		HttpHead head = new HttpHead(url);
 		try {
-			response = Ilias.getClient().execute(head, context);
+			response = IliasManager.getInstance().getIliasClient().execute(head, context);
 		} catch (ClientProtocolException e) {
 			LOGGER.warn("", e);
 		} catch (IOException e) {
 			LOGGER.warn("", e);
 		}
-		
-		int size = 0; 
-		if(response.containsHeader("Content-Length")) {
+
+		int size = 0;
+		if (response.containsHeader("Content-Length")) {
 			Header[] fileSize = response.getHeaders("Content-Length");
 			size = Integer.parseInt(fileSize[0].getValue());
 		} else {
-			LOGGER.warn("Headers: " + Arrays.toString(response.getAllHeaders())); 
+			LOGGER.warn("Headers: " + Arrays.toString(response.getAllHeaders()));
 			LOGGER.warn("\nNo Filesize found for URL: " + url);
 		}
 		return size;

@@ -1,16 +1,15 @@
 package control;
 
-import javafx.application.Platform;
-import model.persistance.Flags;
-import model.persistance.IliasTreeProvider;
-import model.persistance.Settings;
+import javafx.application.*;
+import model.persistance.*;
 
-import org.apache.log4j.Logger;
+import org.apache.log4j.*;
 
-import view.Dashboard;
+import plugin.IliasPlugin.LoginStatus;
+import plugin.*;
+import view.*;
 
 public class IliasStarter {
-	private static String loginStatusMessage;
 	private String username = null;
 	private String password = null;
 	private Logger LOGGER = Logger.getLogger(getClass());
@@ -27,9 +26,10 @@ public class IliasStarter {
 	}
 
 	public boolean login() {
-		Ilias ilias = new Ilias();
-		loginStatusMessage = ilias.login(username, password);
-		if (loginStatusMessage.equals("0")) {
+		KITIlias kitIlias = new KITIlias();
+		IliasManager.getInstance().setIliasPlugin(kitIlias);
+		LoginStatus loginStatusMessage = IliasManager.getInstance().login(username, password);
+		if (loginStatusMessage.equals(LoginStatus.WRONG_PASSWORD)) {
 			Platform.runLater(new Runnable() {
 				@Override
 				public void run() {
@@ -41,7 +41,7 @@ public class IliasStarter {
 			});
 			return false;
 		}
-		if (loginStatusMessage.equals("1")) {
+		if (loginStatusMessage.equals(LoginStatus.CONNECTION_FAILED)) {
 			LOGGER.warn("Connection failed!");
 			dashboard.setStatusText("Verbindung fehlgeschlagen!", true);
 			dashboard.showLoader(false);
@@ -74,7 +74,7 @@ public class IliasStarter {
 
 	public void loadIliasTree() {
 		final IliasScraper Scraper = new IliasScraper(dashboard);
-		Scraper.run(loginStatusMessage);
+		Scraper.run(IliasManager.getInstance().getDashboardHTML());
 		while (Scraper.threadCount.get() > 0) {
 			try {
 				Thread.sleep(100);
