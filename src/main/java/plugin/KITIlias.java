@@ -1,6 +1,7 @@
 package plugin;
 
 import java.io.*;
+import java.security.*;
 import java.util.*;
 
 import org.apache.http.*;
@@ -10,6 +11,7 @@ import org.apache.http.message.*;
 import org.apache.http.protocol.*;
 import org.apache.http.util.*;
 import org.apache.log4j.*;
+import org.bouncycastle.jce.provider.*;
 import org.jsoup.*;
 import org.jsoup.nodes.*;
 
@@ -105,6 +107,7 @@ public class KITIlias extends IliasPlugin {
 	}
 
 	private void executePost() {
+		Security.insertProviderAt(new BouncyCastleProvider(), 1);
 		try {
 			this.response = this.client.execute(this.post, this.context);
 		} catch (IOException e) {
