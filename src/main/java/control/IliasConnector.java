@@ -31,6 +31,7 @@ public class IliasConnector {
 			request.releaseConnection();
 
 		} catch (Exception e) {
+			e.printStackTrace();
 			LOGGER.warn(e.getStackTrace());
 		}
 		return html;

@@ -1,20 +1,14 @@
 package model.persistance;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.nio.file.Files;
-import java.util.List;
+import java.io.*;
+import java.nio.file.*;
+import java.util.*;
 
-import model.ActualisationDate;
-import model.IliasFolder;
+import model.*;
 
 public class IliasTreeStorage {
-	private static final String ILIAS_STORE_FOLDER = System.getProperty("user.home") + "/" + ".ilias";
+	private static final String ILIAS_STORE_FOLDER = System.getProperty("user.home") + "/"
+			+ ".ilias";
 	private static final String TIME_STORE_PATH = ILIAS_STORE_FOLDER + "/" + "time.ser";
 	private static final String COURSES_STORE_PATH = ILIAS_STORE_FOLDER + "/" + "dirs.ser";
 	private static List<IliasFolder> allFiles;
@@ -25,18 +19,17 @@ public class IliasTreeStorage {
 
 	@SuppressWarnings("unchecked")
 	public static List<IliasFolder> getTree() {
-		if (allFiles == null) {
+		if (allFiles == null && new File(COURSES_STORE_PATH).exists()) {
 			allFiles = (List<IliasFolder>) deserialize(COURSES_STORE_PATH);
 		}
 		return allFiles;
 	}
 
 	public static String getActualisationDate() {
-		final ActualisationDate actualisationDate = (ActualisationDate) deserialize(TIME_STORE_PATH);
-
-		if (actualisationDate == null) {
+		if (!new File(TIME_STORE_PATH).exists()) {
 			return "Letzte Aktualisierung: -";
 		}
+		final ActualisationDate actualisationDate = (ActualisationDate) deserialize(TIME_STORE_PATH);
 		return actualisationDate.toString();
 	}
 
@@ -52,12 +45,11 @@ public class IliasTreeStorage {
 			object = o.readObject();
 			o.close();
 		} catch (FileNotFoundException e) {
-			return null;
+			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
-			return null;
 		} catch (ClassNotFoundException e) {
-			return null;
+			e.printStackTrace();
 		}
 		return object;
 	}
