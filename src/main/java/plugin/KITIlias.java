@@ -5,6 +5,7 @@ import java.security.*;
 import java.util.*;
 
 import org.apache.http.*;
+import org.apache.http.client.*;
 import org.apache.http.client.entity.*;
 import org.apache.http.client.methods.*;
 import org.apache.http.message.*;
@@ -110,11 +111,14 @@ public class KITIlias extends IliasPlugin {
 		Security.insertProviderAt(new BouncyCastleProvider(), 1);
 		try {
 			this.response = this.client.execute(this.post, this.context);
+		} catch (ClientProtocolException e) {
+			this.LOGGER.warn(e.getStackTrace());
 		} catch (IOException e) {
 			this.LOGGER.warn(e.getStackTrace());
 		} finally {
 			this.entity = this.response.getEntity();
 		}
+
 		this.nvps.clear();
 	}
 

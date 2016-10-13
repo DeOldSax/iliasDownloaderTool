@@ -90,24 +90,18 @@ public class IliasScraper {
 					if (Settings.getInstance().getFlags().updateCanceled()) {
 						break;
 					}
+					dir.setBaseUri(BASE_URI);
 
+					// TODO check group folder
+					final boolean linkToFolder = dir.attr("href").contains("cmd=view");
 					final boolean linkToFile = dir.attr("href").contains("download");
-					final boolean linkToFolder = dir.attr("href").contains("cmd=view"); // TODO
-																						// check
-																						// group
 					final boolean linkToForum = dir.attr("href").contains("cmd=showThreads");
 					final boolean linkToHyperlink = false;
 
-					int size = 0;
-
 					if (linkToFile) {
+						fileCounter.incrementAndGet();
 						updateStatusText();
-						dir.setBaseUri(BASE_URI);
-						String attr = dir.attr("abs:href");
-						size = new IliasConnector().getFileSize(attr);
-						createFile(parent, dir, size);
-					} else if (linkToHyperlink) {
-						// TODO implement
+						createFile(parent, dir);
 					} else if (linkToForum) {
 						createForum(parent, dir);
 					} else if (linkToFolder) {
@@ -115,6 +109,8 @@ public class IliasScraper {
 						IliasFolder newFolder = createFolder(parent, dir);
 						tempo.add(newFolder);
 						iliasScraper.startThread(tempo);
+					} else if (linkToHyperlink) {
+						// TODO implement
 					}
 				}
 			}
@@ -126,7 +122,6 @@ public class IliasScraper {
 		}
 
 		private IliasForum createForum(IliasFolder parent, Element dir) {
-			dir.setBaseUri(BASE_URI);
 			final String name = dir.text();
 			final String link = dir.attr("abs:href");
 			final IliasForum forum = new IliasForum(name, link, parent);
@@ -134,20 +129,18 @@ public class IliasScraper {
 		}
 
 		private IliasFolder createFolder(IliasFolder kurs, Element dir) {
-			dir.setBaseUri(BASE_URI);
 			final String name = dir.text();
-			final String downloadLink = dir.attr("abs:href");
-			final IliasFolder folder = new IliasFolder(name, downloadLink, kurs);
+			final String link = dir.attr("abs:href");
+			final IliasFolder folder = new IliasFolder(name, link, kurs);
 			return folder;
 		}
 
-		private IliasFile createFile(IliasFolder parentFolder, Element dir, int size) {
-			fileCounter.incrementAndGet();
-			dir.setBaseUri(BASE_URI);
+		private IliasFile createFile(IliasFolder parentFolder, Element dir) {
 			final String name = dir.text();
-			final String downloadLink = dir.attr("abs:href");
+			final String link = dir.attr("abs:href");
+			final int fileSize = new IliasConnector().getFileSize(link);
 			final IliasFileMetaInformation metaInf = suggestMetaInformation(dir);
-			final IliasFile iliasFile = new IliasFile(name, downloadLink, parentFolder, size,
+			final IliasFile iliasFile = new IliasFile(name, link, parentFolder, fileSize,
 					metaInf.getSizeLabel(), metaInf.getFileExtension());
 			return iliasFile;
 		}
