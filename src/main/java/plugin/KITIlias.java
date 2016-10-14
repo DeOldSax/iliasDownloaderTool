@@ -12,7 +12,6 @@ import org.apache.http.message.*;
 import org.apache.http.protocol.*;
 import org.apache.http.util.*;
 import org.apache.log4j.*;
-import org.bouncycastle.jce.provider.*;
 import org.jsoup.*;
 import org.jsoup.nodes.*;
 
@@ -108,12 +107,19 @@ public class KITIlias extends IliasPlugin {
 	}
 
 	private void executePost() {
-		Security.insertProviderAt(new BouncyCastleProvider(), 1);
+
+		if (Security.getProvider("BC") == null) {
+			System.out.println("Bouncy Castle provider is NOT available");
+		} else {
+			System.out.println("Bouncy Castle provider is available");
+		}
 		try {
 			this.response = this.client.execute(this.post, this.context);
 		} catch (ClientProtocolException e) {
+			e.printStackTrace();
 			this.LOGGER.warn(e.getStackTrace());
 		} catch (IOException e) {
+			e.printStackTrace();
 			this.LOGGER.warn(e.getStackTrace());
 		} finally {
 			this.entity = this.response.getEntity();

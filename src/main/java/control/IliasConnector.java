@@ -18,6 +18,7 @@ public class IliasConnector {
 	private Logger LOGGER = Logger.getLogger(getClass());
 
 	public String requestGet(String url) {
+
 		context = new BasicHttpContext();
 		String html = null;
 		try {
@@ -38,6 +39,7 @@ public class IliasConnector {
 	}
 
 	public int getFileSize(String url) {
+
 		context = new BasicHttpContext();
 		HttpHead head = new HttpHead(url);
 		try {
