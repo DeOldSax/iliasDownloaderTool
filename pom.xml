@@ -80,6 +80,7 @@
 							<mainClass>view.Dashboard</mainClass>
 						</manifest>
 						<manifestEntries>
+							<Built-By></Built-By>
 							<version>${project.version}</version>
 						</manifestEntries>
 					</archive>
@@ -114,12 +115,11 @@
 							<goal>run</goal>
 						</goals>
 						<configuration>
-							<tasks>
-								<copy
-									file="target/Ilias-${project.version}.jar"
+							<target>
+								<copy file="target/Ilias-${project.version}.jar"
 									tofile="release/IliasDownloaderTool-${project.version}/Ilias-${project.version}.jar">
 								</copy>
-							</tasks>
+							</target>
 						</configuration>
 					</execution>
 				</executions>
