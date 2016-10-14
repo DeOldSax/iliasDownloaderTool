@@ -56,13 +56,13 @@ public class Dashboard extends Application {
 
 	public static void main(String[] args) {
 		new File(System.getProperty("user.home") + "/.ilias/ilias.log").delete();
-		//PropertyConfigurator.configure(Dashboard.class.getResourceAsStream("log4j.properties"));
-		//Logger.getLogger(Dashboard.class).warn("Start IliasDownloaderTool.");
+		PropertyConfigurator.configure(Dashboard.class.getResourceAsStream("log4j.properties"));
+		Logger.getLogger(Dashboard.class).warn("Start IliasDownloaderTool.");
 
-		//boolean newVersionCalled = new VersionValidator().validate();
-		//if (newVersionCalled) {
-		//	System.exit(0);
-		//}
+		boolean newVersionCalled = new VersionValidator().validate();
+		if (newVersionCalled) {
+			System.exit(0);
+		}
 
 		launch();
 	}
@@ -70,7 +70,7 @@ public class Dashboard extends Application {
 	@Override
 	public void start(Stage stage) throws Exception {
 		dashboard = this;
-		//stage.getIcons().add(new Image("img/folder.png"));
+		stage.getIcons().add(new Image("img/folder.png"));
 		stage.addEventHandler(WindowEvent.WINDOW_CLOSE_REQUEST, new EventHandler<WindowEvent>() {
 			@Override
 			public void handle(WindowEvent event) {
