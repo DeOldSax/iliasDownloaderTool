@@ -107,12 +107,6 @@ public class KITIlias extends IliasPlugin {
 	}
 
 	private void executePost() {
-
-		if (Security.getProvider("BC") == null) {
-			System.out.println("Bouncy Castle provider is NOT available");
-		} else {
-			System.out.println("Bouncy Castle provider is available");
-		}
 		try {
 			this.response = this.client.execute(this.post, this.context);
 		} catch (ClientProtocolException e) {
