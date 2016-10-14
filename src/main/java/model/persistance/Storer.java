@@ -1,34 +1,19 @@
 package model.persistance;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
-import java.nio.file.Files;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.Key;
-import java.security.NoSuchAlgorithmException;
+import java.io.*;
+import java.nio.file.*;
+import java.security.*;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.KeyGenerator;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.SealedObject;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.*;
+import javax.crypto.spec.*;
 
-import org.apache.log4j.Logger;
+import org.apache.log4j.*;
 
 public class Storer {
 
 	private String storePath;
 	private Key key;
+	private static final Logger LOGGER = Logger.getLogger(Storer.class);
 
 	public Storer(String storePath) {
 		this.storePath = storePath;
@@ -84,9 +69,9 @@ public class Storer {
 			out.writeObject(object);
 			out.close();
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			LOGGER.error(e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			LOGGER.error(e);
 		}
 	}
 
@@ -104,11 +89,11 @@ public class Storer {
 			object = o.readObject();
 			o.close();
 		} catch (FileNotFoundException e) {
-			return null;
+			LOGGER.error(e);
 		} catch (IOException e) {
-			return null;
+			LOGGER.error(e);
 		} catch (ClassNotFoundException e) {
-			return null;
+			LOGGER.error(e);
 		}
 		return object;
 	}
@@ -131,7 +116,7 @@ public class Storer {
 			sealedObject = new SealedObject(object, cipher);
 		} catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException
 				| IllegalBlockSizeException | IOException | InvalidAlgorithmParameterException e1) {
-			Logger.getLogger(Storer.class).warn("No Cipher.", e1);
+			LOGGER.warn("No Cipher.", e1);
 			e1.printStackTrace();
 		}
 		return sealedObject;
@@ -159,7 +144,7 @@ public class Storer {
 		} catch (ClassCastException | NoSuchAlgorithmException | NoSuchPaddingException
 				| InvalidKeyException | IllegalBlockSizeException | IOException
 				| ClassNotFoundException | BadPaddingException | InvalidAlgorithmParameterException e1) {
-			Logger.getLogger(Storer.class).warn("No Cipher.", e1);
+			LOGGER.warn("No Cipher.", e1);
 			e1.printStackTrace();
 			return null;
 		}

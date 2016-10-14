@@ -56,10 +56,13 @@ public class IliasScraper {
 		doc = Jsoup.parse(s);
 		temp = doc.select("a[href]");
 
-		for (Element x : temp) {
-			String url = x.attr("abs:href");
-			if (url.contains("goto_produktiv_crs_")) {
-				String name = IliasCourseFormatter.formatCourseName(x.text());
+		String BASE_URI = IliasManager.getInstance().getBaseUri();
+
+		for (Element aTag : temp) {
+			aTag.setBaseUri(BASE_URI);
+			String url = aTag.attr("abs:href");
+			if (url.contains("baseClass=ilrepositorygui")) {
+				String name = IliasCourseFormatter.formatCourseName(aTag.text());
 				courses.add(new IliasFolder(name, url, null));
 			}
 		}
@@ -87,23 +90,18 @@ public class IliasScraper {
 					if (Settings.getInstance().getFlags().updateCanceled()) {
 						break;
 					}
+					dir.setBaseUri(BASE_URI);
 
-					final boolean linkToFile = dir.attr("href").contains("cmd=sendfile");
-					final boolean linkToFolder = dir.attr("href").contains("goto_produktiv_fold_")
-							|| dir.attr("href").contains("goto_produktiv_grp_");
-					final boolean linkToForum = dir.attr("href").contains("goto_produktiv_frm_");
+					// TODO check group folder
+					final boolean linkToFolder = dir.attr("href").contains("cmd=view");
+					final boolean linkToFile = dir.attr("href").contains("download");
+					final boolean linkToForum = dir.attr("href").contains("cmd=showThreads");
 					final boolean linkToHyperlink = false;
 
-					int size = 0;
-
 					if (linkToFile) {
+						fileCounter.incrementAndGet();
 						updateStatusText();
-						dir.setBaseUri(BASE_URI);
-						String attr = dir.attr("abs:href");
-						size = new IliasConnector().getFileSize(attr);
-						createFile(parent, dir, size);
-					} else if (linkToHyperlink) {
-						// TODO implement
+						createFile(parent, dir);
 					} else if (linkToForum) {
 						createForum(parent, dir);
 					} else if (linkToFolder) {
@@ -111,6 +109,8 @@ public class IliasScraper {
 						IliasFolder newFolder = createFolder(parent, dir);
 						tempo.add(newFolder);
 						iliasScraper.startThread(tempo);
+					} else if (linkToHyperlink) {
+						// TODO implement
 					}
 				}
 			}
@@ -122,7 +122,6 @@ public class IliasScraper {
 		}
 
 		private IliasForum createForum(IliasFolder parent, Element dir) {
-			dir.setBaseUri(BASE_URI);
 			final String name = dir.text();
 			final String link = dir.attr("abs:href");
 			final IliasForum forum = new IliasForum(name, link, parent);
@@ -130,20 +129,18 @@ public class IliasScraper {
 		}
 
 		private IliasFolder createFolder(IliasFolder kurs, Element dir) {
-			dir.setBaseUri(BASE_URI);
 			final String name = dir.text();
-			final String downloadLink = dir.attr("abs:href");
-			final IliasFolder folder = new IliasFolder(name, downloadLink, kurs);
+			final String link = dir.attr("abs:href");
+			final IliasFolder folder = new IliasFolder(name, link, kurs);
 			return folder;
 		}
 
-		private IliasFile createFile(IliasFolder parentFolder, Element dir, int size) {
-			fileCounter.incrementAndGet();
-			dir.setBaseUri(BASE_URI);
+		private IliasFile createFile(IliasFolder parentFolder, Element dir) {
 			final String name = dir.text();
-			final String downloadLink = dir.attr("abs:href");
+			final String link = dir.attr("abs:href");
+			final int fileSize = new IliasConnector().getFileSize(link);
 			final IliasFileMetaInformation metaInf = suggestMetaInformation(dir);
-			final IliasFile iliasFile = new IliasFile(name, downloadLink, parentFolder, size,
+			final IliasFile iliasFile = new IliasFile(name, link, parentFolder, fileSize,
 					metaInf.getSizeLabel(), metaInf.getFileExtension());
 			return iliasFile;
 		}
@@ -161,19 +158,19 @@ public class IliasScraper {
 			String fileExtension = "unknown";
 			Elements siblingElements = dir.parent().parent().siblingElements();
 			for (Element element : siblingElements) {
-				if (element.attr("class").equals("il_ItemProperties")) {
+				if (element.attr("class").contains("il_ItemProperties")) {
 					Elements children = element.children();
-					for (int i = 0; i < children.size(); i++) {
-						String text = children.get(i).text().replace("\u00a0", "").trim();
-						if (text.matches("(\\d)(.*)(B|b)(.*)")) {
-							sizeLabel = text;
-							fileExtension = children.get(i - 1).text().replace("\u00a0", "").trim();
-							return new IliasFileMetaInformation(sizeLabel, fileExtension);
-						}
+					try {
+						fileExtension = children.get(0).text().replace("\u00a0", "").trim();
+						sizeLabel = children.get(1).text().replace("\u00a0", "").trim();
+					} catch (ArrayIndexOutOfBoundsException aoobe) {
+						Logger.getLogger(getClass()).warn(
+								"ERROR: File Extension could not be found[1]");
 					}
+					return new IliasFileMetaInformation(sizeLabel, fileExtension);
 				}
 			}
-			Logger.getLogger(getClass()).warn("ERROR: File Extension could not be found");
+			Logger.getLogger(getClass()).warn("ERROR: File Extension could not be found[2]");
 			return new IliasFileMetaInformation(sizeLabel, fileExtension);
 		}
 	}

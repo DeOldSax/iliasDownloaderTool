@@ -1,51 +1,28 @@
 package view;
 
-import java.io.File;
+import java.io.*;
+import java.security.*;
 
-import javafx.animation.Interpolator;
-import javafx.animation.RotateTransition;
-import javafx.animation.Timeline;
-import javafx.animation.TranslateTransition;
-import javafx.application.Application;
-import javafx.application.Platform;
-import javafx.concurrent.Task;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.geometry.Insets;
-import javafx.geometry.Orientation;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.Separator;
-import javafx.scene.control.SplitPane;
-import javafx.scene.control.TextField;
-import javafx.scene.control.Tooltip;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.StackPane;
-import javafx.scene.web.WebEngine;
-import javafx.scene.web.WebView;
-import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
-import javafx.util.Duration;
-import model.IliasFile;
-import model.persistance.IliasTreeStorage;
-import model.persistance.Settings;
-import model.persistance.User;
+import javafx.animation.*;
+import javafx.application.*;
+import javafx.concurrent.*;
+import javafx.event.*;
+import javafx.geometry.*;
+import javafx.scene.*;
+import javafx.scene.control.*;
+import javafx.scene.image.*;
+import javafx.scene.layout.*;
+import javafx.scene.web.*;
+import javafx.stage.*;
+import javafx.util.*;
+import model.*;
+import model.persistance.*;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
-import org.controlsfx.control.textfield.CustomTextField;
+import org.apache.log4j.*;
+import org.bouncycastle.jce.provider.*;
+import org.controlsfx.control.textfield.*;
 
-import control.IliasStarter;
-import control.LocalFileStorage;
-import control.LoginProvider;
-import control.VersionValidator;
+import control.*;
 
 public class Dashboard extends Application {
 
@@ -72,6 +49,10 @@ public class Dashboard extends Application {
 	private Button showLocalNotThere;
 	private Button showIgnored;
 	private RotateTransition refreshTransition;
+
+	static {
+		Security.insertProviderAt(new BouncyCastleProvider(), 1);
+	}
 
 	public static void main(String[] args) {
 		new File(System.getProperty("user.home") + "/.ilias/ilias.log").delete();
