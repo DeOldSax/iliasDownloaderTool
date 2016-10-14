@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>deoldsax</groupId>
 	<artifactId>Ilias</artifactId>
-	<version>v1.0.0</version>
+	<version>v1.1.0</version>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -117,7 +117,7 @@
 						<configuration>
 							<target>
 								<copy file="target/Ilias-${project.version}.jar"
-									tofile="release/IliasDownloaderTool-${project.version}/Ilias-${project.version}.jar">
+									tofile="release/IliasDownloaderTool-${project.version}/Ilias-Downloader-Tool-${project.version}.jar">
 								</copy>
 							</target>
 						</configuration>
