@@ -125,11 +125,11 @@ public class CoursesTreeView extends TreeView<IliasTreeNode> {
 			if (node instanceof IliasFolder) {
 				IliasFolder folder = (IliasFolder) node;
 				setCourses(item, folder.getChildNodes());
-				item.setGraphic(node.getGraphic());
+				//item.setGraphic(node.getGraphic());
 			} else if (node instanceof IliasFile) {
-				item.setGraphic(node.getGraphic());
+				//item.setGraphic(node.getGraphic());
 			} else if (node instanceof IliasForum) {
-				item.setGraphic(node.getGraphic());
+				//item.setGraphic(node.getGraphic());
 			}
 		}
 	}
@@ -178,7 +178,7 @@ public class CoursesTreeView extends TreeView<IliasTreeNode> {
 		while (treeItem.getParent() != null) {
 			treeItem = treeItem.getParent();
 			IliasFolder folder = (IliasFolder) treeItem.getValue();
-			setGraphic(treeItem, folder.getGraphic());
+			//setGraphic(treeItem, folder.getGraphic());
 		}
 	}
 
@@ -260,12 +260,12 @@ public class CoursesTreeView extends TreeView<IliasTreeNode> {
 
 			if (node instanceof IliasFolder) {
 				IliasFolder folder = (IliasFolder) node;
-				box.setGraphic(folder.getGraphic());
+				//box.setGraphic(folder.getGraphic());
 			} else if (node instanceof IliasFile) {
 				IliasFile file = (IliasFile) node;
-				box.setGraphic(file.getGraphic());
+				//box.setGraphic(file.getGraphic());
 			} else if (node instanceof IliasForum) {
-				box.setGraphic(new ImageView("img/forum.png"));
+				//box.setGraphic(new ImageView("img/forum.png"));
 			}
 
 			box.setText(node.toString());
@@ -307,12 +307,12 @@ public class CoursesTreeView extends TreeView<IliasTreeNode> {
 
 			if (node instanceof IliasFolder) {
 				IliasFolder folder = (IliasFolder) node;
-				box.setGraphic(folder.getGraphic());
+				//box.setGraphic(folder.getGraphic());
 			} else if (node instanceof IliasFile) {
 				IliasFile file = (IliasFile) node;
-				box.setGraphic(file.getGraphic());
+				//box.setGraphic(file.getGraphic());
 			} else if (node instanceof IliasForum) {
-				box.setGraphic(new ImageView("img/forum.png"));
+				//box.setGraphic(new ImageView("img/forum.png"));
 			}
 
 			box.setText(node.toString());
@@ -334,7 +334,7 @@ public class CoursesTreeView extends TreeView<IliasTreeNode> {
 
 		private void createAndAddActions(final BorderPane pane) {
 			downloadButton = new Button();
-			downloadButton.setGraphic(new ImageView("img/downloadArrow.png"));
+			//downloadButton.setGraphic(new ImageView("img/downloadArrow.png"));
 			downloadButton.setOnAction(new EventHandler<ActionEvent>() {
 				@Override
 				public void handle(ActionEvent arg0) {
@@ -349,7 +349,7 @@ public class CoursesTreeView extends TreeView<IliasTreeNode> {
 				}
 			});
 			openerButton = new Button();
-			openerButton.setGraphic(new ImageView("img/folder_small.png"));
+			//openerButton.setGraphic(new ImageView("img/folder_small.png"));
 			openerButton.setOnAction(new EventHandler<ActionEvent>() {
 				@Override
 				public void handle(ActionEvent event) {
@@ -357,7 +357,7 @@ public class CoursesTreeView extends TreeView<IliasTreeNode> {
 				}
 			});
 			printerButton = new Button();
-			printerButton.setGraphic(new ImageView("img/printer.png"));
+			//printerButton.setGraphic(new ImageView("img/printer.png"));
 			printerButton.setOnAction(new EventHandler<ActionEvent>() {
 				@Override
 				public void handle(ActionEvent event) {
@@ -374,9 +374,9 @@ public class CoursesTreeView extends TreeView<IliasTreeNode> {
 			}
 			if (node instanceof IliasFile) {
 				if (((IliasFile) node).isIgnored()) {
-					ignoreButton.setGraphic(new ImageView("img/check.png"));
+					//ignoreButton.setGraphic(new ImageView("img/check.png"));
 				} else {
-					ignoreButton.setGraphic(new ImageView("img/ignore.png"));
+					//ignoreButton.setGraphic(new ImageView("img/ignore.png"));
 				}
 				actions.getChildren().add(ignoreButton);
 				actions.getChildren().add(openerButton);
