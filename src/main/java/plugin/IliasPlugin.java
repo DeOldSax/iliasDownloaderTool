@@ -1,11 +1,10 @@
 package plugin;
 
-import org.apache.http.client.*;
-import org.apache.http.conn.scheme.*;
-import org.apache.http.conn.ssl.*;
-import org.apache.http.cookie.*;
+import java.io.IOException;
+
+import org.apache.http.client.CookieStore;
+import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.client.*;
-import org.apache.http.impl.conn.*;
 
 public abstract class IliasPlugin {
 
@@ -13,33 +12,34 @@ public abstract class IliasPlugin {
 		WRONG_PASSWORD, CONNECTION_FAILED, SUCCESS
 	};
 
-	DefaultHttpClient client;
-	private final RedirectStrategy strategy;
+	protected CloseableHttpClient client;
+	private CookieStore cookieStore;
 
 	public IliasPlugin() {
-		SchemeRegistry schemeRegistry = new SchemeRegistry();
-		schemeRegistry.register(new Scheme("https", 80, PlainSocketFactory.getSocketFactory()));
-		schemeRegistry.register(new Scheme("https", 443, SSLSocketFactory.getSocketFactory()));
-		PoolingClientConnectionManager cm = new PoolingClientConnectionManager(schemeRegistry);
+		cookieStore = new BasicCookieStore();
 
-		client = new DefaultHttpClient(cm);
-		strategy = new LaxRedirectStrategy();
-		client.setRedirectStrategy(strategy);
+		client = HttpClientBuilder.create()
+				.setRedirectStrategy(new LaxRedirectStrategy())
+				.setDefaultCookieStore(cookieStore)
+				.build();
 	}
 
-	public final DefaultHttpClient getClient() {
-		DefaultHttpClient clonedClient = new DefaultHttpClient();
+	public final CloseableHttpClient getClient() {
+		CookieStore clonedCookieStore = new BasicCookieStore();
 
-		final CookieStore cookieStore = client.getCookieStore();
-		for (Cookie cookie : cookieStore.getCookies()) {
-			clonedClient.getCookieStore().addCookie(cookie);
+		for (Cookie cookie : this.cookieStore.getCookies()) {
+			clonedCookieStore.addCookie(cookie);
 		}
 
-		return clonedClient;
+		return HttpClientBuilder.create().setDefaultCookieStore(cookieStore).build();
 	}
 
 	public final void shutdown() {
-		client.getConnectionManager().shutdown();
+		try {
+			client.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public abstract LoginStatus login(String username, String password);

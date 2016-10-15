@@ -1,9 +1,7 @@
 package plugin;
 
 import java.io.*;
-import java.security.*;
 import java.util.*;
-
 import org.apache.http.*;
 import org.apache.http.client.*;
 import org.apache.http.client.entity.*;
@@ -34,12 +32,9 @@ public class KITIlias extends IliasPlugin {
 		try {
 			post = new HttpPost("https://ilias.studium.kit.edu/Shibboleth.sso/Login");
 			nvps.add(new BasicNameValuePair("sendLogin", "1"));
-			nvps.add(new BasicNameValuePair("idp_selection",
-					"https://idp.scc.kit.edu/idp/shibboleth"));
-			nvps.add(new BasicNameValuePair("target",
-					"https://ilias.studium.kit.edu/shib_login.php?target="));
-			nvps.add(new BasicNameValuePair("home_organization_selection",
-					"Mit KIT-Account anmelden"));
+			nvps.add(new BasicNameValuePair("idp_selection", "https://idp.scc.kit.edu/idp/shibboleth"));
+			nvps.add(new BasicNameValuePair("target", "https://ilias.studium.kit.edu/shib_login.php?target="));
+			nvps.add(new BasicNameValuePair("home_organization_selection", "Mit KIT-Account anmelden"));
 			post.setEntity(new UrlEncodedFormEntity(nvps, Consts.UTF_8));
 
 			executePost();

@@ -204,7 +204,6 @@ public class CoursesTreeView extends TreeView<IliasTreeNode> {
 	private class IliasTreeCell extends TreeCell<IliasTreeNode> {
 
 		private IliasTreeNode node;
-		private int i = 0;
 		private BorderPane pane;
 		private Label box;
 		private Button downloadButton;
@@ -212,8 +211,7 @@ public class CoursesTreeView extends TreeView<IliasTreeNode> {
 		private Button openerButton;
 		private Button printerButton;
 		private HBox actions;
-		private boolean calledfirsttime = true;
-
+		
 		public IliasTreeCell() {
 			pane = buildCell();
 			EventHandler<MouseEvent> mouseHandler = new EventHandler<MouseEvent>() {

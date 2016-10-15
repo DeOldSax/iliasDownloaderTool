@@ -1,25 +1,21 @@
 package control;
 
 import java.io.*;
-import java.util.*;
-
 import org.apache.http.*;
 import org.apache.http.client.*;
 import org.apache.http.client.methods.*;
 import org.apache.http.cookie.*;
-import org.apache.http.impl.client.*;
 import org.apache.http.protocol.*;
 
 public class IliasSessionUtils {
-	public void printCookies(DefaultHttpClient client) {
+	public void printCookies(CookieStore cookieStore) {
 		int counter = 1;
 		System.out.println("----------->Cookies: " + counter + ":");
-		List<Cookie> cookies = client.getCookieStore().getCookies();
-		if (cookies.isEmpty()) {
+		if (cookieStore.getCookies().isEmpty()) {
 			System.out.println("\nNone");
 		} else {
-			for (int i = 0; i < cookies.size(); i++) {
-				System.out.println("\n- " + cookies.get(i).toString());
+			for (Cookie cookie : cookieStore.getCookies()) {
+				System.out.println("\n- " + cookie);
 			}
 		}
 		System.out.println("\n");
@@ -37,7 +33,7 @@ public class IliasSessionUtils {
 		System.out.println("\nStatus: " + response.getStatusLine() + "\n");
 	}
 
-	public void logout() {
+	public void logout() throws IOException {
 		final String urlLogout = "https://ilias.studium.kit.edu/logout.php?lang=de";
 		final String urlLogoutIdp = "https://idp.scc.kit.edu/idp/Logout";
 		BasicHttpContext context = new BasicHttpContext();
@@ -66,6 +62,6 @@ public class IliasSessionUtils {
 		}
 		request.releaseConnection();
 
-		IliasManager.getInstance().getIliasClient().getConnectionManager().shutdown();
+		IliasManager.getInstance().getIliasClient().close();
 	}
 }

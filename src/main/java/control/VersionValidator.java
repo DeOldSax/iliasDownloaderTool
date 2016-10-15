@@ -23,7 +23,7 @@ public class VersionValidator {
 
 	public boolean validate() {
 
-		DefaultHttpClient client = new DefaultHttpClient();
+		CloseableHttpClient client = HttpClientBuilder.create().build();
 		final HttpGet request = new HttpGet(
 				"https://github.com/DeOldSax/iliasDownloaderTool/releases/latest");
 		HttpResponse response = null;

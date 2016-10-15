@@ -31,7 +31,7 @@ public class IliasManager {
 		return this.ilias.getDashboardHTML();
 	}
 
-	public DefaultHttpClient getIliasClient() {
+	public CloseableHttpClient getIliasClient() {
 		return this.ilias.getClient();
 	}
 

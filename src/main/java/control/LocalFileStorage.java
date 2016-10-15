@@ -13,8 +13,6 @@ import model.persistance.Settings;
 
 /**
  * This class stores all Files. Currently a .zip {@link IliasZip} is treated as a "File" and derives from {@link IliasFile}.
- * 
- * @author David
  *
  */
 public class LocalFileStorage {
