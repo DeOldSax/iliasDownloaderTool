@@ -8,7 +8,7 @@ einfacher zu verwalten und herunterzuladen. Das klicken durch die Ordner im Brow
 Application
 ===================
 
-![Image of Application](http://iliasdownloadertool.de/screenshot.png)
+![Image of Application](http://iliasdownloadertool.de/img/screenshot.png)
 
 
 How to build your own Ilias Downloader Tool
