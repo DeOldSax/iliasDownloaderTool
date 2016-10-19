@@ -160,12 +160,12 @@ public class IliasScraper {
 			for (Element element : siblingElements) {
 				if (element.attr("class").contains("il_ItemProperties")) {
 					Elements children = element.children();
-					try {
-						fileExtension = children.get(0).text().replace("\u00a0", "").trim();
-						sizeLabel = children.get(1).text().replace("\u00a0", "").trim();
-					} catch (ArrayIndexOutOfBoundsException aoobe) {
-						Logger.getLogger(getClass()).warn(
-								"ERROR: File Extension could not be found[1]");
+					for (int i = 0; i < children.size(); i++) {
+						String text = children.get(i).text().replace("\u00a0", "").trim();
+						if (text.matches("(\\d)(.*)(B|b)(.*)")) {
+							sizeLabel = text;
+							fileExtension = children.get(i - 1).text().replace("\u00a0", "").trim();
+						}
 					}
 					return new IliasFileMetaInformation(sizeLabel, fileExtension);
 				}
