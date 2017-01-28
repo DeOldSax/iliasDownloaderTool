@@ -117,7 +117,7 @@
 						<configuration>
 							<target>
 								<copy file="target/Ilias-${project.version}.jar"
-									tofile="release/IliasDownloaderTool-${project.version}/Ilias-Downloader-Tool-${project.version}.jar">
+									tofile="release/IliasDownloaderTool-tueb-${project.version}/Ilias-Downloader-Tool-${project.version}.jar">
 								</copy>
 							</target>
 						</configuration>

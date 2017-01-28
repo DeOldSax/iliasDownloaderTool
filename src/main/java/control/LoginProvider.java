@@ -31,7 +31,8 @@ public class LoginProvider implements EventHandler<ActionEvent> {
 		dashboard.setMenuTransparent(false);
 		dashboard.setSigInTransparent(true);
 		final String username = usernameField.getText();
-		final boolean validUsername = username.length() == 5 || username.startsWith("u");
+//		final boolean validUsername = username.length() == 5 || username.startsWith("u");
+		final boolean validUsername = true;
 		if (!validUsername) {
 			toggleDashboardLoginState("Ungültiger Benutzername");
 			return;
@@ -41,6 +42,7 @@ public class LoginProvider implements EventHandler<ActionEvent> {
 				toggleDashboardLoginState("Ungültiges Passwort");
 				return;
 			}
+
 			User user = Settings.getInstance().getUser();
 			if (savePwd.isSelected()) {
 				user.setName(username);
@@ -58,6 +60,7 @@ public class LoginProvider implements EventHandler<ActionEvent> {
 			}).start();
 		}
 	}
+
 	private void toggleDashboardLoginState(final String message) {
 		Platform.runLater(new Runnable() {
 			@Override
