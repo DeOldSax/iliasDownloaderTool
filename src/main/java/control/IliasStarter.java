@@ -26,9 +26,6 @@ public class IliasStarter {
 	}
 
 	public boolean login() {
-//		IliasPlugin iliasPlugin = new KITIlias();
-		IliasPlugin iliasPlugin = new TuebIlias();
-		IliasManager.getInstance().setIliasPlugin(iliasPlugin);
 		LoginStatus loginStatusMessage = IliasManager.getInstance().login(username, password);
 		if (loginStatusMessage.equals(LoginStatus.WRONG_PASSWORD)) {
 			Platform.runLater(new Runnable() {

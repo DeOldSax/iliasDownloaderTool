@@ -7,6 +7,9 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<!-- select one for build + select plugin in IliasManager.java -->
+		<!-- supported: kit tueb -->
+		<project.university>kit</project.university>
 	</properties>
 
 	<organization>
@@ -99,7 +102,7 @@
 						</goals>
 						<configuration>
 							<outputDirectory>
-								release/IliasDownloaderTool-${project.version}/lib
+								release/IliasDownloaderTool-${project.university}-${project.version}/lib
 							</outputDirectory>
 						</configuration>
 					</execution>
@@ -117,7 +120,7 @@
 						<configuration>
 							<target>
 								<copy file="target/Ilias-${project.version}.jar"
-									tofile="release/IliasDownloaderTool-tueb-${project.version}/Ilias-Downloader-Tool-${project.version}.jar">
+									tofile="release/IliasDownloaderTool-${project.university}-${project.version}/Ilias-Downloader-Tool-${project.university}-${project.version}.jar">
 								</copy>
 							</target>
 						</configuration>
