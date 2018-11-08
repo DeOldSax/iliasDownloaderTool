@@ -28,15 +28,18 @@ public class IliasScraper {
 
 	public void run(String dashboardHtml) {
 		this.iliasTree = getCourses(dashboardHtml);
-		startThread(iliasTree);
+
+		for (IliasFolder parent : iliasTree) {
+			if (!Settings.getInstance().getFlags().updateCanceled()) {
+				startThread(parent);
+			}
+		}
+
 	}
 
-	private void startThread(List<IliasFolder> iliasTree) {
-		if (Settings.getInstance().getFlags().updateCanceled()) {
-			return;
-		}
+	private void startThread(IliasFolder parent) {
 		threadCount.incrementAndGet();
-		new Thread(new IliasScraperThread(this, iliasTree)).start();
+		new Thread(new IliasScraperThread(this, parent)).start();
 	}
 
 	public List<IliasFolder> getIliasTree() {
@@ -72,19 +75,17 @@ public class IliasScraper {
 	private class IliasScraperThread implements Runnable {
 		String BASE_URI = IliasManager.getInstance().getBaseUri();
 		private final IliasScraper iliasScraper;
-		private final List<IliasFolder> courses;
+		private final IliasFolder parent;
 
-		private IliasScraperThread(IliasScraper iliasScraper, List<IliasFolder> courses) {
+		private IliasScraperThread(IliasScraper iliasScraper, IliasFolder parent) {
 			this.iliasScraper = iliasScraper;
-			this.courses = courses;
+			this.parent = parent;
 		}
 
 		@Override
 		public void run() {
-			for (IliasFolder parent : courses) {
-				if (Settings.getInstance().getFlags().updateCanceled()) {
-					break;
-				}
+			if (!Settings.getInstance().getFlags().updateCanceled()) {
+
 				List<Element> directory = openFolder(parent);
 				for (Element dir : directory) {
 					if (Settings.getInstance().getFlags().updateCanceled()) {
@@ -105,15 +106,14 @@ public class IliasScraper {
 					} else if (linkToForum) {
 						createForum(parent, dir);
 					} else if (linkToFolder) {
-						List<IliasFolder> tempo = new ArrayList<IliasFolder>();
 						IliasFolder newFolder = createFolder(parent, dir);
-						tempo.add(newFolder);
-						iliasScraper.startThread(tempo);
+						iliasScraper.startThread(newFolder);
 					} else if (linkToHyperlink) {
 						// TODO implement
 					}
 				}
 			}
+
 			iliasScraper.threadCount.decrementAndGet();
 		}
 
@@ -140,8 +140,8 @@ public class IliasScraper {
 			final String link = dir.attr("abs:href");
 			final int fileSize = new IliasConnector().getFileSize(link);
 			final IliasFileMetaInformation metaInf = suggestMetaInformation(dir);
-			final IliasFile iliasFile = new IliasFile(name, link, parentFolder, fileSize,
-					metaInf.getSizeLabel(), metaInf.getFileExtension());
+			final IliasFile iliasFile = new IliasFile(name, link, parentFolder, fileSize, metaInf.getSizeLabel(),
+					metaInf.getFileExtension());
 			return iliasFile;
 		}
 
