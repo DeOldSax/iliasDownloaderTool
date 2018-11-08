@@ -8,6 +8,7 @@ public class Flags implements Storable {
 	private boolean autoUpdate;
 	private boolean localIliasPathStored;
 	private boolean updateCanceled; 
+	private boolean connectSecure = true;
 	
 	public void setLogin(boolean login) {
 		this.login = login;
@@ -52,5 +53,13 @@ public class Flags implements Storable {
 	@Override
 	public String getStorageFileName() {
 		return "flags.ser";
+	}
+
+	public boolean isConnectSecure() {
+		return connectSecure;
+	}
+
+	public void setConnectSecure(boolean connectSecure) {
+		this.connectSecure = connectSecure;
 	}
 }

@@ -23,12 +23,14 @@ import model.persistance.Settings;
 
 import org.controlsfx.control.PopOver;
 
-public class SettingsMenu extends PopOver/* implements EventHandler<ActionEvent> */{
+@SuppressWarnings("restriction")
+public class SettingsMenu extends PopOver/* implements EventHandler<ActionEvent> */ {
 	private static Button localIliasPath;
 	private final GridPane gridPane;
 	private Button autoUpdate;
 	private Button autoLogin;
 	private boolean promptUpdater;
+	private Button connectSecure;
 	private static FadeTransition t;
 	private static Dashboard dashboard;
 
@@ -40,8 +42,7 @@ public class SettingsMenu extends PopOver/* implements EventHandler<ActionEvent>
 		setDetachable(false);
 		hideOnEscapeProperty().set(true);
 		/*
-		 * @see
-		 * http://stackoverflow.com/questions/25336796/tooltip-background-with
+		 * @see http://stackoverflow.com/questions/25336796/tooltip-background-with
 		 * -javafx-css
 		 */
 		this.getScene().getRoot().getStyleClass().add("main-root");
@@ -81,8 +82,7 @@ public class SettingsMenu extends PopOver/* implements EventHandler<ActionEvent>
 			helpText.getScene().getRoot().getStyleClass().add("main-root");
 			helpText.setDetachable(false);
 			Label text = new Label("Der lokale ILIAS-Ordner ist der Ordner, "
-					+ "in dem du auf deinem Computer deine Dateien"
-					+ " aus dem ILIAS speicherst.\nDiese Angabe wird "
+					+ "in dem du auf deinem Computer deine Dateien" + " aus dem ILIAS speicherst.\nDiese Angabe wird "
 					+ "ben\u00F6tigt, damit ein Abgleich stattfinden kann, "
 					+ "welche Dateien du bereits besitzt und welche noch nicht."
 					+ "\nDie Benennung deiner Unterordner oder Dateien spielt dabei keine Rolle.");
@@ -150,6 +150,45 @@ public class SettingsMenu extends PopOver/* implements EventHandler<ActionEvent>
 		box2.getChildren().addAll(faq, emailAdress);
 		gridPane.add(contactDeveloper, 0, 5);
 		gridPane.add(box2, 1, 5);
+		
+		Label experimental = new Label("Experimentelle Einstellungen");
+		connectSecure = new Button("Sichere Verbindung benutzen");
+		//connectSecure.setPrefWidth(250);
+		connectSecure.setOnAction(toggleButton);
+		if (flags.isConnectSecure()) {
+			connectSecure.setId("autoButtonActive");
+		}
+
+		Button helpSecure = new Button("?");
+		helpSecure.setId("greenButton");
+		helpSecure.setOnAction(event -> {
+			PopOver helpText = new PopOver();
+			helpText.setArrowSize(0);
+			helpText.getScene().getRoot().getStyleClass().add("main-root");
+			helpText.setDetachable(false);
+			Label text = new Label("Sollte dein IliasDownloader Probleme beim Login oder Aktualisieren "
+					+ "haben, ermöglicht dieser Button,\ndass die Sicherheit der Verbindung zu Ilias "
+					+ "weniger stark überprüft wird.\nDies sollte in den meisten Fällen das Problem "
+					+ "beheben.\nZwar wird dadurch die Verbindung nicht direkt unsicher,\ntrotzdem "
+					+ "sollte diese Funktion mit Vorsicht genossen werden.");
+			text.setPadding(new Insets(10, 10, 10, 10));
+			Button okBtn = new Button("X");
+			okBtn.setOnAction(event2 -> {
+				helpText.hide();
+			});
+			HBox boxSecure = new HBox();
+			boxSecure.getChildren().addAll(text, okBtn);
+			helpText.setContentNode(boxSecure);
+			helpText.show(helpSecure);
+		});
+
+		HBox boxExperimental = new HBox();
+		boxExperimental.setSpacing(20);
+		boxExperimental.getChildren().addAll(connectSecure, helpSecure);
+
+		gridPane.add(experimental, 0, 6);
+		gridPane.add(boxExperimental, 1, 6);
+		
 	}
 
 	private void showFileChooser() {
@@ -159,8 +198,7 @@ public class SettingsMenu extends PopOver/* implements EventHandler<ActionEvent>
 		final DirectoryChooser directoryChooser = new DirectoryChooser();
 		directoryChooser.setTitle("Lokaler Ilias Ordner");
 
-		final String localIliasFolderPath = Settings.getInstance().getIliasFolderSettings()
-				.getLocalIliasFolderPath();
+		final String localIliasFolderPath = Settings.getInstance().getIliasFolderSettings().getLocalIliasFolderPath();
 		if (!localIliasFolderPath.equals(".")) {
 			directoryChooser.setInitialDirectory(new File(localIliasFolderPath));
 		}
@@ -168,8 +206,7 @@ public class SettingsMenu extends PopOver/* implements EventHandler<ActionEvent>
 		final File selectedFile = directoryChooser.showDialog(new Stage());
 
 		if (selectedFile != null) {
-			Settings.getInstance().getIliasFolderSettings()
-					.setLocalIliasFolderPath(selectedFile.getAbsolutePath());
+			Settings.getInstance().getIliasFolderSettings().setLocalIliasFolderPath(selectedFile.getAbsolutePath());
 			Settings.getInstance().getFlags().setLocalIliasPathStored(true);
 			localIliasPath.setText(selectedFile.getAbsolutePath());
 			updateLocalIliasFolderPath();
@@ -196,9 +233,7 @@ public class SettingsMenu extends PopOver/* implements EventHandler<ActionEvent>
 
 	private void openEmailDialog() {
 		try {
-			Desktop.getDesktop()
-					.mail(new URI(
-							"mailto:DeOldSax@gmx.de?subject=Bugreport/Verbesserungsvorschlag/Frage"));
+			Desktop.getDesktop().mail(new URI("mailto:DeOldSax@gmx.de?subject=Bugreport/Verbesserungsvorschlag/Frage"));
 		} catch (IOException | URISyntaxException e) {
 			e.printStackTrace();
 		}
@@ -206,8 +241,7 @@ public class SettingsMenu extends PopOver/* implements EventHandler<ActionEvent>
 
 	private void openIliasWiki() {
 		try {
-			Desktop.getDesktop().browse(
-					new URI("https://github.com/DeOldSax/iliasDownloaderTool/wiki"));
+			Desktop.getDesktop().browse(new URI("https://github.com/DeOldSax/iliasDownloaderTool/wiki"));
 		} catch (IOException | URISyntaxException e) {
 			e.printStackTrace();
 		}
@@ -216,13 +250,11 @@ public class SettingsMenu extends PopOver/* implements EventHandler<ActionEvent>
 	public void changeLocalIliasFolderButton() {
 		if (Settings.getInstance().getFlags().isLocalIliasPathStored()) {
 			localIliasPath.setId("localIliasPath");
-			localIliasPath.setText(Settings.getInstance().getIliasFolderSettings()
-					.getLocalIliasFolderPath());
+			localIliasPath.setText(Settings.getInstance().getIliasFolderSettings().getLocalIliasFolderPath());
 			getBlinkyTransition().stop();
 			localIliasPath.setOpacity(1);
 		} else {
-			if (Settings.getInstance().getIliasFolderSettings().getLocalIliasFolderPath()
-					.equals(".")) {
+			if (Settings.getInstance().getIliasFolderSettings().getLocalIliasFolderPath().equals(".")) {
 				localIliasPath.setText("Ilias Ordner auswählen");
 			}
 			localIliasPath.setId("localIliasPathNotSelected");
@@ -260,6 +292,16 @@ public class SettingsMenu extends PopOver/* implements EventHandler<ActionEvent>
 				button.setId(null);
 			} else {
 				flags.setAutoUpdate(true);
+				button.setId("autoButtonActive");
+			}
+			return;
+		}
+		if (button.equals(connectSecure)) {
+			if (flags.isConnectSecure()) {
+				flags.setConnectSecure(false);
+				button.setId(null);
+			} else {
+				flags.setConnectSecure(true);
 				button.setId("autoButtonActive");
 			}
 			return;
