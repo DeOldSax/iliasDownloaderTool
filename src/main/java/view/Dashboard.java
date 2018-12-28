@@ -129,7 +129,7 @@ public class Dashboard extends Application {
 		actualisationTimePane = new GridPane();
 		actualisationTimePane.setHgap(10);
 		actualisationTimePane.setVgap(5);
-		lastUpdateTime = new Label(IliasTreeStorage.getActualisationDate());
+		lastUpdateTime = new Label(IliasTreeStorage.getUpdateTime());
 		lastUpdateTime.setId("lastUpdateTimeLabel");
 		actualisationTimePane.add(new Label(), 0, 0);
 		actualisationTimePane.add(new Label(), 0, 1);
@@ -343,8 +343,8 @@ public class Dashboard extends Application {
 	}
 
 	public static void updateUpdateTime() {
-		IliasTreeStorage.setActualisationDate();
-		lastUpdateTime.setText(IliasTreeStorage.getActualisationDate());
+		IliasTreeStorage.setUpdateTime();
+		lastUpdateTime.setText(IliasTreeStorage.getUpdateTime());
 	}
 
 	public void fadeInLogin() {

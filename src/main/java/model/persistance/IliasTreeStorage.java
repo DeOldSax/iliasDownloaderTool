@@ -25,22 +25,26 @@ public class IliasTreeStorage {
 		return allFiles;
 	}
 
-	public static String getActualisationDate() {
+	public static String getUpdateTime() {
 		if (!new File(TIME_STORE_PATH).exists()) {
-			return "Letzte Aktualisierung: -";
+			return UpdateTime.DEFAULT_VALUE;
 		}
-		final ActualisationDate actualisationDate = (ActualisationDate) deserialize(TIME_STORE_PATH);
-		return actualisationDate.toString();
+		final UpdateTime updateTime = (UpdateTime) deserialize(TIME_STORE_PATH);
+		if (updateTime == null) {
+			return UpdateTime.DEFAULT_VALUE;
+		}
+		return updateTime.toString();
 	}
 
-	public static void setActualisationDate() {
-		serialize(new ActualisationDate(), TIME_STORE_PATH);
+	public static void setUpdateTime() {
+		serialize(new UpdateTime(), TIME_STORE_PATH);
 	}
 
 	private static Object deserialize(String path) {
 		Object object = null;
+		File file = new File(path);
 		try {
-			final FileInputStream fileInputStream = new FileInputStream(new File(path));
+			final FileInputStream fileInputStream = new FileInputStream(file);
 			ObjectInputStream o = new ObjectInputStream(fileInputStream);
 			object = o.readObject();
 			o.close();
@@ -49,7 +53,7 @@ public class IliasTreeStorage {
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
+			file.delete();
 		}
 		return object;
 	}

@@ -1,15 +1,18 @@
 package control;
 
-import org.apache.http.impl.client.*;
-
-import plugin.*;
+import org.apache.http.impl.client.CloseableHttpClient;
+import plugin.IliasPlugin;
 import plugin.IliasPlugin.LoginStatus;
+import plugin.KITIlias;
+import plugin.TuebIlias;
 
 public class IliasManager {
 	private IliasPlugin ilias;
 	private static IliasManager iliasManager;
 
 	private IliasManager() {
+		this.ilias = new KITIlias();
+//		this.ilias = new TuebIlias();
 	}
 
 	public static IliasManager getInstance() {
@@ -17,10 +20,6 @@ public class IliasManager {
 			iliasManager = new IliasManager();
 		}
 		return iliasManager;
-	}
-
-	public void setIliasPlugin(IliasPlugin ilias) {
-		this.ilias = ilias;
 	}
 
 	public LoginStatus login(String username, String password) {
@@ -31,7 +30,7 @@ public class IliasManager {
 		return this.ilias.getDashboardHTML();
 	}
 
-	public DefaultHttpClient getIliasClient() {
+	public CloseableHttpClient getIliasClient() {
 		return this.ilias.getClient();
 	}
 

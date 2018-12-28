@@ -16,8 +16,7 @@ public class IliasFile extends IliasTreeNode {
 	private final int size;
 	private final String extension;
 	private final String sizeLabel;
-	private static final Logger LOGGER = Logger.getLogger(IliasFile.class);
-
+	
 	public IliasFile(String name, String url, IliasFolder parentFolder, int size, String sizeLabel,
 			String extension) {
 		super(name, url, parentFolder);

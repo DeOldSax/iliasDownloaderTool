@@ -17,7 +17,8 @@ public class LoginProvider implements EventHandler<ActionEvent> {
 	private final RadioButton savePwd;
 	private final Dashboard dashboard;
 
-	public LoginProvider(Dashboard dashboard, TextField usernameField, PasswordField passwordField, RadioButton savePwd) {
+	public LoginProvider(Dashboard dashboard, TextField usernameField, PasswordField passwordField,
+			RadioButton savePwd) {
 		this.dashboard = dashboard;
 		this.usernameField = usernameField;
 		this.passwordField = passwordField;
@@ -31,33 +32,29 @@ public class LoginProvider implements EventHandler<ActionEvent> {
 		dashboard.setMenuTransparent(false);
 		dashboard.setSigInTransparent(true);
 		final String username = usernameField.getText();
-		final boolean validUsername = username.length() == 5 || username.startsWith("u");
-		if (!validUsername) {
-			toggleDashboardLoginState("Ungültiger Benutzername");
+		final String password = passwordField.getText();
+		if (password.length() < 1) {
+			toggleDashboardLoginState("Ungültiges Passwort");
 			return;
-		} else {
-			final String password = passwordField.getText();
-			if (password.length() < 1) {
-				toggleDashboardLoginState("Ungültiges Passwort");
-				return;
-			}
-			User user = Settings.getInstance().getUser();
-			if (savePwd.isSelected()) {
-				user.setName(username);
-				user.setPassword(password);
-			} else {
-				user.setName("");
-				user.setPassword("");
-			}
-
-			new Thread(new Runnable() {
-				@Override
-				public void run() {
-					new IliasStarter(dashboard, username, password).login();
-				}
-			}).start();
 		}
+
+		User user = Settings.getInstance().getUser();
+		if (savePwd.isSelected()) {
+			user.setName(username);
+			user.setPassword(password);
+		} else {
+			user.setName("");
+			user.setPassword("");
+		}
+
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				new IliasStarter(dashboard, username, password).login();
+			}
+		}).start();
 	}
+
 	private void toggleDashboardLoginState(final String message) {
 		Platform.runLater(new Runnable() {
 			@Override
@@ -70,5 +67,5 @@ public class LoginProvider implements EventHandler<ActionEvent> {
 			}
 		});
 	}
-	
+
 }
