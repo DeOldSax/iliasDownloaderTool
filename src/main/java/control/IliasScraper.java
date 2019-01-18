@@ -64,7 +64,9 @@ public class IliasScraper {
 		for (Element aTag : temp) {
 			aTag.setBaseUri(BASE_URI);
 			String url = aTag.attr("abs:href");
-			if (url.contains("baseClass=ilrepositorygui")) {
+
+			// first condition is for kit + tueb, second for uni stuttgart
+			if (url.toLowerCase().contains("baseClass=ilrepositorygui") || url.toLowerCase().contains("stuttgart_crs")) {
 				String name = IliasCourseFormatter.formatCourseName(aTag.text());
 				courses.add(new IliasFolder(name, url, null));
 			}
@@ -94,7 +96,8 @@ public class IliasScraper {
 					dir.setBaseUri(BASE_URI);
 
 					// TODO check group folder
-					final boolean linkToFolder = dir.attr("href").contains("cmd=view");
+					final boolean linkToFolder = dir.attr("href").contains("cmd=view")
+							|| dir.attr("href").toLowerCase().contains("stuttgart_fold");
 					final boolean linkToFile = dir.attr("href").contains("download");
 					final boolean linkToForum = dir.attr("href").contains("cmd=showThreads");
 					final boolean linkToHyperlink = false;
