@@ -44,7 +44,7 @@ public class IliasFile extends IliasTreeNode {
 
 	private String createStoreKey() {
 		String url = super.getUrl();
-		Matcher matcher = Pattern.compile("(.*?)(\\d+)(.*)").matcher(url);
+		Matcher matcher = Pattern.compile("(.*?)(\\d{3,})(.*)").matcher(url);
 		String digits = "";
 
 		if (matcher.find()) {
