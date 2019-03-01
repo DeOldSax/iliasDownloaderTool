@@ -3,12 +3,12 @@ Ilias Downloader Tool
 
 Das Ilias Downloader Tool ist unter anderem als Hilfe gedacht, um Dateien aus dem Ilias [ilias.studium.kit.edu](https://ilias.studium.kit.edu)
 einfacher zu verwalten und herunterzuladen. Das klicken durch die Ordner im Browser, kann durch langsame oder fehlende Internetverbindung sehr mühsam werden. Bei steigender Anzahl von Ordnern und Kursen im Ilias verliert man leicht den Überblick welche Dokumente man schon lokal vorliegen hat und welche nicht.
-<br>**Weitere Informationen befinden sich auf der** [**Website**](http://iliasdownloadertool.de).
+<br>**Weitere Informationen befinden sich auf der** [**Website**](https://iliasdownloadertool.de).
 
 Application
 ===================
 
-![Image of Application](http://www.iliasdownloadertool.de/static/img/screenshot.png)
+![Image of Application](https://iliasdownloadertool.de/static/img/screenshot.png)
 
 
 How to build your own Ilias Downloader Tool
