@@ -39,4 +39,9 @@ public class IliasManager {
 	public String getBaseUri() {
 		return this.ilias.getBaseUri();
 	}
+
+	public String getShortName() {
+		return this.ilias.getShortName();
+	}
+
 }

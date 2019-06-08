@@ -124,4 +124,10 @@ public class TuebIlias extends IliasPlugin {
 	public String getDashboardHTML() {
 		return this.dashboardHTML;
 	}
+
+	@Override
+	public String getShortName() {
+		return "EKUT";
+	}
+
 }

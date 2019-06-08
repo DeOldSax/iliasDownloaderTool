@@ -96,4 +96,9 @@ public class KNIlias extends IliasPlugin {
         return this.dashboardHTML;
     }
 
+    @Override
+    public String getShortName() {
+        return "KN";
+    }
+
 }

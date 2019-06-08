@@ -127,4 +127,9 @@ public class KITIlias extends IliasPlugin {
 		return this.dashboardHTML;
 	}
 
+	@Override
+	public String getShortName() {
+		return "KIT";
+	}
+
 }

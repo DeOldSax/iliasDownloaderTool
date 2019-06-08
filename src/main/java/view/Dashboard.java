@@ -3,6 +3,8 @@ package view;
 import java.io.*;
 import java.security.*;
 
+import analytics.ActionType;
+import analytics.AnalyticsLogger;
 import javafx.animation.*;
 import javafx.application.*;
 import javafx.concurrent.*;
@@ -55,12 +57,16 @@ public class Dashboard extends Application {
 	}
 
 	public static void main(String[] args) {
+		AnalyticsLogger analyticsLogger = AnalyticsLogger.getInstance();
+		analyticsLogger.log(ActionType.START);
+
 		new File(System.getProperty("user.home") + "/.ilias/ilias.log").delete();
 		PropertyConfigurator.configure(Dashboard.class.getResourceAsStream("log4j.properties"));
 		Logger.getLogger(Dashboard.class).warn("Start IliasDownloaderTool.");
 
 		boolean newVersionCalled = new VersionValidator().validate();
 		if (newVersionCalled) {
+			analyticsLogger.log(ActionType.STOP);
 			System.exit(0);
 		}
 
@@ -71,16 +77,16 @@ public class Dashboard extends Application {
 	public void start(Stage stage) throws Exception {
 		dashboard = this;
 		stage.getIcons().add(new Image("img/folder.png"));
-		stage.addEventHandler(WindowEvent.WINDOW_CLOSE_REQUEST, new EventHandler<WindowEvent>() {
-			@Override
-			public void handle(WindowEvent event) {
-				Settings settings = Settings.getInstance();
-				settings.getFlags().setLogin(false);
-				settings.getFlags().setUpdateCanceled(false);
-				settings.store();
-				System.exit(0);
-			};
+		stage.addEventHandler(WindowEvent.WINDOW_CLOSE_REQUEST, event -> {
+			Settings settings = Settings.getInstance();
+			settings.getFlags().setLogin(false);
+			settings.getFlags().setUpdateCanceled(false);
+			settings.store();
+
+			AnalyticsLogger.getInstance().log(ActionType.STOP);
+			System.exit(0);
 		});
+
 		this.stage = stage;
 		background = new BorderPane();
 		background.setPadding(new Insets(20, 50, 20, 50));

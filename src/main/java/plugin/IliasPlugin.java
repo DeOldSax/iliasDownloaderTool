@@ -113,4 +113,7 @@ public abstract class IliasPlugin {
 	public abstract String getBaseUri();
 
 	public abstract String getDashboardHTML();
+
+	public abstract String getShortName();
+
 }

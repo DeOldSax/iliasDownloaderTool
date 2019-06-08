@@ -96,4 +96,9 @@ public class StuggeIlias extends IliasPlugin {
         return this.dashboardHTML;
     }
 
+    @Override
+    public String getShortName() {
+        return "STUGGE";
+    }
+
 }
