@@ -11,8 +11,9 @@ public class IliasManager {
 	private IliasManager() {
 		//this.ilias = new KITIlias();
 		//this.ilias = new StuggeIlias();
-//		this.ilias = new TuebIlias();
-		this.ilias = new KNIlias();
+		// this.ilias = new TuebIlias();
+		//this.ilias = new KNIlias();
+        this.ilias = new PHTGIlias();
 	}
 
 	public static IliasManager getInstance() {

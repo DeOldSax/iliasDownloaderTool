@@ -65,12 +65,11 @@ public class IliasScraper {
 			aTag.setBaseUri(BASE_URI);
 			String url = aTag.attr("abs:href");
 
-			// first condition is for kit + tueb, second for uni stuttgart
-			if (url.toLowerCase().contains("baseClass=ilrepositorygui") // kit + tueb
+			if (url.toLowerCase().contains("baseclass=ilrepositorygui") // kit + tueb
 				 || url.toLowerCase().contains("stuttgart_crs") // stuttgart
-				 || url.toLowerCase().contains("uni_crs")) // konstanz
+				 || url.toLowerCase().contains("uni_crs") // konstanz
+			     || url.toLowerCase().contains("cmdclass=ilrepositorygui")) // phtg
 			{
-
 				String name = IliasCourseFormatter.formatCourseName(aTag.text());
 				courses.add(new IliasFolder(name, url, null));
 			}
@@ -173,6 +172,7 @@ public class IliasScraper {
 						if (text.matches("(\\d)(.*)(B|b)(.*)")) {
 							sizeLabel = text;
 							fileExtension = children.get(i - 1).text().replace("\u00a0", "").trim();
+							break;
 						}
 					}
 					return new IliasFileMetaInformation(sizeLabel, fileExtension);
