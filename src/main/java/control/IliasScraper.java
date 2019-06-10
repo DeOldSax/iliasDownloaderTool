@@ -102,6 +102,7 @@ public class IliasScraper {
 					// TODO check group folder
 					final boolean linkToFolder = dir.attr("href").contains("cmd=view") // kit
 							|| dir.attr("href").toLowerCase().contains("stuttgart_fold") // stuttgart
+							|| dir.attr("href").toLowerCase().contains("goto_") // hsf_fold
 							|| dir.attr("href").toLowerCase().contains("uni_fold"); // konstanz
 					final boolean linkToFile = dir.attr("href").contains("download");
 					final boolean linkToForum = dir.attr("href").contains("cmd=showThreads");
