@@ -34,7 +34,6 @@ public class IliasScraper {
 				startThread(parent);
 			}
 		}
-
 	}
 
 	private void startThread(IliasFolder parent) {

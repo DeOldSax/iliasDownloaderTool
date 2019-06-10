@@ -9,7 +9,6 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.bouncycastle.jcajce.provider.digest.SHA3;
 import org.bouncycastle.util.encoders.Hex;
-import org.json.JSONObject;
 
 import java.util.UUID;
 
@@ -43,7 +42,7 @@ public class AnalyticsLogger {
         String name = Settings.getInstance().getUser().getName();
         String shortName = IliasManager.getInstance().getShortName();
 
-        return hash(hash(name) + hash(shortName) + hash("https://www.iliasdownloadertool.de/"));
+        return hash(hash(name) + hash(shortName) + hash("G(xpt+OgoLltz5b#e(Bu-YcYF$cokfmp9349fdjd!-4sdvf2"));
     }
 
     private String generateSessionID() {
@@ -51,33 +50,28 @@ public class AnalyticsLogger {
     }
 
     public void log(Enum actionType) {
-        CloseableHttpClient client = HttpClients.createDefault();
-        String uri = "http://localhost:5000/api/v1/analytics";
-        String uri2 = "https://www.iliasdownloadertool.de/api/v1/analytics";
-        HttpPost httpPost = new HttpPost(uri);
+        new Thread(() -> {
+            CloseableHttpClient client = HttpClients.createDefault();
+            String uri = "http://localhost:5000/api/v1/analytics";
+            String uri2 = "https://www.iliasdownloadertool.de/api/v1/analytics";
+            HttpPost httpPost = new HttpPost(uri2);
 
-        String json = new JSONObject()
-                .put("user_id", this.userID)
-                .put("session_id", this.sessionID)
-                .put("action_type", actionType)
-                .put("ilias_version", this.iliasVersion)
-                .put("ilias_portal", this.iliasPortal)
-                .toString();
+            SessionLog sessionLog = new SessionLog(this.userID, this.sessionID, actionType,
+                    this.iliasVersion, this.iliasPortal);
 
-        System.out.println(json);
+            StringEntity entity = null;
+            try {
+                entity = new StringEntity(sessionLog.toJson());
+                httpPost.setEntity(entity);
+                httpPost.setHeader("Accept", "application/json");
+                httpPost.setHeader("Content-type", "application/json");
 
-        StringEntity entity = null;
-        try {
-            entity = new StringEntity(json);
-            httpPost.setEntity(entity);
-            httpPost.setHeader("Accept", "application/json");
-            httpPost.setHeader("Content-type", "application/json");
-
-            client.execute(httpPost);
-            client.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+                client.execute(httpPost);
+                client.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
 
     private String hash(String s) {
@@ -86,4 +80,5 @@ public class AnalyticsLogger {
 
         return Hex.toHexString(digest);
     }
+
 }
