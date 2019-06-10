@@ -13,7 +13,8 @@ public class IliasManager {
 		//this.ilias = new StuggeIlias();
 		// this.ilias = new TuebIlias();
 		//this.ilias = new KNIlias();
-        this.ilias = new PHTGIlias();
+		//this.ilias = new PHTGIlias();
+		this.ilias = new HSFIlias();
 	}
 
 	public static IliasManager getInstance() {

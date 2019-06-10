@@ -66,9 +66,10 @@ public class IliasScraper {
 			String url = aTag.attr("abs:href");
 
 			if (url.toLowerCase().contains("baseclass=ilrepositorygui") // kit + tueb
-				 || url.toLowerCase().contains("stuttgart_crs") // stuttgart
-				 || url.toLowerCase().contains("uni_crs") // konstanz
-			     || url.toLowerCase().contains("cmdclass=ilrepositorygui")) // phtg
+				|| url.toLowerCase().contains("stuttgart_crs") // stuttgart
+				|| url.toLowerCase().contains("uni_crs") // konstanz
+				|| url.toLowerCase().contains("goto_hsf") // hsf
+				|| url.toLowerCase().contains("cmdclass=ilrepositorygui")) // phtg
 			{
 				String name = IliasCourseFormatter.formatCourseName(aTag.text());
 				courses.add(new IliasFolder(name, url, null));
