@@ -100,4 +100,9 @@ public class HSFIlias extends IliasPlugin {
         return this.dashboardHTML;
     }
 
+    @Override
+    public String getShortName() {
+        return "HSF";
+    }
+
 }
