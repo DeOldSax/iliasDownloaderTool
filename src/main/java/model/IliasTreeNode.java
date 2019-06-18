@@ -57,4 +57,5 @@ public abstract class IliasTreeNode implements Serializable {
 		}
 		return name;
 	}
+
 }

@@ -5,16 +5,18 @@ import plugin.*;
 import plugin.IliasPlugin.LoginStatus;
 
 public class IliasManager {
+
 	private IliasPlugin ilias;
+
 	private static IliasManager iliasManager;
 
 	private IliasManager() {
 		//this.ilias = new KITIlias();
 		//this.ilias = new StuggeIlias();
 		// this.ilias = new TuebIlias();
-		//this.ilias = new KNIlias();
+		this.ilias = new KNIlias();
 		//this.ilias = new PHTGIlias();
-		this.ilias = new HSFIlias();
+		//this.ilias = new HSFIlias();
 	}
 
 	public static IliasManager getInstance() {
