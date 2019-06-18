@@ -68,18 +68,15 @@ public class IliasFileDownloader extends Task<Void> {
 		fileChooser.setInitialDirectory(new File(targetPath));
 		fileChooser.setInitialFileName(name + "." + file.getExtension());
 
-		Platform.runLater(new Runnable() {
-			@Override
-			public void run() {
-				final File selectedFile = fileChooser.showSaveDialog(new Stage());
-				String path = targetPath;
-				if (selectedFile != null) {
-					path = selectedFile.getAbsolutePath();
-					if (!path.endsWith("." + file.getExtension())) {
-						path = path + "." + file.getExtension();
-					}
-					new Thread(new IliasFileDownloaderTask(file, path)).start();
+		Platform.runLater(() -> {
+			final File selectedFile = fileChooser.showSaveDialog(new Stage());
+			String path = targetPath;
+			if (selectedFile != null) {
+				path = selectedFile.getAbsolutePath();
+				if (!path.endsWith("." + file.getExtension())) {
+					path = path + "." + file.getExtension();
 				}
+				new Thread(new IliasFileDownloaderTask(file, path)).start();
 			}
 		});
 	}

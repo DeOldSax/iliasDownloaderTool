@@ -26,10 +26,10 @@ public class FileAppearanceManager {
 	private Map<String, String> ignoredPictures; 
 	
 	private FileAppearanceManager() {
-		fileExtensions = new ArrayList<String>(); 
-		normalPictures = new HashMap<String, String>(); 
-		notSynchronizedPictures = new HashMap<String, String>(); 
-		ignoredPictures = new HashMap<String, String>(); 
+		fileExtensions = new ArrayList<>();
+		normalPictures = new HashMap<>();
+		notSynchronizedPictures = new HashMap<>();
+		ignoredPictures = new HashMap<>();
 		
 		try {
 			readPropertyFile();

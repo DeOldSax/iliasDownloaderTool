@@ -14,6 +14,8 @@ import java.util.UUID;
 
 public class AnalyticsLogger {
 
+    public static String url = "https://www.iliasdownloadertool.de/api/v1/analytics";
+
     public static AnalyticsLogger logger;
 
     private final String sessionID;
@@ -24,7 +26,7 @@ public class AnalyticsLogger {
 
     private final String iliasPortal;
 
-    public AnalyticsLogger() {
+    private AnalyticsLogger() {
         this.sessionID = generateSessionID();
         this.iliasVersion = new VersionValidator().getVersion();
         this.userID = generateUserID();
@@ -40,9 +42,9 @@ public class AnalyticsLogger {
 
     private String generateUserID() {
         String name = Settings.getInstance().getUser().getName();
-        String shortName = IliasManager.getInstance().getShortName();
+        String pluginShortName = IliasManager.getInstance().getShortName();
 
-        return hash(hash(name) + hash(shortName) + hash("G(xpt+OgoLltz5b#e(Bu-YcYF$cokfmp9349fdjd!-4sdvf2"));
+        return hash(hash(name) + hash(pluginShortName) + hash("G(xpt+OgoLltz5b#e(Bu-YcYF$cokfmp9349fdjd!-4sdvf2"));
     }
 
     private String generateSessionID() {
@@ -52,14 +54,13 @@ public class AnalyticsLogger {
     public void log(Enum actionType) {
         new Thread(() -> {
             CloseableHttpClient client = HttpClients.createDefault();
-            String uri = "http://localhost:5000/api/v1/analytics";
-            String uri2 = "https://www.iliasdownloadertool.de/api/v1/analytics";
-            HttpPost httpPost = new HttpPost(uri2);
+
+            HttpPost httpPost = new HttpPost(url);
 
             SessionLog sessionLog = new SessionLog(this.userID, this.sessionID, actionType,
                     this.iliasVersion, this.iliasPortal);
 
-            StringEntity entity = null;
+            StringEntity entity;
             try {
                 entity = new StringEntity(sessionLog.toJson());
                 httpPost.setEntity(entity);
