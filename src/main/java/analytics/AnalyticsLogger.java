@@ -3,6 +3,7 @@ package analytics;
 import control.IliasManager;
 import control.VersionValidator;
 import model.persistance.Settings;
+import model.persistance.User;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -41,10 +42,15 @@ public class AnalyticsLogger {
     }
 
     private String generateUserID() {
-        String name = Settings.getInstance().getUser().getName();
         String pluginShortName = IliasManager.getInstance().getShortName();
+        User user = Settings.getInstance().getUser();
 
-        return hash(hash(name) + hash(pluginShortName) + hash("G(xpt+OgoLltz5b#e(Bu-YcYF$cokfmp9349fdjd!-4sdvf2"));
+        if (user.getName() == null) {
+            return hash("init");
+        } else {
+            String name = hash(user.getName());
+            return hash(name + hash(pluginShortName) + hash("G(xpt+OgoLltz5b#e(Bu-YcYF$cokfmp9349fdjd!-4sdvf2"));
+        }
     }
 
     private String generateSessionID() {
