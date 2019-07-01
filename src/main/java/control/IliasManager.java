@@ -17,7 +17,8 @@ public class IliasManager {
 		// this.ilias = new KNIlias();
 		// this.ilias = new PHTGIlias();
 		// this.ilias = new HSFIlias();
-		this.ilias = new WBSIlias();
+		// this.ilias = new WBSIlias();
+		this.ilias = new DemoIlias();
 	}
 
 	public static IliasManager getInstance() {
