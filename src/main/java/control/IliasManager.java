@@ -11,12 +11,13 @@ public class IliasManager {
 	private static IliasManager iliasManager;
 
 	private IliasManager() {
-		//this.ilias = new KITIlias();
-		//this.ilias = new StuggeIlias();
+		// this.ilias = new KITIlias();
+		// this.ilias = new StuggeIlias();
 		// this.ilias = new TuebIlias();
-		this.ilias = new KNIlias();
-		//this.ilias = new PHTGIlias();
-		//this.ilias = new HSFIlias();
+		// this.ilias = new KNIlias();
+		// this.ilias = new PHTGIlias();
+		// this.ilias = new HSFIlias();
+		this.ilias = new WBSIlias();
 	}
 
 	public static IliasManager getInstance() {

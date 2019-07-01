@@ -8,8 +8,8 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<!-- select one for build + select plugin in IliasManager.java -->
-		<!-- supported: kit tueb stugge kn phtg hsf-->
-		<project.university>kn</project.university>
+		<!-- supported: kit tueb stugge kn phtg hsf wbs -->
+		<project.university>wbs</project.university>
 	</properties>
 
     <organization>

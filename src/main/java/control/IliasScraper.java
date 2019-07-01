@@ -64,7 +64,7 @@ public class IliasScraper {
 			aTag.setBaseUri(BASE_URI);
 			String url = aTag.attr("abs:href");
 
-			if (url.toLowerCase().contains("baseclass=ilrepositorygui") // kit + tueb
+			if (url.toLowerCase().contains("baseclass=ilrepositorygui") // kit + tueb + wbs
 				|| url.toLowerCase().contains("stuttgart_crs") // stuttgart
 				|| url.toLowerCase().contains("uni_crs") // konstanz
 				|| url.toLowerCase().contains("goto_hsf") // hsf
@@ -99,7 +99,7 @@ public class IliasScraper {
 					dir.setBaseUri(BASE_URI);
 
 					// TODO check group folder
-					final boolean linkToFolder = dir.attr("href").contains("cmd=view") // kit
+					final boolean linkToFolder = dir.attr("href").contains("cmd=view") // kit + wbs
 							|| dir.attr("href").toLowerCase().contains("stuttgart_fold") // stuttgart
 							|| dir.attr("href").toLowerCase().contains("hsf_fold") // hsf
 							|| dir.attr("href").toLowerCase().contains("uni_fold"); // konstanz
