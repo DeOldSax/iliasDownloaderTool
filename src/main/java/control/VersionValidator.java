@@ -17,7 +17,7 @@ import org.jsoup.select.*;
 
 public class VersionValidator {
 	private final int YES = 0;
-	private final String VERSION = "v1.2.1";
+	private final String VERSION = "v1.2.2";
 	private String LATEST_VERSION;
 	private Logger LOGGER = Logger.getLogger(getClass());
 
