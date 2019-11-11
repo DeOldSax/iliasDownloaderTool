@@ -46,7 +46,7 @@ public class IliasScraper {
 	}
 
 	private List<IliasFolder> getCourses(String dashboardHtml) {
-		List<IliasFolder> courses = new ArrayList<IliasFolder>();
+		List<IliasFolder> courses = new ArrayList<>();
 		String s = null;
 		Document doc = Jsoup.parse(dashboardHtml);
 		List<Element> temp = doc.select("h4");

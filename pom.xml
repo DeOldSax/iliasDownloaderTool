@@ -3,13 +3,13 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>deoldsax</groupId>
     <artifactId>Ilias</artifactId>
-    <version>v1.2.1</version>
+    <version>v1.2.2</version>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<!-- select one for build + select plugin in IliasManager.java -->
-		<!-- supported: kit tueb stugge kn phtg hsf wbs -->
-		<project.university>wbs</project.university>
+		<!-- supported: demo kit tueb stugge kn phtg hsf wbs-->
+		<project.university>demo</project.university>
 	</properties>
 
     <organization>
@@ -128,6 +128,9 @@
                                 <copy file="target/Ilias-${project.version}.jar"
                                       tofile="release/IliasDownloaderTool-${project.university}-${project.version}/Ilias-Downloader-Tool-${project.university}-${project.version}.jar">
                                 </copy>
+                                <zip destfile="release/IliasDownloaderTool-${project.university}-${project.version}.zip"
+                                     basedir="release/IliasDownloaderTool-${project.university}-${project.version}"
+                                />
                             </target>
                         </configuration>
                     </execution>

@@ -27,7 +27,7 @@ public class KITIlias extends IliasPlugin {
 	public LoginStatus login(String username, String password) {
 		LoginStatus loginStatus = LoginStatus.CONNECTION_FAILED;
 		context = new BasicHttpContext();
-		nvps = new ArrayList<NameValuePair>();
+		nvps = new ArrayList<>();
 
 		try {
 			post = new HttpPost("https://ilias.studium.kit.edu/Shibboleth.sso/Login");
