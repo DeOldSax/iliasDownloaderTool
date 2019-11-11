@@ -6,6 +6,7 @@ import java.util.*;
 import org.apache.http.*;
 import org.apache.http.client.*;
 import org.apache.http.client.methods.*;
+import org.apache.http.conn.HttpHostConnectException;
 import org.apache.http.protocol.*;
 import org.apache.http.util.*;
 import org.apache.log4j.*;
@@ -44,6 +45,9 @@ public class IliasConnector {
 		HttpHead head = new HttpHead(url);
 		try {
 			response = IliasManager.getInstance().getIliasClient().execute(head, context);
+		} catch (HttpHostConnectException e) {
+			LOGGER.warn("connection timout while fetching file size", e);
+			return 0;
 		} catch (ClientProtocolException e) {
 			LOGGER.warn("", e);
 		} catch (IOException e) {
