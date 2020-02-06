@@ -21,6 +21,30 @@ How to build your own Ilias Downloader Tool
 3. Build with ```mvn clean install``` 
 4. Find your iliasdownloadertool in ```release/```
 
+In 2020 on Linux
+----------------
+
+1. Install [SDKMAN!](https://sdkman.io/install):
+    ```shell
+      curl -s "https://get.sdkman.io" | bash
+      source "$HOME/.sdkman/bin/sdkman-init.sh"
+      sdk version
+    ```
+2. Install Java 8 with JavaFX and Maven 3.3.9:
+    ```shell
+   sdk install java 8.0.232.fx-zulu
+   sdk install maven 3.3.9
+    ```
+   With `sdk list java` or  `sdk list maven`, you can find the other available versions.
+3. Create a`JAVA_HOME` variable:
+    ```shell
+   echo JAVA_HOME="$HOME/.sdkman/candidates/java/current/bin/" >> ~/.bashrc
+   source ~/.bashrc
+    ```
+4. Clone this repo and change your university in the `pom.xml` at line 12 and in `src/main/java/control/IliasManager.java` at line 14++.
+5. Build it with `mvn clean install`.
+6. Start it with `java -jar ./release/IliasDownloaderTool-ube-v1.2.2//Ilias-Downloader-Tool-ube-v1.2.2.jar`.
+
 
 Contribute
 ================
