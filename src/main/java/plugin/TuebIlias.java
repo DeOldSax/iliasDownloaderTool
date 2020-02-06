@@ -12,6 +12,7 @@ import org.apache.http.util.*;
 import org.apache.log4j.*;
 import org.jsoup.*;
 import org.jsoup.nodes.*;
+import org.jsoup.select.Elements;
 
 public class TuebIlias extends IliasPlugin {
 	private HttpPost post;
@@ -29,7 +30,7 @@ public class TuebIlias extends IliasPlugin {
 		nvps = new ArrayList<NameValuePair>();
 		try {
 			post = new HttpPost("https://ovidius.uni-tuebingen.de/ilias3/shib_login.php?target=");
-			
+
 			executePost();
 			String html = null;
 			try {
@@ -40,17 +41,17 @@ public class TuebIlias extends IliasPlugin {
 
 			Document doc = Jsoup.parse(html);
 			Element form = doc.select("form[action*=idp").first();
-			Element input_tag = form.select("input[name='lt']").first();
-			String ltKey = input_tag.attr("value");
-			
+
+			// Updated 06.02.2020 to fit the new login process
 			post = new HttpPost("https://idp.uni-tuebingen.de" + form.attr("action"));
-			nvps.add(new BasicNameValuePair("username", username));
-			nvps.add(new BasicNameValuePair("password", password));
-			
-			nvps.add(new BasicNameValuePair("lt", ltKey));
+			nvps.add(new BasicNameValuePair("j_username", username));
+			nvps.add(new BasicNameValuePair("j_password", password));
+
 			nvps.add(new BasicNameValuePair("execution", "e1s1"));
-			nvps.add(new BasicNameValuePair("_eventId", "submit"));
+			nvps.add(new BasicNameValuePair("donotcache", "1"));
+			nvps.add(new BasicNameValuePair("_eventId_proceed", ""));
 			post.setEntity(new UrlEncodedFormEntity(nvps, Consts.UTF_8));
+			// End of update
 
 			executePost();
 			html = null;
@@ -59,7 +60,7 @@ public class TuebIlias extends IliasPlugin {
 			} catch (IOException | ParseException e) {
 				LOGGER.warn(e.getStackTrace());
 			}
-			
+
 
 			doc = Jsoup.parse(html);
 			Element relayState = doc.select("input[name=RelayState]").first();
@@ -94,7 +95,7 @@ public class TuebIlias extends IliasPlugin {
 			}
 		} finally {
 			post.releaseConnection();
-	}
+		}
 
 		return loginStatus;
 	}

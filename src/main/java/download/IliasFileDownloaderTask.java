@@ -36,6 +36,10 @@ public class IliasFileDownloaderTask extends Task<Void> {
 			entity = response.getEntity();
 
 			BufferedInputStream in = new BufferedInputStream(entity.getContent());
+			// remove invalid file endings
+			String targetPath = this.targetPath.endsWith(".")
+					? this.targetPath.substring(0, this.targetPath.length() - 1)
+					: this.targetPath;
 			BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(new File(
 					targetPath)));
 
