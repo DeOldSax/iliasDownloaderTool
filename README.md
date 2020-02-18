@@ -21,9 +21,18 @@ How to build your own Ilias Downloader Tool
 3. Build with ```mvn clean install``` 
 4. Find your iliasdownloadertool in ```release/```
 
-In 2020 on Linux
-----------------
+Build with SDKMAN!
+------------------
+0. (Only with Windows):
 
+    1. Install WSL, Cygwin or another Linux environment.
+    2. Install a X Server for Windows like [VcXsrv](https://sourceforge.net/projects/vcxsrv/)
+    3. Start it and export the Display variable to the emulated X Server in your Linux bash.
+    Also export a GL pass-through, because the X Server can only handle GL 1.2: 
+    ```shell
+      echo "export Display=:0" >> ~/.bashrc
+      echo "export LIBGL_ALWAYS_INDIRECT=1" >> ~/.bashrc
+    ```   
 1. Install [SDKMAN!](https://sdkman.io/install):
     ```shell
       curl -s "https://get.sdkman.io" | bash
@@ -35,19 +44,18 @@ In 2020 on Linux
    sdk install java 8.0.232.fx-zulu
    sdk install maven 3.3.9
     ```
-   With `sdk list java` or  `sdk list maven`, you can find the other available versions.
+   With `sdk list java` or `sdk list maven`, you can find the other available versions.
 3. Create a`JAVA_HOME` variable:
     ```shell
-   echo JAVA_HOME="$HOME/.sdkman/candidates/java/current/bin/" >> ~/.bashrc
+   echo JAVA_HOME="$HOME/.sdkman/candidates/java/current" >> ~/.bashrc
    source ~/.bashrc
     ```
 4. Clone this repo and change your university in the `pom.xml` at line 12 and in `src/main/java/control/IliasManager.java` at line 14++.
 5. Build it with `mvn clean install`.
-6. Start it with `java -jar ./release/IliasDownloaderTool-ube-v1.2.2//Ilias-Downloader-Tool-ube-v1.2.2.jar`.
+6. Start it with `java -jar ./release/IliasDownloaderTool-ube-v1.2.2/Ilias-Downloader-Tool-ube-v1.2.2.jar`.
+
 
 
 Contribute
 ================
 Feel free to contribute!!!
-
-

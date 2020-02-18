@@ -1,18 +1,19 @@
 package plugin;
 
-import java.io.*;
-import java.util.*;
 import org.apache.http.*;
-import org.apache.http.client.*;
-import org.apache.http.client.entity.*;
-import org.apache.http.client.methods.*;
-import org.apache.http.message.*;
-import org.apache.http.protocol.*;
-import org.apache.http.util.*;
-import org.apache.log4j.*;
-import org.jsoup.*;
-import org.jsoup.nodes.*;
-import org.jsoup.select.Elements;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.protocol.BasicHttpContext;
+import org.apache.http.util.EntityUtils;
+import org.apache.log4j.Logger;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TuebIlias extends IliasPlugin {
 	private HttpPost post;
@@ -27,7 +28,7 @@ public class TuebIlias extends IliasPlugin {
 	public LoginStatus login(String username, String password) {
 		LoginStatus loginStatus = LoginStatus.CONNECTION_FAILED;
 		context = new BasicHttpContext();
-		nvps = new ArrayList<NameValuePair>();
+		nvps = new ArrayList<>();
 		try {
 			post = new HttpPost("https://ovidius.uni-tuebingen.de/ilias3/shib_login.php?target=");
 
@@ -42,7 +43,6 @@ public class TuebIlias extends IliasPlugin {
 			Document doc = Jsoup.parse(html);
 			Element form = doc.select("form[action*=idp").first();
 
-			// Updated 06.02.2020 to fit the new login process
 			post = new HttpPost("https://idp.uni-tuebingen.de" + form.attr("action"));
 			nvps.add(new BasicNameValuePair("j_username", username));
 			nvps.add(new BasicNameValuePair("j_password", password));
@@ -51,7 +51,6 @@ public class TuebIlias extends IliasPlugin {
 			nvps.add(new BasicNameValuePair("donotcache", "1"));
 			nvps.add(new BasicNameValuePair("_eventId_proceed", ""));
 			post.setEntity(new UrlEncodedFormEntity(nvps, Consts.UTF_8));
-			// End of update
 
 			executePost();
 			html = null;
@@ -84,9 +83,7 @@ public class TuebIlias extends IliasPlugin {
 
 			try {
 				String htmlStartpage = EntityUtils.toString(entity);
-				if (htmlStartpage.equals("1")) {
-					loginStatus = LoginStatus.CONNECTION_FAILED;
-				} else {
+				if (!htmlStartpage.equals("1")) {
 					loginStatus = LoginStatus.SUCCESS;
 					this.dashboardHTML = htmlStartpage;
 				}
@@ -103,9 +100,6 @@ public class TuebIlias extends IliasPlugin {
 	private void executePost() {
 		try {
 			this.response = this.client.execute(this.post, this.context);
-		} catch (ClientProtocolException e) {
-			e.printStackTrace();
-			this.LOGGER.warn(e.getStackTrace());
 		} catch (IOException e) {
 			e.printStackTrace();
 			this.LOGGER.warn(e.getStackTrace());
