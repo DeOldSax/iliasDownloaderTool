@@ -1,5 +1,6 @@
 package plugin;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.*;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -7,7 +8,6 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.util.EntityUtils;
-import org.apache.log4j.Logger;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -16,12 +16,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 public class HSFIlias extends IliasPlugin {
 
     private HttpPost post;
     private HttpResponse response;
     private HttpEntity entity;
-    private Logger LOGGER = Logger.getLogger(getClass());
     private String dashboardHTML;
     private BasicHttpContext context;
     private List<NameValuePair> nvps;
@@ -41,7 +41,7 @@ public class HSFIlias extends IliasPlugin {
             try {
                 html = EntityUtils.toString(entity);
             } catch (IOException | ParseException e) {
-                LOGGER.warn(e.getStackTrace());
+                log.warn(e.getMessage(), e);
             }
 
             Document doc = Jsoup.parse(html);
@@ -65,7 +65,7 @@ public class HSFIlias extends IliasPlugin {
 
                 }
             } catch (ParseException | IOException e) {
-                LOGGER.warn(e.getStackTrace());
+                log.warn(e.getMessage(), e);
             }
         } finally {
             post.releaseConnection();
@@ -79,10 +79,10 @@ public class HSFIlias extends IliasPlugin {
             this.response = this.client.execute(this.post, this.context);
         } catch (ClientProtocolException e) {
             e.printStackTrace();
-            this.LOGGER.warn(e.getStackTrace());
+            log.warn(e.getMessage(), e);
         } catch (IOException e) {
             e.printStackTrace();
-            this.LOGGER.warn(e.getStackTrace());
+            log.warn(e.getMessage(), e);
         } finally {
             this.entity = this.response.getEntity();
         }

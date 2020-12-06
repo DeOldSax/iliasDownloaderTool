@@ -10,8 +10,9 @@ import java.util.Properties;
 
 import javafx.scene.image.ImageView;
 
-import org.apache.log4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class FileAppearanceManager {
 	
 	private static FileAppearanceManager instance; 
@@ -34,8 +35,8 @@ public class FileAppearanceManager {
 		try {
 			readPropertyFile();
 		} catch (IOException e) {
-			Logger.getLogger(getClass()).debug("Error: FileAppearanceConfiguration file not found.");
-		} 
+			log.warn("Error: FileAppearanceConfiguration file not found.");
+		}
 	}
 	
 	public ImageView getNormalPicture(String extension) {

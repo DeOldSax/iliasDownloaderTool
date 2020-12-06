@@ -4,16 +4,17 @@ import java.io.*;
 
 import javafx.application.*;
 import javafx.concurrent.*;
+import lombok.extern.slf4j.Slf4j;
 import model.*;
 
 import org.apache.http.*;
 import org.apache.http.client.methods.*;
 import org.apache.http.protocol.*;
-import org.apache.log4j.*;
 
 import view.*;
 import control.*;
 
+@Slf4j
 public class IliasFileDownloaderTask extends Task<Void> {
 	private HttpGet request;
 	private HttpResponse response;
@@ -49,7 +50,7 @@ public class IliasFileDownloaderTask extends Task<Void> {
 
 			request.releaseConnection();
 		} catch (IOException e) {
-			Logger.getLogger(getClass()).warn("", e);
+			log.warn(e.getMessage(), e);
 		}
 
 		LocalFileStorage.getInstance().addIliasFile(file, targetPath);

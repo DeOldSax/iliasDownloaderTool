@@ -14,12 +14,12 @@ public class IliasManager {
 		// this.ilias = new KITIlias();
 		// this.ilias = new StuggeIlias();
 		// this.ilias = new TuebIlias();
-		// this.ilias = new KNIlias();
+		this.ilias = new KNIlias();
 		// this.ilias = new PHTGIlias();
 		// this.ilias = new HSFIlias();
 		// this.ilias = new WBSIlias();
 		// this.ilias = new DemoIlias();
-		this.ilias = new UniBernIlias();
+		// this.ilias = new UniBernIlias();
 	}
 
 	public static IliasManager getInstance() {

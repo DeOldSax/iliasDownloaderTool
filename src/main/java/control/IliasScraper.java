@@ -3,10 +3,10 @@ package control;
 import java.util.*;
 import java.util.concurrent.atomic.*;
 
+import lombok.extern.slf4j.Slf4j;
 import model.*;
 import model.persistance.*;
 
-import org.apache.log4j.*;
 import org.jsoup.*;
 import org.jsoup.nodes.*;
 import org.jsoup.select.*;
@@ -14,6 +14,7 @@ import org.jsoup.select.*;
 import utils.*;
 import view.*;
 
+@Slf4j
 public class IliasScraper {
 	public AtomicInteger threadCount;
 	public AtomicInteger fileCounter;
@@ -181,7 +182,7 @@ public class IliasScraper {
 					return new IliasFileMetaInformation(sizeLabel, fileExtension);
 				}
 			}
-			Logger.getLogger(getClass()).warn("ERROR: File Extension could not be found[2]");
+			log.warn("ERROR: File Extension could not be found[2]");
 			return new IliasFileMetaInformation(sizeLabel, fileExtension);
 		}
 	}
