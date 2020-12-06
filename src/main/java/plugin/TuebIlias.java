@@ -1,18 +1,21 @@
 package plugin;
 
-import java.io.*;
-import java.util.*;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.*;
 import org.apache.http.client.*;
-import org.apache.http.client.entity.*;
-import org.apache.http.client.methods.*;
-import org.apache.http.message.*;
-import org.apache.http.protocol.*;
-import org.apache.http.util.*;
-import org.jsoup.*;
-import org.jsoup.nodes.*;
+
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.protocol.BasicHttpContext;
+import org.apache.http.util.EntityUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 public class TuebIlias extends IliasPlugin {
@@ -27,10 +30,10 @@ public class TuebIlias extends IliasPlugin {
 	public LoginStatus login(String username, String password) {
 		LoginStatus loginStatus = LoginStatus.CONNECTION_FAILED;
 		context = new BasicHttpContext();
-		nvps = new ArrayList<NameValuePair>();
+		nvps = new ArrayList<>();
 		try {
 			post = new HttpPost("https://ovidius.uni-tuebingen.de/ilias3/shib_login.php?target=");
-			
+
 			executePost();
 			String html = null;
 			try {
@@ -41,16 +44,14 @@ public class TuebIlias extends IliasPlugin {
 
 			Document doc = Jsoup.parse(html);
 			Element form = doc.select("form[action*=idp").first();
-			Element input_tag = form.select("input[name='lt']").first();
-			String ltKey = input_tag.attr("value");
-			
+
 			post = new HttpPost("https://idp.uni-tuebingen.de" + form.attr("action"));
-			nvps.add(new BasicNameValuePair("username", username));
-			nvps.add(new BasicNameValuePair("password", password));
-			
-			nvps.add(new BasicNameValuePair("lt", ltKey));
+			nvps.add(new BasicNameValuePair("j_username", username));
+			nvps.add(new BasicNameValuePair("j_password", password));
+
 			nvps.add(new BasicNameValuePair("execution", "e1s1"));
-			nvps.add(new BasicNameValuePair("_eventId", "submit"));
+			nvps.add(new BasicNameValuePair("donotcache", "1"));
+			nvps.add(new BasicNameValuePair("_eventId_proceed", ""));
 			post.setEntity(new UrlEncodedFormEntity(nvps, Consts.UTF_8));
 
 			executePost();
@@ -83,9 +84,7 @@ public class TuebIlias extends IliasPlugin {
 
 			try {
 				String htmlStartpage = EntityUtils.toString(entity);
-				if (htmlStartpage.equals("1")) {
-					loginStatus = LoginStatus.CONNECTION_FAILED;
-				} else {
+				if (!htmlStartpage.equals("1")) {
 					loginStatus = LoginStatus.SUCCESS;
 					this.dashboardHTML = htmlStartpage;
 				}
@@ -94,7 +93,7 @@ public class TuebIlias extends IliasPlugin {
 			}
 		} finally {
 			post.releaseConnection();
-	}
+		}
 
 		return loginStatus;
 	}
