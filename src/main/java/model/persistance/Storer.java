@@ -68,8 +68,6 @@ public class Storer {
 			out = new ObjectOutputStream(output);
 			out.writeObject(object);
 			out.close();
-		} catch (FileNotFoundException e) {
-			log.error(e.getMessage(), e);
 		} catch (IOException e) {
 			log.error(e.getMessage(), e);
 		}
@@ -89,10 +87,8 @@ public class Storer {
 			object = o.readObject();
 			o.close();
 		} catch (FileNotFoundException e) {
-			log.error(e.getMessage(), e);
-		} catch (IOException e) {
-			log.error(e.getMessage(), e);
-		} catch (ClassNotFoundException e) {
+			//
+		} catch (IOException | ClassNotFoundException e) {
 			log.error(e.getMessage(), e);
 		}
 		return object;
