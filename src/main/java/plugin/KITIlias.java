@@ -49,11 +49,13 @@ public class KITIlias extends IliasPlugin {
 
 			Document doc = Jsoup.parse(html);
 			Element form = doc.select("form[action*=idp").first();
+			Element csrf = doc.select("[name=csrf_token]").first();
 
 			post = new HttpPost("https://idp.scc.kit.edu" + form.attr("action"));
 			nvps.add(new BasicNameValuePair("_eventId_proceed", ""));
 			nvps.add(new BasicNameValuePair("j_username", username));
 			nvps.add(new BasicNameValuePair("j_password", password));
+			nvps.add(new BasicNameValuePair("csrf_token", csrf.attr("value")));
 			post.setEntity(new UrlEncodedFormEntity(nvps, Consts.UTF_8));
 
 			executePost();
