@@ -21,6 +21,11 @@ How to build your own Ilias Downloader Tool
 3. Build with ```mvn clean install``` 
 4. Find your iliasdownloadertool in ```release/```
 
+Make sure you update the following params accordingly:
+- change the value of project.university (e.g. `kit`) here: https://github.com/DeOldSax/iliasDownloaderTool/blob/c7ca12a5ef6df8bbf55c142f29ad540bc6f3e547/pom.xml#L12
+- select the right plugin class here: https://github.com/DeOldSax/iliasDownloaderTool/blob/c7ca12a5ef6df8bbf55c142f29ad540bc6f3e547/src/main/java/control/IliasManager.java#L14
+
+
 Build with SDKMAN!
 ------------------
 0. (Only with Windows):
