@@ -18,7 +18,7 @@ How to build your own Ilias Downloader Tool
 3. Clone this repo and change your university (e.g. `kit`) in the [pom.xml](https://github.com/DeOldSax/iliasDownloaderTool/blob/develop/pom.xml#L12) at line 12 and in [src/main/java/control/IliasManager.java](https://github.com/DeOldSax/iliasDownloaderTool/blob/develop/src/main/java/control/IliasManager.java#L16) at line 16
 4. Build it with ```mvn clean install```
 5. Find your iliasdownloadertool in ```release/```
-6. Start it with `java -jar ./release/IliasDownloaderTool-ube-v1.2.2/Ilias-Downloader-Tool-kit-v1.2.2.jar` or a simple doubleclick
+6. Start it with `java -jar ./release/IliasDownloaderTool-kit-v2/Ilias-Downloader-Tool-kit-v2.jar` or a simple doubleclick
 
 
 Build with SDKMAN!
