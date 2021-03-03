@@ -1,11 +1,8 @@
 Ilias Downloader Tool
 ===================
 
-Das Ilias Downloader Tool ist unter anderem als Hilfe gedacht, um Dateien aus dem
-E-Learning Portal [**ilias**](https://www.ilias.de/)
-einfacher zu verwalten und herunterzuladen. Das klicken durch die Ordner im Browser, kann durch langsame oder fehlende Internetverbindung sehr mühsam werden. Bei steigender Anzahl von Ordnern und Kursen im Ilias verliert man leicht den Überblick welche Dokumente man schon lokal vorliegen hat und welche nicht.
-<br>
-Aktuell unterstütze Portale und weitere Infos findest du auf der [**Website**](https://iliasdownloadertool.de).
+Desktop Tool for [**ilias**](https://www.ilias.de/). Find more information at [**https://iliasdownloadertool.de**](https://iliasdownloadertool.de).
+
 
 Application
 ===================
@@ -18,12 +15,10 @@ How to build your own Ilias Downloader Tool
 
 1. Install [Maven v3.3.9](https://maven.apache.org/download.cgi)
 2. Install [Java JDK v1.8.0_102](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
-3. Build with ```mvn clean install``` 
-4. Find your iliasdownloadertool in ```release/```
-
-Make sure you update the following params accordingly:
-- change the value of project.university (e.g. `kit`) here: https://github.com/DeOldSax/iliasDownloaderTool/blob/c7ca12a5ef6df8bbf55c142f29ad540bc6f3e547/pom.xml#L12
-- select the right plugin class here: https://github.com/DeOldSax/iliasDownloaderTool/blob/c7ca12a5ef6df8bbf55c142f29ad540bc6f3e547/src/main/java/control/IliasManager.java#L14
+3. Clone this repo and change your university (e.g. `kit`) in the [pom.xml](https://github.com/DeOldSax/iliasDownloaderTool/blob/develop/pom.xml#L12) at line 12 and in [src/main/java/control/IliasManager.java](https://github.com/DeOldSax/iliasDownloaderTool/blob/develop/src/main/java/control/IliasManager.java#L16) at line 16
+4. Build it with ```mvn clean install```
+5. Find your iliasdownloadertool in ```release/```
+6. Start it with `java -jar ./release/IliasDownloaderTool-ube-v1.2.2/Ilias-Downloader-Tool-kit-v1.2.2.jar` or a simple doubleclick
 
 
 Build with SDKMAN!
@@ -55,12 +50,12 @@ Build with SDKMAN!
    echo JAVA_HOME="$HOME/.sdkman/candidates/java/current" >> ~/.bashrc
    source ~/.bashrc
     ```
-4. Clone this repo and change your university in the `pom.xml` at line 12 and in `src/main/java/control/IliasManager.java` at line 14++.
+4.  Clone this repo and change your university (e.g. `kit`) in the [pom.xml](https://github.com/DeOldSax/iliasDownloaderTool/blob/develop/pom.xml#L12) at line 12 and in [src/main/java/control/IliasManager.java](https://github.com/DeOldSax/iliasDownloaderTool/blob/develop/src/main/java/control/IliasManager.java#L16) at line 16.
 5. Build it with `mvn clean install`.
-6. Start it with `java -jar ./release/IliasDownloaderTool-ube-v1.2.2/Ilias-Downloader-Tool-ube-v1.2.2.jar`.
-
+6. Start it with `java -jar ./release/IliasDownloaderTool-kit-v2/Ilias-Downloader-Tool-kit-v2.jar`.
 
 
 Contribute
 ================
-Feel free to contribute!!!
+If you feel like contributing to fix a bug or support a new Ilias Platform, feel free to do so and throw a pull request at this repo.
+In case you need any help or guidance, feel free to write an email to mail@iliasdownloadertool.de.
