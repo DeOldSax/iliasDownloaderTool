@@ -3,17 +3,17 @@ package control;
 import analytics.ActionType;
 import analytics.AnalyticsLogger;
 import javafx.application.Platform;
+import lombok.extern.slf4j.Slf4j;
 import model.persistance.Flags;
 import model.persistance.IliasTreeProvider;
 import model.persistance.Settings;
-import org.apache.log4j.Logger;
 import plugin.IliasPlugin.LoginStatus;
 import view.Dashboard;
 
+@Slf4j
 public class IliasStarter {
     private String username = null;
     private String password = null;
-    private Logger LOGGER = Logger.getLogger(getClass());
     private Dashboard dashboard;
 
     public IliasStarter(Dashboard dashboard) {
@@ -38,7 +38,7 @@ public class IliasStarter {
             return false;
         }
         if (loginStatusMessage.equals(LoginStatus.CONNECTION_FAILED)) {
-            LOGGER.warn("Connection failed!");
+            log.warn("Connection failed!");
             Dashboard.setStatusText("Verbindung fehlgeschlagen!", true);
             dashboard.showLoader(false);
             return false;
@@ -70,7 +70,7 @@ public class IliasStarter {
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
-                LOGGER.warn(e.getStackTrace());
+                log.warn(e.getMessage(), e);
             }
         }
         Flags flags = Settings.getInstance().getFlags();

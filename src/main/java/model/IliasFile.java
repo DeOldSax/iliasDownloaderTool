@@ -3,13 +3,13 @@ package model;
 import java.util.regex.*;
 
 import javafx.scene.image.*;
+import lombok.extern.slf4j.Slf4j;
 import model.persistance.*;
-
-import org.apache.log4j.*;
 
 import utils.*;
 import control.*;
 
+@Slf4j
 public class IliasFile extends IliasTreeNode {
 
 	private static final long serialVersionUID = -6286982393008142116L;
@@ -50,7 +50,7 @@ public class IliasFile extends IliasTreeNode {
 		if (matcher.find()) {
 			digits = matcher.group(2);
 		} else {
-			Logger.getLogger(getClass()).warn("StoreKey digits not found!");
+			log.warn("StoreKey digits not found!");
 		}
 
 		return digits;

@@ -6,20 +6,20 @@ import java.net.*;
 
 import javax.swing.*;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.*;
 import org.apache.http.client.methods.*;
 import org.apache.http.impl.client.*;
 import org.apache.http.util.*;
-import org.apache.log4j.*;
 import org.jsoup.*;
 import org.jsoup.nodes.*;
 import org.jsoup.select.*;
 
+@Slf4j
 public class VersionValidator {
 	private final int YES = 0;
-	private final String VERSION = "v1.2.2";
+	private final String VERSION = "v2";
 	private String LATEST_VERSION;
-	private Logger LOGGER = Logger.getLogger(getClass());
 
 	public boolean validate() {
 
@@ -42,7 +42,7 @@ public class VersionValidator {
 			}
 
 		} catch (IOException e) {
-			LOGGER.warn("HttpConnection failed --> no version check", e);
+			log.warn("HttpConnection failed --> no version check", e);
 			return false;
 		}
 		request.releaseConnection();
@@ -59,7 +59,7 @@ public class VersionValidator {
 				try {
 					Desktop.getDesktop().browse(new URI("www.iliasdownloadertool.de"));
 				} catch (IOException | URISyntaxException e) {
-					LOGGER.warn(e.getMessage(), e);
+					log.warn(e.getMessage(), e);
 				}
 			} else {
 				JOptionPane.showMessageDialog(null, "www.iliasdownloadertool.de", "follow link",

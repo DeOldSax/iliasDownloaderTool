@@ -4,16 +4,17 @@ import java.io.*;
 
 import javafx.application.*;
 import javafx.concurrent.*;
+import lombok.extern.slf4j.Slf4j;
 import model.*;
 
 import org.apache.http.*;
 import org.apache.http.client.methods.*;
 import org.apache.http.protocol.*;
-import org.apache.log4j.*;
 
 import view.*;
 import control.*;
 
+@Slf4j
 public class IliasFileDownloaderTask extends Task<Void> {
 	private HttpGet request;
 	private HttpResponse response;
@@ -36,6 +37,10 @@ public class IliasFileDownloaderTask extends Task<Void> {
 			entity = response.getEntity();
 
 			BufferedInputStream in = new BufferedInputStream(entity.getContent());
+			// remove invalid file endings
+			String targetPath = this.targetPath.endsWith(".")
+					? this.targetPath.substring(0, this.targetPath.length() - 1)
+					: this.targetPath;
 			BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(new File(
 					targetPath)));
 
@@ -49,7 +54,7 @@ public class IliasFileDownloaderTask extends Task<Void> {
 
 			request.releaseConnection();
 		} catch (IOException e) {
-			Logger.getLogger(getClass()).warn("", e);
+			log.warn(e.getMessage(), e);
 		}
 
 		LocalFileStorage.getInstance().addIliasFile(file, targetPath);

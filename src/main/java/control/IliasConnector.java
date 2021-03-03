@@ -3,20 +3,20 @@ package control;
 import java.io.*;
 import java.util.*;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.*;
 import org.apache.http.client.*;
 import org.apache.http.client.methods.*;
 import org.apache.http.conn.HttpHostConnectException;
 import org.apache.http.protocol.*;
 import org.apache.http.util.*;
-import org.apache.log4j.*;
 
+@Slf4j
 public class IliasConnector {
 	private HttpGet request;
 	private HttpResponse response;
 	private HttpEntity entity;
 	private BasicHttpContext context;
-	private Logger LOGGER = Logger.getLogger(getClass());
 
 	public String requestGet(String url) {
 
@@ -34,7 +34,7 @@ public class IliasConnector {
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			LOGGER.warn(e.getStackTrace());
+			log.warn(e.getMessage(), e);
 		}
 		return html;
 	}
@@ -46,12 +46,12 @@ public class IliasConnector {
 		try {
 			response = IliasManager.getInstance().getIliasClient().execute(head, context);
 		} catch (HttpHostConnectException e) {
-			LOGGER.warn("connection timout while fetching file size", e);
+			log.warn("connection timout while fetching file size", e);
 			return 0;
 		} catch (ClientProtocolException e) {
-			LOGGER.warn("", e);
+			log.warn(e.getMessage(), e);
 		} catch (IOException e) {
-			LOGGER.warn("", e);
+			log.warn(e.getMessage(), e);
 		}
 
 		int size = 0;
@@ -59,8 +59,8 @@ public class IliasConnector {
 			Header[] fileSize = response.getHeaders("Content-Length");
 			size = Integer.parseInt(fileSize[0].getValue());
 		} else {
-			LOGGER.warn("Headers: " + Arrays.toString(response.getAllHeaders()));
-			LOGGER.warn("\nNo Filesize found for URL: " + url);
+			log.warn("Headers: " + Arrays.toString(response.getAllHeaders()));
+			log.warn("\nNo Filesize found for URL: " + url);
 		}
 		return size;
 	}

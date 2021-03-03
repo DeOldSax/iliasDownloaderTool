@@ -17,15 +17,16 @@ import javafx.scene.layout.*;
 import javafx.scene.web.*;
 import javafx.stage.*;
 import javafx.util.*;
+import lombok.extern.slf4j.Slf4j;
 import model.*;
 import model.persistance.*;
 
-import org.apache.log4j.*;
 import org.bouncycastle.jce.provider.*;
 import org.controlsfx.control.textfield.*;
 
 import control.*;
 
+@Slf4j
 public class Dashboard extends Application {
 
 	private Dashboard dashboard;
@@ -61,8 +62,7 @@ public class Dashboard extends Application {
 		analyticsLogger.log(ActionType.START);
 
 		new File(System.getProperty("user.home") + "/.ilias/ilias.log").delete();
-		PropertyConfigurator.configure(Dashboard.class.getResourceAsStream("log4j.properties"));
-		Logger.getLogger(Dashboard.class).warn("Start IliasDownloaderTool.");
+		log.info("Start IliasDownloaderTool");
 
 		boolean newVersionCalled = new VersionValidator().validate();
 		if (newVersionCalled) {

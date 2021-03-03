@@ -2,6 +2,8 @@ package plugin;
 
 import java.io.*;
 import java.util.*;
+
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.*;
 import org.apache.http.client.*;
 import org.apache.http.client.entity.*;
@@ -9,16 +11,15 @@ import org.apache.http.client.methods.*;
 import org.apache.http.message.*;
 import org.apache.http.protocol.*;
 import org.apache.http.util.*;
-import org.apache.log4j.*;
 import org.jsoup.*;
 import org.jsoup.nodes.*;
 
+@Slf4j
 public class KITIlias extends IliasPlugin {
 
 	private HttpPost post;
 	private HttpResponse response;
 	private HttpEntity entity;
-	private Logger LOGGER = Logger.getLogger(getClass());
 	private String dashboardHTML;
 	private BasicHttpContext context;
 	private List<NameValuePair> nvps;
@@ -43,16 +44,18 @@ public class KITIlias extends IliasPlugin {
 			try {
 				html = EntityUtils.toString(entity);
 			} catch (IOException | ParseException e) {
-				LOGGER.warn(e.getStackTrace());
+				log.warn(e.getMessage(), e);
 			}
 
 			Document doc = Jsoup.parse(html);
 			Element form = doc.select("form[action*=idp").first();
+			Element csrf = doc.select("[name=csrf_token]").first();
 
 			post = new HttpPost("https://idp.scc.kit.edu" + form.attr("action"));
 			nvps.add(new BasicNameValuePair("_eventId_proceed", ""));
 			nvps.add(new BasicNameValuePair("j_username", username));
 			nvps.add(new BasicNameValuePair("j_password", password));
+			nvps.add(new BasicNameValuePair("csrf_token", csrf.attr("value")));
 			post.setEntity(new UrlEncodedFormEntity(nvps, Consts.UTF_8));
 
 			executePost();
@@ -60,7 +63,7 @@ public class KITIlias extends IliasPlugin {
 			try {
 				html = EntityUtils.toString(entity);
 			} catch (IOException | ParseException e) {
-				LOGGER.warn(e.getStackTrace());
+				log.warn(e.getMessage(), e);
 			}
 
 			doc = Jsoup.parse(html);
@@ -92,7 +95,7 @@ public class KITIlias extends IliasPlugin {
 					this.dashboardHTML = htmlStartpage;
 				}
 			} catch (ParseException | IOException e) {
-				LOGGER.warn(e.getStackTrace());
+				log.warn(e.getMessage(), e);
 			}
 		} finally {
 			post.releaseConnection();
@@ -106,10 +109,10 @@ public class KITIlias extends IliasPlugin {
 			this.response = this.client.execute(this.post, this.context);
 		} catch (ClientProtocolException e) {
 			e.printStackTrace();
-			this.LOGGER.warn(e.getStackTrace());
+			log.warn(e.getMessage(), e);
 		} catch (IOException e) {
 			e.printStackTrace();
-			this.LOGGER.warn(e.getStackTrace());
+			log.warn(e.getMessage(), e);
 		} finally {
 			this.entity = this.response.getEntity();
 		}

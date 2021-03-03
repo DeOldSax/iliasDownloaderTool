@@ -7,13 +7,13 @@ import java.security.*;
 import javax.crypto.*;
 import javax.crypto.spec.*;
 
-import org.apache.log4j.*;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class Storer {
 
 	private String storePath;
 	private Key key;
-	private static final Logger LOGGER = Logger.getLogger(Storer.class);
 
 	public Storer(String storePath) {
 		this.storePath = storePath;
@@ -69,9 +69,9 @@ public class Storer {
 			out.writeObject(object);
 			out.close();
 		} catch (FileNotFoundException e) {
-			LOGGER.error(e);
+			log.error(e.getMessage(), e);
 		} catch (IOException e) {
-			LOGGER.error(e);
+			log.error(e.getMessage(), e);
 		}
 	}
 
@@ -89,11 +89,11 @@ public class Storer {
 			object = o.readObject();
 			o.close();
 		} catch (FileNotFoundException e) {
-			LOGGER.error(e);
+			log.error(e.getMessage(), e);
 		} catch (IOException e) {
-			LOGGER.error(e);
+			log.error(e.getMessage(), e);
 		} catch (ClassNotFoundException e) {
-			LOGGER.error(e);
+			log.error(e.getMessage(), e);
 		}
 		return object;
 	}
@@ -116,7 +116,7 @@ public class Storer {
 			sealedObject = new SealedObject(object, cipher);
 		} catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException
 				| IllegalBlockSizeException | IOException | InvalidAlgorithmParameterException e1) {
-			LOGGER.warn("No Cipher.", e1);
+			log.error("No Cipher.", e1);
 			e1.printStackTrace();
 		}
 		return sealedObject;
@@ -144,7 +144,7 @@ public class Storer {
 		} catch (ClassCastException | NoSuchAlgorithmException | NoSuchPaddingException
 				| InvalidKeyException | IllegalBlockSizeException | IOException
 				| ClassNotFoundException | BadPaddingException | InvalidAlgorithmParameterException e1) {
-			LOGGER.warn("No Cipher.", e1);
+			log.error("No Cipher.", e1);
 			e1.printStackTrace();
 			return null;
 		}
