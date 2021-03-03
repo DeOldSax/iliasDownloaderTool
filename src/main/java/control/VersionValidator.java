@@ -18,7 +18,7 @@ import org.jsoup.select.*;
 @Slf4j
 public class VersionValidator {
 	private final int YES = 0;
-	private final String VERSION = "v1.2.2";
+	private final String VERSION = "v2";
 	private String LATEST_VERSION;
 
 	public boolean validate() {
