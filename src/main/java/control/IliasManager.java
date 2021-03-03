@@ -4,6 +4,8 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import plugin.*;
 import plugin.IliasPlugin.LoginStatus;
 
+import java.util.HashMap;
+
 public class IliasManager {
 
 	private IliasPlugin ilias;
@@ -11,21 +13,27 @@ public class IliasManager {
 	private static IliasManager iliasManager;
 
 	private IliasManager() {
-		// this.ilias = new KITIlias();
-		// this.ilias = new StuggeIlias();
-		// this.ilias = new TuebIlias();
-		this.ilias = new KNIlias();
-		// this.ilias = new PHTGIlias();
-		// this.ilias = new HSFIlias();
-		// this.ilias = new WBSIlias();
-		// this.ilias = new DemoIlias();
-		// this.ilias = new UniBernIlias();
+		String magicVariable = "kn";
+
+		HashMap<String, IliasPlugin> map = new HashMap<>();
+		map.put("kn", new KNIlias());
+		map.put("kit", new KITIlias());
+		map.put("demo", new DemoIlias());
+		map.put("hsf", new HSFIlias());
+		map.put("tueb", new TuebIlias());
+		map.put("wbs", new WBSIlias());
+		map.put("ube", new UniBernIlias());
+		map.put("phtg", new PHTGIlias());
+		map.put("stugge", new StuggeIlias());
+
+		this.ilias = map.get(magicVariable);
 	}
 
 	public static IliasManager getInstance() {
 		if (iliasManager == null) {
 			iliasManager = new IliasManager();
 		}
+
 		return iliasManager;
 	}
 
