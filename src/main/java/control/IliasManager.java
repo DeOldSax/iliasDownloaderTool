@@ -1,11 +1,23 @@
 package control;
 
+import analytics.AnalyticsLogger;
+import lombok.extern.slf4j.Slf4j;
+import model.persistance.Plugin;
+import model.persistance.Settings;
 import org.apache.http.impl.client.CloseableHttpClient;
 import plugin.*;
 import plugin.IliasPlugin.LoginStatus;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.Properties;
 
+@Slf4j
 public class IliasManager {
 
 	private IliasPlugin ilias;
@@ -13,9 +25,9 @@ public class IliasManager {
 	private static IliasManager iliasManager;
 
 	private IliasManager() {
-		String magicVariable = "kn";
+        Plugin plugin = Settings.getInstance().getPlugin();
 
-		HashMap<String, IliasPlugin> map = new HashMap<>();
+        HashMap<String, IliasPlugin> map = new HashMap<>();
 		map.put("kn", new KNIlias());
 		map.put("kit", new KITIlias());
 		map.put("demo", new DemoIlias());
@@ -25,8 +37,8 @@ public class IliasManager {
 		map.put("ube", new UniBernIlias());
 		map.put("phtg", new PHTGIlias());
 		map.put("stugge", new StuggeIlias());
-
-		this.ilias = map.get(magicVariable);
+        map.put("fhdo", new FHDortmundIlias());
+		this.ilias = map.get(plugin.getName() == null ? "kn" : plugin.getName());
 	}
 
 	public static IliasManager getInstance() {

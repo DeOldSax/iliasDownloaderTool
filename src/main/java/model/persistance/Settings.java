@@ -23,10 +23,12 @@ public class Settings {
 	private Storer storer;
 	private List<Storable> storableObjects;
 
+    private String IliasManager;
 	private User user;
 	private Flags flags;
 	private FileStates fileStates;
 	private IliasFolderSettings iliasFolderSettings;
+    private Plugin plugin;
 
 	private Settings() {
 		storableObjects = new ArrayList<Storable>();
@@ -39,6 +41,17 @@ public class Settings {
 		}
 		return instance;
 	}
+
+    public Plugin getPlugin() {
+        if (plugin == null) {
+            plugin = (Plugin) load(new Plugin());
+            if (plugin == null) {
+                plugin = new Plugin();
+            }
+            storableObjects.add(plugin);
+        }
+        return plugin;
+    }
 
 	public User getUser() {
 		if (user == null) {
@@ -86,11 +99,7 @@ public class Settings {
 	}
 
 	public void toggleFileIgnored(IliasFile file) {
-		if (file.isIgnored()) {
-			file.setIgnored(false);
-		} else {
-			file.setIgnored(true);
-		}
+        file.setIgnored(!file.isIgnored());
 	}
 
 	private Storable load(Storable storeable) {

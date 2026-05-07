@@ -50,7 +50,7 @@ public class IliasScraper {
 		List<IliasFolder> courses = new ArrayList<>();
 		String s = null;
 		Document doc = Jsoup.parse(dashboardHtml);
-		List<Element> temp = doc.select("h4");
+        List<Element> temp = doc.select("h4");
 
 		for (Element x : temp) {
 			s = s + x.toString();
@@ -68,9 +68,12 @@ public class IliasScraper {
 			if (url.toLowerCase().contains("baseclass=ilrepositorygui") // kit + tueb + wbs
 				|| url.toLowerCase().contains("stuttgart_crs") // stuttgart
 				|| url.toLowerCase().contains("uni_crs") // konstanz
+                || url.toLowerCase().contains("fhdo_crs") // FH DO
 				|| url.toLowerCase().contains("unibe_crs") // uni bern
 				|| url.toLowerCase().contains("goto_hsf") // hsf
-				|| url.toLowerCase().contains("cmdclass=ilrepositorygui")) // phtg
+				|| url.toLowerCase().contains("cmdclass=ilrepositorygui") // phtg
+                || url.toLowerCase().contains("/go/crs")
+            )
 			{
 				String name = IliasCourseFormatter.formatCourseName(aTag.text());
 				courses.add(new IliasFolder(name, url, null));
@@ -104,9 +107,12 @@ public class IliasScraper {
 					final boolean linkToFolder = dir.attr("href").contains("cmd=view") // kit + wbs
 							|| dir.attr("href").toLowerCase().contains("stuttgart_fold") // stuttgart
 							|| dir.attr("href").toLowerCase().contains("hsf_fold") // hsf
+                            || dir.attr("href").toLowerCase().contains("fhdo_fold") // fh do
+                            || dir.attr("href").toLowerCase().contains("fhdo_grp") // fh do group
+                            || dir.attr("href").toLowerCase().contains("/go/fold/") // fh do folder
 							|| dir.attr("href").toLowerCase().contains("unibe_fold") // uni bern
 							|| dir.attr("href").toLowerCase().contains("uni_fold"); // konstanz
-					final boolean linkToFile = dir.attr("href").contains("download");
+					final boolean linkToFile = dir.attr("href").contains("download") || dir.attr("href").contains("cmd=sendfile") ;
 					final boolean linkToForum = dir.attr("href").contains("cmd=showThreads");
 					final boolean linkToHyperlink = false;
 
@@ -160,7 +166,8 @@ public class IliasScraper {
 			List<Element> directory;
 			final String newHtmlContent = new IliasConnector().requestGet(kurs.getUrl());
 			Document doc = Jsoup.parse(newHtmlContent);
-			directory = doc.select("h4").select("a");
+            // Ilias seems to have switched to h3 in newer versions. Required to use h3 for FH Dormtund
+			directory = doc.select("h4, h3").select("a");
 			return directory;
 		}
 

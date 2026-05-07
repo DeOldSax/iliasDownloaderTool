@@ -5,20 +5,29 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.stream.IntStream;
 
 import javafx.animation.FadeTransition;
 import javafx.animation.Timeline;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import model.persistance.Flags;
+import model.persistance.Plugin;
 import model.persistance.Settings;
 
 import org.controlsfx.control.PopOver;
@@ -33,6 +42,8 @@ public class SettingsMenu extends PopOver/* implements EventHandler<ActionEvent>
 	private Button connectSecure;
 	private static FadeTransition t;
 	private static Dashboard dashboard;
+
+    private ComboBox<Plugin> pluginComboBox;
 
 	public SettingsMenu(Dashboard dashboard) {
 		SettingsMenu.dashboard = dashboard;
@@ -55,55 +66,62 @@ public class SettingsMenu extends PopOver/* implements EventHandler<ActionEvent>
 	}
 
 	private void initDialog() {
+// Row 0 – "Fertig" button
+        final Button hideSettingsMenu = new Button("Fertig");
+        hideSettingsMenu.setId("greenButton");
+        hideSettingsMenu.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                hide();
+            }
+        });
+        gridPane.add(hideSettingsMenu, 0, 0);
 
-		final Button hideSettingsMenu = new Button("Fertig");
-		hideSettingsMenu.setId("greenButton");
-		hideSettingsMenu.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent event) {
-				hide();
-			}
-		});
-		gridPane.add(hideSettingsMenu, 0, 0);
+        // Row 2 – Local Ilias folder
+        Label selectIliasLocalBtn = new Label("Mein Lokaler Ilias Ordner            ");
+        gridPane.add(selectIliasLocalBtn, 0, 2);
 
-		Label selectIliasLocalBtn = new Label("Mein Lokaler Ilias Ordner            ");
-		gridPane.add(selectIliasLocalBtn, 0, 2);
+        localIliasPath = new Button();
+        localIliasPath.setOnAction(event -> showFileChooser());
 
-		localIliasPath = new Button();
-		localIliasPath.setOnAction(event -> {
-			showFileChooser();
-		});
+        Button help = new Button("?");
+        help.setId("greenButton");
+        help.setOnAction(event -> {
+            PopOver helpText = new PopOver();
+            helpText.setArrowSize(0);
+            helpText.getScene().getRoot().getStyleClass().add("main-root");
+            helpText.setDetachable(false);
+            Label text = new Label("Der lokale ILIAS-Ordner ist der Ordner, "
+                    + "in dem du auf deinem Computer deine Dateien" + " aus dem ILIAS speicherst.\nDiese Angabe wird "
+                    + "ben\u00F6tigt, damit ein Abgleich stattfinden kann, "
+                    + "welche Dateien du bereits besitzt und welche noch nicht."
+                    + "\nDie Benennung deiner Unterordner oder Dateien spielt dabei keine Rolle.");
+            text.setPadding(new Insets(10, 10, 10, 10));
+            Button okBtn = new Button("X");
+            okBtn.setOnAction(event2 -> helpText.hide());
+            HBox box = new HBox();
+            box.getChildren().addAll(text, okBtn);
+            helpText.setContentNode(box);
+            helpText.show(help);
+        });
 
-		Button help = new Button("?");
-		help.setId("greenButton");
-		help.setOnAction(event -> {
-			PopOver helpText = new PopOver();
-			helpText.setArrowSize(0);
-			helpText.getScene().getRoot().getStyleClass().add("main-root");
-			helpText.setDetachable(false);
-			Label text = new Label("Der lokale ILIAS-Ordner ist der Ordner, "
-					+ "in dem du auf deinem Computer deine Dateien" + " aus dem ILIAS speicherst.\nDiese Angabe wird "
-					+ "ben\u00F6tigt, damit ein Abgleich stattfinden kann, "
-					+ "welche Dateien du bereits besitzt und welche noch nicht."
-					+ "\nDie Benennung deiner Unterordner oder Dateien spielt dabei keine Rolle.");
-			text.setPadding(new Insets(10, 10, 10, 10));
-			Button okBtn = new Button("X");
-			okBtn.setOnAction(event2 -> {
-				helpText.hide();
-			});
-			HBox box = new HBox();
-			box.getChildren().addAll(text, okBtn);
-			helpText.setContentNode(box);
-			helpText.show(help);
-		});
+        HBox boxX = new HBox();
+        boxX.setSpacing(20);
+        boxX.getChildren().addAll(localIliasPath, help);
+        gridPane.add(boxX, 1, 2);
 
-		HBox boxX = new HBox();
-		boxX.setSpacing(20);
-		boxX.getChildren().addAll(localIliasPath, help);
 
-		gridPane.add(boxX, 1, 2);
 
-		Label startActions = new Label("Bei jedem Start ausführen          ");
+        // ── Row 3 – Plugin selector (NEW) ────────────────────────────────────
+        Label pluginLabel = new Label("Plugin auswählen                       ");
+        gridPane.add(pluginLabel, 0, 3);
+
+        pluginComboBox = buildPluginComboBox();
+        gridPane.add(pluginComboBox, 1, 3);
+
+
+
+        Label startActions = new Label("Bei jedem Start ausführen          ");
 		autoLogin = new Button("Anmelden");
 		final EventHandler<ActionEvent> toggleButton = new EventHandler<ActionEvent>() {
 			@Override
@@ -307,4 +325,72 @@ public class SettingsMenu extends PopOver/* implements EventHandler<ActionEvent>
 			return;
 		}
 	}
+
+    private ComboBox<Plugin> buildPluginComboBox() {
+        ObservableList<Plugin> plugins = FXCollections.observableArrayList(
+                new Plugin("kn", "Universität Konstanz"),
+                new Plugin("kit", "Karlsruher Institut für Technologie"),
+                new Plugin("demo", "Demo (christian:iliasdemo)"),
+                new Plugin("hsf", "Hochschule Fresenius"),
+                new Plugin("tueb", "Eberhard Karls Universität Tübingen"),
+                new Plugin("wbs", "WBS Training"),
+                new Plugin("ube", "Universität Bern"),
+                new Plugin("phtg", "Pädagogische Hochschule Thurgau"),
+                new Plugin("stugge", "Universität Stuttgart"),
+                new Plugin("fhdo", "Fachhochschule Dortmund")
+        );
+        Plugin preselectedPlugin = Settings.getInstance().getPlugin();
+        int index = IntStream.range(0, plugins.size())
+                .filter(i -> plugins.get(i).getName().equals(preselectedPlugin.getName()))
+                .findFirst()
+                .orElse(-1);
+        ComboBox<Plugin> combo = new ComboBox<>(plugins);
+        combo.getSelectionModel().select(index);
+        combo.setPromptText("— Plugin auswählen —");
+        combo.setPrefWidth(250);
+
+        // Rich cell in the drop-down list
+        combo.setCellFactory(lv -> new ListCell<Plugin>() {
+            protected void updateItem(Plugin plugin, boolean empty) {
+                super.updateItem(plugin, empty);
+                if (empty || plugin == null) {
+                    setText(null);
+                    setGraphic(null);
+                } else {
+                    VBox cell = new VBox(2);
+                    Label nameLabel = new Label(plugin.getName());
+                    nameLabel.setFont(Font.font("System", FontWeight.BOLD, 13));
+                    cell.getChildren().addAll(nameLabel);
+                    setGraphic(cell);
+                    setText(null);
+                }
+            }
+        });
+
+        // Compact display when collapsed
+        combo.setButtonCell(new ListCell<Plugin>() {
+            protected void updateItem(Plugin plugin, boolean empty) {
+                super.updateItem(plugin, empty);
+                setText(empty || plugin == null ? "— Plugin auswählen —" : plugin.getDisplay());
+            }
+        });
+
+        // Optional: react to selection
+        combo.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null) {
+                System.out.println("Plugin gewählt: " + newVal.getDisplay());
+                // TODO: hand the selected plugin to your plugin-loading logic
+                Plugin plugin = Settings.getInstance().getPlugin();
+                plugin.setName(newVal.getName());
+                plugin.setDisplay(newVal.getDisplay());
+            }
+        });
+
+        return combo;
+    }
+
+    /** Returns the currently selected plugin, or null if none is chosen. */
+    public Plugin getSelectedPlugin() {
+        return pluginComboBox != null ? pluginComboBox.getValue() : null;
+    }
 }

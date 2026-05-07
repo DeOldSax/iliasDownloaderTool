@@ -5,3 +5,5 @@
 /.project
 /release
 /target
+
+.DS_Store

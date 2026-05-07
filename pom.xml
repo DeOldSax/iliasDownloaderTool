@@ -7,9 +7,6 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<!-- select one for build + select plugin in IliasManager.java -->
-		<!-- supported: demo kit tueb stugge kn phtg hsf wbs ube-->
-		<project.university>ube</project.university>
 	</properties>
 
     <organization>
@@ -39,7 +36,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.16</version>
+            <version>1.18.30</version>
         </dependency>
 
         <dependency>
@@ -114,7 +111,7 @@
                         </goals>
                         <configuration>
                             <outputDirectory>
-                                release/IliasDownloaderTool-${project.university}-${project.version}/lib
+                                release/IliasDownloaderTool-${project.version}/lib
                             </outputDirectory>
                         </configuration>
                     </execution>
@@ -132,10 +129,10 @@
                         <configuration>
                             <target>
                                 <copy file="target/Ilias-${project.version}.jar"
-                                      tofile="release/IliasDownloaderTool-${project.university}-${project.version}/Ilias-Downloader-Tool-${project.university}-${project.version}.jar">
+                                      tofile="release/IliasDownloaderTool-${project.version}/Ilias-Downloader-Tool-${project.version}.jar">
                                 </copy>
-                                <zip destfile="release/IliasDownloaderTool-${project.university}-${project.version}.zip"
-                                     basedir="release/IliasDownloaderTool-${project.university}-${project.version}"
+                                <zip destfile="release/IliasDownloaderTool-${project.version}.zip"
+                                     basedir="release/IliasDownloaderTool-${project.version}"
                                 />
                             </target>
                         </configuration>
